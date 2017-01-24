@@ -9,7 +9,7 @@ Provides a client-side library for interacting with Blackbaud authentication.
 
 ## Usage
 
-### Standalone (TypeScript)
+### Standalone (ES6/TypeScript)
 
 There are two classes available in this package: `BBAuth` and `BBOmnibar`.  `BBAuth` allows you to retrieve an auth token from the Blackbaud authentication service, and `BBOmnibar` allows you to render the omnibar at the top of the page.
 
@@ -29,29 +29,21 @@ BBAuth.getToken()
 
     // Add additional logic to bootstrap the rest of the application.
   });
-
 ```
 
-### With SKY UX Builder
-
-You can easily wire in the initial auth token check as a step to a SKY UX project's boostrap logic.  In the event that the user is not logged in, this will prevent the rest of the application from being bootstrapped.
+To make authorized requests to your web service endpoints you will also use the `BBAuth.getToken()` method to retrieve a token that can be added as a header to your request.  Since retrieving a token is an asynchronous operation, this method returns a `Promise`, so you should wait until the Promise is resolved before making your web request.
 
 ```
-import { SkyAppBootstrapper } from '@blackbaud/skyux-builder/runtime';
-import { BBAuth, BBOmnibar } from '@blackbaud/auth-client';
+import { BBAuth } from '@blackbaud/auth-client';
 
-// Make an initial attempt to get an auth token.  If the user is not currently logged in,
-// this code will redirect the browser to Blackbaud's sign-in page.
-let tokenPromise = BBAuth.getToken();
+BBAuth.getToken()
+  .then((token: string) => {
+    const xhr = new XMLHttpRequest();
 
-tokenPromise.then(() => {
-  // The user is logged in; load the omnibar.
-  BBOmnibar.load({
-    serviceName: 'Some service name'
+    xhr.open('GET', url, true);
+
+    xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+
+    xhr.send();
   });
-});
-
-// Hand the token Promise to the SKY UX application bootstrapper so the application is
-// only bootstrapped if the user is logged in.
-SkyAppBootstrapper.bootstrapper = tokenPromise;
 ```
