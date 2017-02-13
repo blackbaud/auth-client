@@ -1,49 +1,90 @@
-declare const BBAUTH: any;
-
 export class BBOmnibar {
-  public static load(config: any): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      function registerScript(url: string): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
-          let scriptEl = document.createElement('script');
+  public static load(userToken: string): Promise<any> {
+    return new Promise<any>((resolve: any, reject: any) => {
+      const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
+      const CLS_LOADING = 'sky-omnibar-loading';
 
-          scriptEl.onload = resolve;
-          scriptEl.onerror = reject;
+      const styleEl = document.createElement('style');
+      styleEl.innerText = `
+    body {
+      margin-top: 50px;
+    }
 
-          scriptEl.src = url;
+    .sky-omnibar-iframe,
+    .sky-omnibar-placeholder {
+      border: none;
+      height: 50px;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
 
-          document.body.appendChild(scriptEl);
-        });
+    .sky-omnibar-placeholder {
+      background-color: #4d5259;
+      border-top: 5px solid #00b4f1;
+      display: none;
+    }
+
+    .sky-omnibar-placeholder.sky-omnibar-loading {
+      display: block;
+    }
+
+    .sky-omnibar-iframe.sky-omnibar-loading {
+      visibility: hidden;
+    }
+
+    .sky-omnibar-iframe-expanded {
+      height: 100%;
+    }
+      `;
+
+      document.head.appendChild(styleEl);
+
+      const placeholderEl = document.createElement('div');
+      placeholderEl.className = `sky-omnibar-placeholder ${CLS_LOADING}`;
+
+      document.body.appendChild(placeholderEl);
+
+      const iframeEl = document.createElement('iframe');
+      iframeEl.className = `sky-omnibar-iframe ${CLS_LOADING}`;
+      iframeEl.src = 'https://sky.blackbaud-dev.com/omnibar/';
+
+      document.body.appendChild(iframeEl);
+
+      function expandIframe() {
+        iframeEl.classList.add(CLS_EXPANDED);
       }
 
-      registerScript('https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js')
-        .then(() => {
-          return registerScript(
-            'https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js'
-          );
-        })
-        .then(() => {
-          return registerScript(
-            'https://signin.blackbaud.com/Omnibar.min.js'
-          );
-        })
-        .then(() => {
-          document.body.classList.add('bb-omnibar-height-padding');
+      function collapseIframe() {
+        iframeEl.classList.remove(CLS_EXPANDED);
+      }
 
-          let omnibarEl = document.createElement('div');
-          document.body.appendChild(omnibarEl);
+      window.addEventListener('message', function (event) {
+        const message = event.data;
 
-          config = config || {};
+        if (message && message.source === 'skyux-spa-omnibar') {
+          switch (message.messageType) {
+            case 'ready':
+              placeholderEl.classList.remove(CLS_LOADING);
+              iframeEl.classList.remove(CLS_LOADING);
 
-          config['z-index'] = 1000;
-          config.afterLoad = resolve;
-
-          BBAUTH.Omnibar.load(
-            omnibarEl,
-            config
-          );
-        });
-
+              resolve();
+              break;
+            case 'expand':
+              expandIframe();
+              break;
+            case 'collapse':
+              collapseIframe();
+              break;
+            case 'navigate':
+              location.href = message.url;
+              break;
+          }
+        }
+      });
     });
   }
 }
