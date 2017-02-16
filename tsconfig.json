@@ -13,6 +13,7 @@
   "files": [
     "index.ts",
     "auth.ts",
-    "omnibar.ts"
+    "omnibar.ts",
+    "omnibar-nav-item.ts"
   ]
 }

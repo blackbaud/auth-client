@@ -1,5 +1,7 @@
+import { BBOmnibarNavItem } from './omnibar-nav-item';
+
 export class BBOmnibar {
-  public static load(userToken: string): Promise<any> {
+  public static load(config: any, nav: any): Promise<any> {
     return new Promise<any>((resolve: any, reject: any) => {
       const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
       const CLS_LOADING = 'sky-omnibar-loading';
@@ -62,7 +64,40 @@ export class BBOmnibar {
         iframeEl.classList.remove(CLS_EXPANDED);
       }
 
-      window.addEventListener('message', function (event) {
+      function myPostMessage(message: any) {
+        message.source = 'auth-client';
+        iframeEl.contentWindow.postMessage(message, '*');
+      }
+
+      function handleStateChange() {
+        myPostMessage({
+          messageType: 'location-change',
+          href: document.location.href
+        });
+      }
+
+      function monkeyPatchState() {
+        let oldPushState = history.pushState;
+        let oldReplaceState = history.replaceState;
+
+        history.pushState = function () {
+          let result = oldPushState.apply(history, arguments);
+
+          handleStateChange();
+
+          return result;
+        };
+
+        history.replaceState = function () {
+          let result = oldReplaceState.apply(history, arguments);
+
+          handleStateChange();
+
+          return result;
+        };
+      }
+
+      window.addEventListener('message', (event: MessageEvent) => {
         const message = event.data;
 
         if (message && message.source === 'skyux-spa-omnibar') {
@@ -70,6 +105,18 @@ export class BBOmnibar {
             case 'ready':
               placeholderEl.classList.remove(CLS_LOADING);
               iframeEl.classList.remove(CLS_LOADING);
+
+              iframeEl.contentWindow.postMessage(
+                {
+                  source: 'auth-client',
+                  messageType: 'nav-ready',
+                  localNavItems: nav.localNavItems
+                },
+                '*'
+              );
+
+              monkeyPatchState();
+              handleStateChange();
 
               resolve();
               break;
@@ -79,8 +126,16 @@ export class BBOmnibar {
             case 'collapse':
               collapseIframe();
               break;
-            case 'navigate':
+            case 'navigate-url':
               location.href = message.url;
+              break;
+            case 'navigate':
+              const navItem: BBOmnibarNavItem = message.navItem;
+
+              if (!nav.beforeNavCallback || nav.beforeNavCallback(navItem) !== false) {
+                location.href = navItem.url;
+              }
+
               break;
           }
         }
