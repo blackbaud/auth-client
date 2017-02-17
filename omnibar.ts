@@ -1,7 +1,10 @@
-import { BBOmnibarNavItem } from './omnibar-nav-item';
+import { BBOmnibarConfig } from './omnibar-config';
+import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 
 export class BBOmnibar {
-  public static load(config: any, nav: any): Promise<any> {
+  public static load(config: BBOmnibarConfig): Promise<any> {
+    const nav = config.nav;
+
     return new Promise<any>((resolve: any, reject: any) => {
       const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
       const CLS_LOADING = 'sky-omnibar-loading';
@@ -110,7 +113,7 @@ export class BBOmnibar {
                 {
                   source: 'auth-client',
                   messageType: 'nav-ready',
-                  localNavItems: nav.localNavItems
+                  localNavItems: nav && nav.localNavItems
                 },
                 '*'
               );
@@ -130,7 +133,7 @@ export class BBOmnibar {
               location.href = message.url;
               break;
             case 'navigate':
-              const navItem: BBOmnibarNavItem = message.navItem;
+              const navItem: BBOmnibarNavigationItem = message.navItem;
 
               if (!nav.beforeNavCallback || nav.beforeNavCallback(navItem) !== false) {
                 location.href = navItem.url;
