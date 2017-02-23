@@ -13,6 +13,9 @@
   "files": [
     "index.ts",
     "auth.ts",
-    "omnibar.ts"
+    "omnibar.ts",
+    "omnibar-config.ts",
+    "omnibar-navigation.ts",
+    "omnibar-navigation-item.ts"
   ]
 }

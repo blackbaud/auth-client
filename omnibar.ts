@@ -1,14 +1,20 @@
 declare const BBAUTH: any;
 
+import { BBOmnibarExperimental } from './omnibar-experimental';
+
 export class BBOmnibar {
   public static load(config: any): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
+    if (config && config.experimental) {
+      return BBOmnibarExperimental.load(config);
+    }
+
+    return new Promise<any>((resolve: any, reject: any) => {
       function registerScript(url: string): Promise<any> {
-        return new Promise<any>((resolve, reject) => {
+        return new Promise<any>((resolveInner: any, rejectInner: any) => {
           let scriptEl = document.createElement('script');
 
-          scriptEl.onload = resolve;
-          scriptEl.onerror = reject;
+          scriptEl.onload = resolveInner;
+          scriptEl.onerror = rejectInner;
 
           scriptEl.src = url;
 
