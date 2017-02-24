@@ -1,6 +1,6 @@
 export class BBAuth {
   private static lastToken: string;
-  private static lastTokenTime: Date;
+  private static expirationTime: number;
 
   public static getToken(): Promise<string> {
     const tokenInteraction = new BBAuthTokenIntegration(
@@ -9,22 +9,22 @@ export class BBAuth {
       'https://signin.blackbaud.com'
     );
 
-    const now = new Date();
+    const now = new Date().valueOf();
 
     if (
       BBAuth.lastToken &&
-      BBAuth.lastTokenTime &&
-      (now.valueOf() - BBAuth.lastTokenTime.valueOf()) < 4 * 60 * 1000 /* 4 minutes */
+      BBAuth.expirationTime &&
+      (BBAuth.expirationTime - now > 60 * 1000) /* Refresh if within 1 minute of expiration */
     ) {
       // Return the stored token.
       return new Promise<string>((resolve: any, reject: any) => {
         resolve(BBAuth.lastToken);
       });
     } else {
-      return tokenInteraction.getToken().then((t: string) => {
-        BBAuth.lastTokenTime = new Date();
-        BBAuth.lastToken = t;
-        return t;
+      return tokenInteraction.getToken().then((tokenResponse: any) => {
+        BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
+        BBAuth.lastToken = tokenResponse['access_token'];
+        return BBAuth.token;
       });
     }
   }
@@ -41,10 +41,10 @@ class BBAuthTokenIntegration {
   public getToken() {
     return new Promise((resolve: any, reject: any) => {
       // First get the CSRF token
-      this.requestToken(this.csrfUrl, 'token_needed', 'csrf_token')
-        .then((csrfToken: string) => {
+      this.requestToken(this.csrfUrl, 'token_needed')
+        .then((csrfResponse: any) => {
           // Next get the access token, and then pass it to the callback.
-          return this.requestToken(this.tokenUrl, csrfToken, 'access_token');
+          return this.requestToken(this.tokenUrl, csrfResponse['csrf_token']);
         })
         .then(resolve)
         .catch(() => {
@@ -54,17 +54,17 @@ class BBAuthTokenIntegration {
     });
   }
 
-  private requestToken(url: string, value: string, responseProp: string) {
+  private requestToken(url: string, csrfValue: string) {
     return new Promise((resolve: any, reject: any) => {
       this.post(
         url,
         {
           name: 'X-CSRF',
-          value: value
+          value: csrfValue
         },
         (text: string) => {
           const response = JSON.parse(text);
-          resolve(response[responseProp]);
+          resolve(response);
         },
         reject
       );
