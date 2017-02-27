@@ -24,7 +24,7 @@ export class BBAuth {
       return tokenInteraction.getToken().then((tokenResponse: any) => {
         BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
         BBAuth.lastToken = tokenResponse['access_token'];
-        return BBAuth.token;
+        return BBAuth.lastToken;
       });
     }
   }
