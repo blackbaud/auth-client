@@ -55,7 +55,7 @@ export class BBOmnibarExperimental {
 
       const iframeEl = document.createElement('iframe');
       iframeEl.className = `sky-omnibar-iframe ${CLS_LOADING}`;
-      iframeEl.src = 'https://sky.blackbaud-dev.com/omnibar/';
+      iframeEl.src = 'https://host.nxt.blackbaud.com/omnibar/';
 
       document.body.appendChild(iframeEl);
 
