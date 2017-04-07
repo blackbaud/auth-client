@@ -4,18 +4,14 @@
     "module": "commonjs",
     "target": "es5",
     "noImplicitAny": true,
-    "outDir": "dist",
+    "sourceMap": true,
+    "types": [
+      "jasmine",
+      "node"
+    ],
     "lib": [
       "dom",
       "es6"
     ]
-  },
-  "files": [
-    "index.ts",
-    "auth.ts",
-    "omnibar.ts",
-    "omnibar-config.ts",
-    "omnibar-navigation.ts",
-    "omnibar-navigation-item.ts"
-  ]
+  }
 }

@@ -4,20 +4,46 @@
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "npm run test:unit",
+    "test:ci": "npm run test:unit:ci",
+    "test:unit": "npm run test:unit:base -- config/karma/local.karma.conf.js",
+    "test:unit:ci": "npm run test:unit:base -- config/karma/ci.karma.conf.js",
+    "test:unit:base": "node --max-old-space-size=4096 node_modules/karma/bin/karma start",
+    "build": "webpack --config config/webpack/webpack.prod.config.js",
+    "watch": "npm run test:unit -- --auto-watch --no-single-run"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blackbaud/skyux-auth.git"
+    "url": "git+https://github.com/blackbaud/auth-client.git"
   },
   "author": "Blackbaud, Inc.",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/blackbaud/skyux-auth/issues"
+    "url": "https://github.com/blackbaud/auth-client/issues"
   },
-  "homepage": "https://github.com/blackbaud/skyux-auth#readme",
+  "homepage": "https://github.com/blackbaud/auth-client#readme",
   "devDependencies": {
+    "@types/core-js": "0.9.41",
+    "@types/jasmine": "2.5.47",
+    "@types/webpack": "2.2.14",
+    "core-js": "2.4.1",
+    "istanbul-instrumenter-loader": "0.1.0",
+    "jasmine": "2.5.3",
+    "karma": "1.5.0",
+    "karma-browserstack-launcher": "1.2.0",
+    "karma-chrome-launcher": "2.0.0",
+    "karma-coverage": "1.1.1",
+    "karma-jasmine": "1.1.0",
+    "karma-mocha-reporter": "2.2.3",
+    "karma-sourcemap-loader": "0.3.7",
+    "karma-webpack": "1.8.0",
+    "raw-loader": "0.5.1",
+    "remap-istanbul": "github:devcrossnet/remap-istanbul",
+    "source-map-inline-loader": "github:blackbaud-bobbyearl/source-map-inline-loader",
+    "ts-loader": "2.0.3",
     "tslint": "4.4.2",
-    "typescript": "2.1.5"
+    "tslint-loader": "3.4.3",
+    "typescript": "2.2.2",
+    "webpack": "2.3.3"
   }
 }
