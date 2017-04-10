@@ -127,7 +127,7 @@ function messageHandler(event: MessageEvent) {
 }
 
 function buildOmnibarUrl() {
-  const qs = [];
+  const qs: string[] = [];
 
   let omnibarUrl = omnibarConfig.url ||
     /* istanbul ignore next */

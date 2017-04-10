@@ -2,8 +2,9 @@
   "name": "@blackbaud/auth-client",
   "version": "1.0.0",
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
-  "main": "src/index.ts",
+  "main": "index.ts",
   "scripts": {
+    "ci": "npm run test:ci && npm run build",
     "test": "npm run test:unit",
     "test:ci": "npm run test:unit:ci",
     "test:unit": "npm run test:unit:base -- config/karma/local.karma.conf.js",
@@ -33,6 +34,7 @@
     "karma-browserstack-launcher": "1.2.0",
     "karma-chrome-launcher": "2.0.0",
     "karma-coverage": "1.1.1",
+    "karma-firefox-launcher": "1.0.1",
     "karma-jasmine": "1.1.0",
     "karma-mocha-reporter": "2.2.3",
     "karma-sourcemap-loader": "0.3.7",
