@@ -4,6 +4,7 @@
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
   "main": "src/index.ts",
   "scripts": {
+    "ci": "npm run test:ci && npm run build",
     "test": "npm run test:unit",
     "test:ci": "npm run test:unit:ci",
     "test:unit": "npm run test:unit:base -- config/karma/local.karma.conf.js",
