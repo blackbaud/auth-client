@@ -17,4 +17,6 @@ script: npm run ci
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+  - node ./scripts/prepare-package
+  - cd dist
   - bash <(curl -s https://blackbaud.github.io/skyux-travis/after-success.sh)

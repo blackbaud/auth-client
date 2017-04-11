@@ -3,8 +3,8 @@ var path = require('path');
 module.exports = {
   entry: './index.ts',
   output: {
-    path: path.resolve(__dirname, '..', '..', 'dist', 'bundle'),
-    filename: 'index.js',
+    path: path.resolve(__dirname, '..', '..', 'dist', 'bundles'),
+    filename: 'auth-client.umd.js',
     library: 'BBAuthClient',
     libraryTarget: 'umd'
   },
@@ -15,7 +15,12 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        loader: 'ts-loader'
+        loader: 'ts-loader',
+        options: {
+          compilerOptions: {
+            declaration: false
+          }
+        }
       }
     ]
   }
