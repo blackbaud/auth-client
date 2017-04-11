@@ -18,6 +18,7 @@ function makePackageFileForDist() {
 
 function copyFilesToDist() {
   fs.copySync(path.join(rootPath, 'README.md'), path.join(distPath, 'README.md'));
+  fs.copySync(path.join(rootPath, 'CHANGELOG.md'), path.join(distPath, 'CHANGELOG.md'));
 }
 
 makePackageFileForDist();
