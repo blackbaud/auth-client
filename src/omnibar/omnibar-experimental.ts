@@ -5,6 +5,8 @@ import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 
+const HOST_ORIGIN = 'https://host.nxt.blackbaud.com';
+
 let placeholderEl: HTMLDivElement;
 let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
@@ -25,7 +27,41 @@ function collapseIframe() {
 
 function addStyleEl() {
   styleEl = document.createElement('style');
-  styleEl.innerText = require('raw-loader!./omnibar-styles.css');
+  styleEl.innerText = `
+body {
+  margin-top: 50px;
+}
+
+.sky-omnibar-iframe,
+.sky-omnibar-placeholder {
+  border: none;
+  height: 50px;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+}
+
+.sky-omnibar-placeholder {
+  background-color: #4d5259;
+  border-top: 5px solid #00b4f1;
+  display: none;
+}
+
+.sky-omnibar-placeholder.sky-omnibar-loading {
+  display: block;
+}
+
+.sky-omnibar-iframe.sky-omnibar-loading {
+  visibility: hidden;
+}
+
+.sky-omnibar-iframe-expanded {
+  height: 100%;
+}
+  `;
 
   document.head.appendChild(styleEl);
 }
@@ -76,47 +112,51 @@ function monkeyPatchState() {
 }
 
 function messageHandler(event: MessageEvent) {
+  if (!BBAuthInterop.messageIsFromOmnibar(event)) {
+    return;
+  }
+
   const message = event.data;
   const nav = omnibarConfig.nav;
 
-  if (message && message.source === 'skyux-spa-omnibar') {
-    switch (message.messageType) {
-      case 'ready':
-        monkeyPatchState();
+  switch (message.messageType) {
+    case 'ready':
+      monkeyPatchState();
 
-        placeholderEl.classList.remove(CLS_LOADING);
-        iframeEl.classList.remove(CLS_LOADING);
+      placeholderEl.classList.remove(CLS_LOADING);
+      iframeEl.classList.remove(CLS_LOADING);
 
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            localNavItems: nav && nav.localNavItems,
-            messageType: 'nav-ready'
-          }
-        );
-
-        handleStateChange();
-
-        promiseResolve();
-        break;
-      case 'expand':
-        expandIframe();
-        break;
-      case 'collapse':
-        collapseIframe();
-        break;
-      case 'navigate-url':
-        BBAuthInterop.navigate(message.url);
-        break;
-      case 'navigate':
-        const navItem: BBOmnibarNavigationItem = message.navItem;
-
-        if (!nav || !nav.beforeNavCallback || nav.beforeNavCallback(navItem) !== false) {
-          BBAuthInterop.navigate(navItem.url);
+      BBAuthInterop.postOmnibarMessage(
+        iframeEl,
+        {
+          envId: omnibarConfig.envId,
+          localNavItems: nav && nav.localNavItems,
+          messageType: 'nav-ready',
+          svcId: omnibarConfig.svcId
         }
+      );
 
-        break;
-    }
+      handleStateChange();
+
+      promiseResolve();
+      break;
+    case 'expand':
+      expandIframe();
+      break;
+    case 'collapse':
+      collapseIframe();
+      break;
+    case 'navigate-url':
+      BBAuthInterop.navigate(message.url);
+      break;
+    case 'navigate':
+      const navItem: BBOmnibarNavigationItem = message.navItem;
+
+      if (!nav || !nav.beforeNavCallback || nav.beforeNavCallback(navItem) !== false) {
+        BBAuthInterop.navigate(navItem.url);
+      }
+
+      break;
   }
 }
 
@@ -126,18 +166,6 @@ function buildOmnibarUrl() {
   let omnibarUrl = omnibarConfig.url ||
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/';
-
-  if (omnibarConfig.svcId) {
-    qs.push('svcid=' + encodeURIComponent(omnibarConfig.svcId));
-  }
-
-  if (omnibarConfig.envId) {
-    qs.push('envid=' + encodeURIComponent(omnibarConfig.envId));
-  }
-
-  if (qs.length) {
-    omnibarUrl += '?' + qs.join('&');
-  }
 
   return omnibarUrl;
 }

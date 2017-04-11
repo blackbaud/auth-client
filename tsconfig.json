@@ -12,6 +12,7 @@
     "lib": [
       "dom",
       "es6"
-    ]
+    ],
+    "outDir": "dist"
   }
 }

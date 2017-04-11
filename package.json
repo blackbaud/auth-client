@@ -2,7 +2,8 @@
   "name": "@blackbaud/auth-client",
   "version": "1.0.0",
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
-  "main": "index.ts",
+  "main": "dist/bundles/auth-client.umd.js",
+  "module": "index.ts",
   "scripts": {
     "ci": "npm run test:ci && npm run build",
     "test": "npm run test:unit",
@@ -10,7 +11,7 @@
     "test:unit": "npm run test:unit:base -- config/karma/local.karma.conf.js",
     "test:unit:ci": "npm run test:unit:base -- config/karma/ci.karma.conf.js",
     "test:unit:base": "node --max-old-space-size=4096 node_modules/karma/bin/karma start",
-    "build": "webpack --config config/webpack/webpack.prod.config.js",
+    "build": "rimraf dist && tsc && webpack --config config/webpack/webpack.prod.config.js",
     "watch": "npm run test:unit -- --auto-watch --no-single-run"
   },
   "repository": {
@@ -28,6 +29,7 @@
     "@types/jasmine": "2.5.47",
     "@types/webpack": "2.2.14",
     "core-js": "2.4.1",
+    "fs-extra": "2.1.2",
     "istanbul-instrumenter-loader": "0.1.0",
     "jasmine": "2.5.3",
     "karma": "1.5.0",
@@ -41,6 +43,7 @@
     "karma-webpack": "1.8.0",
     "raw-loader": "0.5.1",
     "remap-istanbul": "github:devcrossnet/remap-istanbul",
+    "rimraf": "2.6.1",
     "source-map-inline-loader": "github:blackbaud-bobbyearl/source-map-inline-loader",
     "ts-loader": "2.0.3",
     "tslint": "4.4.2",

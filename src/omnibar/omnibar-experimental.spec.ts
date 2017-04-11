@@ -48,20 +48,34 @@ describe('Omnibar (experimental)', () => {
 
   let navigateSpy: jasmine.Spy;
   let postOmnibarMessageSpy: jasmine.Spy;
+  let messageIsFromOmnibarSpy: jasmine.Spy;
+
+  let messageIsFromOmnibarReturnValue = true;
 
   beforeAll(() => {
     navigateSpy = spyOn(BBAuthInterop, 'navigate');
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
+
+    messageIsFromOmnibarSpy = spyOn(
+      BBAuthInterop,
+      'messageIsFromOmnibar'
+    ).and.callFake(() => {
+      return messageIsFromOmnibarReturnValue;
+    });
   });
 
   beforeEach(() => {
     navigateSpy.calls.reset();
     postOmnibarMessageSpy.calls.reset();
+    messageIsFromOmnibarSpy.calls.reset();
   });
 
   afterEach(() => {
+    messageIsFromOmnibarReturnValue = true;
+
     navigateSpy.calls.reset();
     postOmnibarMessageSpy.calls.reset();
+    messageIsFromOmnibarSpy.calls.reset();
 
     destroyOmnibar();
   });
@@ -93,39 +107,10 @@ describe('Omnibar (experimental)', () => {
     expect(getComputedStyle(iframeEl).visibility).toBe('visible');
   });
 
-  it('should append the specified service ID and/or environment ID to the omnibar URL', () => {
-    loadOmnibar({
-      svcId: 'ab?/cd'
-    });
-
-    let iframeEl = getIframeEl();
-
-    expect(iframeEl.src).toBe(BASE_URL + '?svcid=ab%3F%2Fcd');
-
-    destroyOmnibar();
-
-    loadOmnibar({
-      envId: 'wx?/yz'
-    });
-
-    iframeEl = getIframeEl();
-
-    expect(iframeEl.src).toBe(BASE_URL + '?envid=wx%3F%2Fyz');
-
-    destroyOmnibar();
-
-    loadOmnibar({
-      envId: 'wx?/yz',
-      svcId: 'ab?/cd'
-    });
-
-    iframeEl = getIframeEl();
-
-    expect(iframeEl.src).toBe(BASE_URL + '?svcid=ab%3F%2Fcd&envid=wx%3F%2Fyz');
-  });
-
   describe('interop with host page', () => {
     it('should ignore messages that do not originate from omnibar', () => {
+      messageIsFromOmnibarReturnValue = false;
+
       loadOmnibar();
 
       fireMessageEvent(
@@ -206,6 +191,8 @@ describe('Omnibar (experimental)', () => {
   describe('interop with omnibar', () => {
 
     it('should notify the omnibar when navigation is ready to be loaded', () => {
+      const envId = 'abc';
+      const svcId = 'xyz';
       const localNavItems: BBOmnibarNavigationItem[] = [
         {
           title: 'Test',
@@ -214,9 +201,11 @@ describe('Omnibar (experimental)', () => {
       ];
 
       loadOmnibar({
+        envId,
         nav: {
           localNavItems
-        }
+        },
+        svcId
       });
 
       fireMessageEvent({
@@ -227,7 +216,9 @@ describe('Omnibar (experimental)', () => {
         getIframeEl(),
         {
           localNavItems,
-          messageType: 'nav-ready'
+          envId,
+          messageType: 'nav-ready',
+          svcId
         }
       );
     });
