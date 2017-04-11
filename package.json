@@ -2,7 +2,7 @@
   "name": "@blackbaud/auth-client",
   "version": "1.0.0",
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
-  "main": "index.ts",
+  "main": "dist/bundle/index.js",
   "scripts": {
     "ci": "npm run test:ci && npm run build",
     "test": "npm run test:unit",

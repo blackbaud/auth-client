@@ -3,7 +3,7 @@ var path = require('path');
 module.exports = {
   entry: './index.ts',
   output: {
-    path: path.resolve(__dirname, '..', '..', 'dist'),
+    path: path.resolve(__dirname, '..', '..', 'dist', 'bundle'),
     filename: 'index.js',
     library: 'BBAuthClient',
     libraryTarget: 'umd'
