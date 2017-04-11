@@ -10,7 +10,7 @@ export class BBAuthInterop {
   /* istanbul ignore next */
   public static postOmnibarMessage(iframeEl: HTMLIFrameElement, message: any) {
     message.source = 'auth-client';
-    iframeEl.contentWindow.postMessage(message, '*');
+    iframeEl.contentWindow.postMessage(message, HOST_ORIGIN);
   }
 
   public static messageIsFromOmnibar(event: {origin: string, data: any}): boolean {
