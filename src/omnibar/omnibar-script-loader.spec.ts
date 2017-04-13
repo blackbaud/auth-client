@@ -43,4 +43,45 @@ describe('Omnibar script loader', () => {
       });
   });
 
+  it('should not register a script if a higher version is already registered', (done) => {
+    const appendChildSpy = spyOn(
+      document.body,
+      'appendChild'
+    )
+      .and.callFake((el: any) => {
+        el.onload();
+      });
+
+    BBOmnibarScriptLoader
+      .smartRegisterScript('http://example.com/', '2.3.4', '3.1.0')
+      .then(() => {
+        expect(appendChildSpy).not.toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            src: 'https://example.com'
+          })
+        );
+        done();
+      });
+  });
+
+  it('should not register a script if the same version is already registered', (done) => {
+    const appendChildSpy = spyOn(
+      document.body,
+      'appendChild'
+    )
+      .and.callFake((el: any) => {
+        el.onload();
+      });
+
+    BBOmnibarScriptLoader
+      .smartRegisterScript('http://example.com/', '2.3.4', '2.3.4')
+      .then(() => {
+        expect(appendChildSpy).not.toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            src: 'https://example.com'
+          })
+        );
+        done();
+      });
+  });
 });
