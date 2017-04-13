@@ -10,8 +10,11 @@ export class BBOmnibar {
     }
 
     return new Promise<any>((resolve: any, reject: any) => {
-      BBOmnibarScriptLoader.registerScript(
-        'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js'
+      let jqueryVersion = $.fn.jquery || '';
+      BBOmnibarScriptLoader.smartRegisterScript(
+        'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js',
+        '2.1.0',
+        jqueryVersion
       )
         .then(() => {
           return BBOmnibarScriptLoader.registerScript(
