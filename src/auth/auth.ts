@@ -1,10 +1,16 @@
 import { BBAuthTokenIntegration } from './auth-token-integration';
 
 export class BBAuth {
+  public static mock = false;
+
   private static lastToken: string;
   private static expirationTime: number;
 
   public static getToken(): Promise<string> {
+    if (BBAuth.mock) {
+      return Promise.resolve('mock_access_token_auth-client@blackbaud.com');
+    }
+
     const tokenInteraction = new BBAuthTokenIntegration(
       'https://signin.blackbaud.com/api/v2/csrf',
       'https://signin.blackbaud.com/api/v2/oauth/token',

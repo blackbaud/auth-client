@@ -1,3 +1,5 @@
+import { BBAuthInterop } from '../shared/interop';
+
 export class BBAuthTokenIntegration {
 
   constructor(
@@ -17,7 +19,9 @@ export class BBAuthTokenIntegration {
         .then(resolve)
         .catch(() => {
           // Not logged in, so go back to Auth Svc.
-          location.href = this.signInUrl + '?redirectUrl=' + encodeURIComponent(location.href);
+          BBAuthInterop.navigate(
+            this.signInUrl + '?redirectUrl=' + encodeURIComponent(location.href)
+          );
         });
     });
   }
@@ -52,19 +56,14 @@ export class BBAuthTokenIntegration {
 
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4 && xhr.status === 401) {
-        if (unuthCB) {
-          unuthCB();
-        }
+        unuthCB();
       } else if (xhr.readyState === 4 && xhr.status === 200) {
         okCB(xhr.responseText);
       }
     };
 
     xhr.open('POST', url, true);
-
-    if (header) {
-      xhr.setRequestHeader(header.name, header.value);
-    }
+    xhr.setRequestHeader(header.name, header.value);
 
     xhr.setRequestHeader('Accept', 'application/json');
     xhr.withCredentials = true;
