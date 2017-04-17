@@ -55,6 +55,66 @@ describe('Omnibar', () => {
     });
   });
 
+  it('should not register jQuery if a higher or equal version is already registered', (done) => {
+    // defining a jQuery verion
+    (<any> window).jQuery = {
+      fn: {
+          jquery: '3.2.1'
+        }
+    };
+
+    BBOmnibar.load({
+      serviceName: 'test'
+    }).then(() => {
+      expect(registerScriptSpy.calls.argsFor(0)).toEqual(
+        ['https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js']
+      );
+
+      expect(registerScriptSpy.calls.argsFor(1)).toEqual(
+        ['https://signin.blackbaud.com/Omnibar.min.js']
+      );
+
+      done();
+    });
+  });
+
+  it('should add the required omnibar elements to the page', (done) => {
+    BBOmnibar.load({
+      serviceName: 'test'
+    }).then(() => {
+      expect(document.querySelectorAll('.bb-omnibar-height-padding')).not.toBeNull();
+
+      done();
+    });
+  });
+
+  it('should register jQuery if current version is less than the minimum version', (done) => {
+    // defining a jQuery version
+    (<any> window).jQuery = {
+      fn: {
+          jquery: '1.10.0'
+        }
+    };
+
+    BBOmnibar.load({
+      serviceName: 'test'
+    }).then(() => {
+      expect(registerScriptSpy.calls.argsFor(0)).toEqual(
+        ['https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js']
+      );
+
+      expect(registerScriptSpy.calls.argsFor(1)).toEqual(
+        ['https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js']
+      );
+
+      expect(registerScriptSpy.calls.argsFor(2)).toEqual(
+        ['https://signin.blackbaud.com/Omnibar.min.js']
+      );
+
+      done();
+    });
+  });
+
   it('should add the required omnibar elements to the page', (done) => {
     BBOmnibar.load({
       serviceName: 'test'
