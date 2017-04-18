@@ -14,8 +14,8 @@ describe('Auth', () => {
 
   afterEach(() => {
     BBAuth.mock = false;
-    (<any> BBAuth).lastToken = undefined;
-    (<any> BBAuth).expirationTime = undefined;
+    (BBAuth as any).lastToken = undefined;
+    (BBAuth as any).expirationTime = undefined;
   });
 
   it('should return a mock token when mock = true', (done) => {
@@ -28,8 +28,8 @@ describe('Auth', () => {
   });
 
   it('should return the cached token if it has not expired', (done) => {
-    (<any> BBAuth).lastToken = 'abc';
-    (<any> BBAuth).expirationTime = new Date().valueOf() + 100000;
+    (BBAuth as any).lastToken = 'abc';
+    (BBAuth as any).expirationTime = new Date().valueOf() + 100000;
 
     BBAuth.getToken().then((token: string) => {
       expect(token).toBe('abc');
@@ -45,8 +45,8 @@ describe('Auth', () => {
   });
 
   it('should return a new token if the cached token is expired', (done) => {
-    (<any> BBAuth).lastToken = 'abc';
-    (<any> BBAuth).expirationTime = new Date().valueOf() - 100000;
+    (BBAuth as any).lastToken = 'abc';
+    (BBAuth as any).expirationTime = new Date().valueOf() - 100000;
 
     BBAuth.getToken().then((token: string) => {
       expect(token).toBe('xyz');
@@ -56,8 +56,8 @@ describe('Auth', () => {
 
   it('should cache new tokens', (done) => {
     BBAuth.getToken().then((token: string) => {
-      expect((<any> BBAuth).lastToken).toBe('xyz');
-      expect((<any> BBAuth).expirationTime).toBeGreaterThan(new Date().valueOf());
+      expect((BBAuth as any).lastToken).toBe('xyz');
+      expect((BBAuth as any).expirationTime).toBeGreaterThan(new Date().valueOf());
       done();
     });
   });

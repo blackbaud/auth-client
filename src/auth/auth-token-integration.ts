@@ -49,8 +49,8 @@ export class BBAuthTokenIntegration {
       name: string,
       value: string
     },
-    okCB: Function,
-    unuthCB: Function
+    okCB: (responseText: string) => any,
+    unuthCB: () => any
   ) {
     const xhr = new XMLHttpRequest();
 

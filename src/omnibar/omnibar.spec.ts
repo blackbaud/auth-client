@@ -13,7 +13,7 @@ describe('Omnibar', () => {
       BBOmnibarScriptLoader,
       'registerScript'
     ).and.callFake(() => {
-      (<any> window).BBAUTH = fakeAuth;
+      (window as any).BBAUTH = fakeAuth;
 
       return Promise.resolve();
     });
@@ -57,7 +57,7 @@ describe('Omnibar', () => {
 
   it('should not register jQuery if a higher or equal version is already registered', (done) => {
     // defining a jQuery verion
-    (<any> window).jQuery = {
+    (window as any).jQuery = {
       fn: {
           jquery: '3.2.1'
         }
@@ -90,7 +90,7 @@ describe('Omnibar', () => {
 
   it('should register jQuery if current version is less than the minimum version', (done) => {
     // defining a jQuery version
-    (<any> window).jQuery = {
+    (window as any).jQuery = {
       fn: {
           jquery: '1.10.0'
         }

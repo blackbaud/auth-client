@@ -4,7 +4,7 @@ describe('Interop', () => {
 
   it('should validate that incoming messages originate from the omnibar', () => {
     function validate(source: string, origin: string, valid: boolean) {
-      let isFromOmnibar = BBAuthInterop.messageIsFromOmnibar({
+      const isFromOmnibar = BBAuthInterop.messageIsFromOmnibar({
         data: {
           source
         },

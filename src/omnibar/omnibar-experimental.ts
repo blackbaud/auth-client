@@ -163,7 +163,7 @@ function messageHandler(event: MessageEvent) {
 function buildOmnibarUrl() {
   const qs: string[] = [];
 
-  let omnibarUrl = omnibarConfig.url ||
+  const omnibarUrl = omnibarConfig.url ||
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/';
 
