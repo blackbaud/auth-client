@@ -53,11 +53,32 @@ describe('Omnibar script loader', () => {
       });
 
     BBOmnibarScriptLoader
-      .smartRegisterScript('http://example.com/', '2.3.4', '3.1.0')
+      .smartRegisterScript('https://example.com/', '2.3.4', '3.1.0')
       .then(() => {
         expect(appendChildSpy).not.toHaveBeenCalledWith(
           jasmine.objectContaining({
-            src: 'https://example.com'
+            src: 'https://example.com/'
+          })
+        );
+        done();
+      });
+  });
+
+  it('should support comparing version numbers of varying segment lengths', (done) => {
+    const appendChildSpy = spyOn(
+      document.body,
+      'appendChild'
+    )
+      .and.callFake((el: any) => {
+        el.onload();
+      });
+
+    BBOmnibarScriptLoader
+      .smartRegisterScript('https://example.com/', '2.3.4', '2.3.3')
+      .then(() => {
+        expect(appendChildSpy).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            src: 'https://example.com/'
           })
         );
         done();
@@ -74,11 +95,53 @@ describe('Omnibar script loader', () => {
       });
 
     BBOmnibarScriptLoader
-      .smartRegisterScript('http://example.com/', '2.3.4', '2.3.4')
+      .smartRegisterScript('https://example.com/', '2.3.4', '2.3.4')
       .then(() => {
         expect(appendChildSpy).not.toHaveBeenCalledWith(
           jasmine.objectContaining({
-            src: 'https://example.com'
+            src: 'https://example.com/'
+          })
+        );
+        done();
+      });
+  });
+
+  it('should register a script if a lower version is already registered', (done) => {
+    const appendChildSpy = spyOn(
+      document.body,
+      'appendChild'
+    )
+      .and.callFake((el: any) => {
+        el.onload();
+      });
+
+    BBOmnibarScriptLoader
+      .smartRegisterScript('https://example.com/', '2.3.4', '2.3.3')
+      .then(() => {
+        expect(appendChildSpy).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            src: 'https://example.com/'
+          })
+        );
+        done();
+      });
+  });
+
+  it('should support comparing version numbers when they are the same except for the patch segment', (done) => {
+    const appendChildSpy = spyOn(
+      document.body,
+      'appendChild'
+    )
+      .and.callFake((el: any) => {
+        el.onload();
+      });
+
+    BBOmnibarScriptLoader
+      .smartRegisterScript('https://example.com/', '2.4.1', '2.4')
+      .then(() => {
+        expect(appendChildSpy).toHaveBeenCalledWith(
+          jasmine.objectContaining({
+            src: 'https://example.com/'
           })
         );
         done();
