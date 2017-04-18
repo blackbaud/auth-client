@@ -14,12 +14,11 @@ export class BBOmnibarScriptLoader {
   }
 
   public static smartRegisterScript(url: string, minVersion: string, currentVersion?: string): Promise<any> {
-      if (currentVersion && BBOmnibarScriptLoader.isVersionMet(minVersion, currentVersion)) {
-          return new Promise<any>((resolve: any, reject: any) => {
-              resolve();
-          });
-      }
-      return BBOmnibarScriptLoader.registerScript(url);
+    if (currentVersion && BBOmnibarScriptLoader.isVersionMet(minVersion, currentVersion)) {
+      return Promise.resolve();
+    }
+
+    return BBOmnibarScriptLoader.registerScript(url);
   }
 
   private static isVersionMet(min: string, cur: string): boolean {

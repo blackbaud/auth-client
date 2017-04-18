@@ -11,7 +11,7 @@
     "test:unit": "npm run test:unit:base -- config/karma/local.karma.conf.js",
     "test:unit:ci": "npm run test:unit:base -- config/karma/ci.karma.conf.js",
     "test:unit:base": "node --max-old-space-size=4096 node_modules/karma/bin/karma start",
-    "build": "rimraf dist && tsc && webpack --config config/webpack/webpack.prod.config.js",
+    "build": "rimraf dist && tsc && rimraf dist/**/*.spec.* && webpack --config config/webpack/webpack.prod.config.js",
     "watch": "npm run test:unit -- --auto-watch --no-single-run"
   },
   "repository": {
