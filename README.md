@@ -1,15 +1,19 @@
 # @blackbaud/auth-client
+
+[![npm](https://img.shields.io/npm/v/@blackbaud/auth-client.svg)](https://www.npmjs.com/package/@blackbaud/auth-client)
+[![status](https://travis-ci.org/blackbaud/auth-client.svg?branch=master)](https://travis-ci.org/blackbaud/auth-client)
+[![coverage](https://codecov.io/github/blackbaud/auth-client/coverage.svg?branch=master)](https://codecov.io/github/blackbaud/auth-client/)
+
 Provides a client-side library for interacting with Blackbaud authentication.
 
 ## Installation
 
 - Ensure that you have Node v6+ and NPM v3+. To verify this, run `node -v` and `npm -v` at the command line.
-- For Mac OS X, we recommend that you use [Node Version Manager (nvm)](https://github.com/creationix/nvm) to wrap your NodeJS installation so that it installs in your user directory and avoids permission-related issues.
-- From the command line, run `npm install blackbaud/auth-client -g` (Note the lack of `@` at the beginning of the package name.  This is because auth client has not yet been registered with NPM).
+- Install the library as a dependency of your project by running `npm install @blackbaud/auth-client --save` in your project's folder.
 
 ## Usage
 
-### Standalone (ES6/TypeScript)
+### ES6/TypeScript
 
 There are two classes available in this package: `BBAuth` and `BBOmnibar`.  `BBAuth` allows you to retrieve an auth token from the Blackbaud authentication service, and `BBOmnibar` allows you to render the omnibar at the top of the page.
 
@@ -46,4 +50,25 @@ BBAuth.getToken()
 
     xhr.send();
   });
+```
+
+### Vanilla JavaScript/ES5
+
+Auth client is also distributed as a UMD bundle.  If you're using ES5 with Node or a tool like Browserify you can `require()` it:
+
+```
+var BBAuthClient = require('@blackbaud/auth-client');
+
+BBAuthClient.BBOmnibar.load({
+  serviceName: 'Some service name'
+});
+```
+
+If you're using no module loader at all, then you can load the `dist/bundles/auth-client.umd.js` file onto your page and via a `<script>` element or concatenated with the rest of your page's JavaScript and access it via the global `BBAuthClient` variable:
+
+```
+// BBAuthClient is global here.
+BBAuthClient.BBOmnibar.load({
+  serviceName: 'Some service name'
+});
 ```
