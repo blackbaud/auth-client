@@ -10,7 +10,7 @@ export class BBOmnibar {
     }
 
     return new Promise<any>((resolve: any, reject: any) => {
-      const jquery = (<any> window).jQuery;
+      const jquery = (window as any).jQuery;
       const jqueryVersion = jquery && jquery.fn && jquery.fn.jquery;
       BBOmnibarScriptLoader.smartRegisterScript(
         'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js',
@@ -30,7 +30,7 @@ export class BBOmnibar {
         .then(() => {
           document.body.classList.add('bb-omnibar-height-padding');
 
-          let omnibarEl = document.createElement('div');
+          const omnibarEl = document.createElement('div');
           omnibarEl.setAttribute('data-omnibar-el', '');
           document.body.appendChild(omnibarEl);
 
