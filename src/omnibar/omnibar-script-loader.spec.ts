@@ -139,7 +139,7 @@ describe('Omnibar script loader', () => {
     BBOmnibarScriptLoader
       .smartRegisterScript('https://example.com/', '2.4.1', '2.4')
       .then(() => {
-        expect(appendChildSpy).toHaveBeenCalledWith(
+        expect(appendChildSpy).not.toHaveBeenCalledWith(
           jasmine.objectContaining({
             src: 'https://example.com/'
           })
