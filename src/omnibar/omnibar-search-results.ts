@@ -1,7 +1,8 @@
+import { BBOmnibarSearchArgs } from './omnibar-search-args';
 import { BBOmnibarSearchResultItem } from './omnibar-search-result-item';
 
 export class BBOmnibarSearchResults {
-  public searchInput: string;
+  public searchArgs: BBOmnibarSearchArgs;
 
-  public results: BBOmnibarSearchResultItem[];
+  public items: BBOmnibarSearchResultItem[];
 }

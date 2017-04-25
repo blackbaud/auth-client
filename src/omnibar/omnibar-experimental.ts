@@ -2,6 +2,7 @@ import { BBAuth } from '../auth';
 import { BBAuthInterop } from '../shared/interop';
 import { BBOmnibarConfig } from './omnibar-config';
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
+import { BBOmnibarSearchArgs } from './omnibar-search-args';
 
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
@@ -88,10 +89,10 @@ function handleStateChange() {
   );
 }
 
-function handleSearch(searchInput: string) {
+function handleSearch(searchArgs: BBOmnibarSearchArgs) {
   if (omnibarConfig.onSearch) {
     omnibarConfig
-      .onSearch(searchInput)
+      .onSearch(searchArgs)
       .then((results: any) => {
         BBAuthInterop.postOmnibarMessage(
           iframeEl,
@@ -188,7 +189,7 @@ function messageHandler(event: MessageEvent) {
 
       break;
     case 'search':
-      handleSearch(message.searchInput);
+      handleSearch(message.searchArgs);
       break;
     case 'get-token':
       handleGetToken(message.tokenRequestId);

@@ -1,4 +1,5 @@
 import { BBOmnibarNavigation } from './omnibar-navigation';
+import { BBOmnibarSearchArgs } from './omnibar-search-args';
 import { BBOmnibarSearchResults } from './omnibar-search-results';
 
 export class BBOmnibarConfig {
@@ -14,5 +15,5 @@ export class BBOmnibarConfig {
 
   public url?: string;
 
-  public onSearch?: (searchText: string) => Promise<BBOmnibarSearchResults>;
+  public onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
 }
