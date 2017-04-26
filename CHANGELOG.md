@@ -1,3 +1,8 @@
+# 1.3.0 (2017-04-26)
+
+- Fixed an issue retrieving a token in IE (#13) (Thanks @Blackbaud-MatthewBell!)
+- More infrastructure around the experimental omnibar (#14)
+
 # 1.2.0 (2017-04-25)
 
 - Added support for running local search from omnibar (#12)
