@@ -266,7 +266,15 @@ describe('Omnibar (experimental)', () => {
         messageType: 'ready'
       });
 
-      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+      expect(postOmnibarMessageSpy.calls.argsFor(0)).toEqual([
+        getIframeEl(),
+        {
+          messageType: 'host-ready',
+          origin: location.origin
+        }
+      ]);
+
+      expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
         getIframeEl(),
         {
           localNavItems,
@@ -274,7 +282,7 @@ describe('Omnibar (experimental)', () => {
           messageType: 'nav-ready',
           svcId
         }
-      );
+      ]);
     });
 
     it('should notify the omnibar when the host page\'s URL changes', () => {
