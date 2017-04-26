@@ -1,8 +1,12 @@
 import { BBOmnibarConfig } from './omnibar-config';
 import { BBOmnibarExperimental } from './omnibar-experimental';
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
+import { BBOmnibarSearchArgs } from './omnibar-search-args';
+import { BBOmnibarSearchResults } from './omnibar-search-results';
 
 import { BBAuthInterop } from '../shared/interop';
+
+import { BBAuth } from '../auth';
 
 describe('Omnibar (experimental)', () => {
   const BASE_URL = 'about:blank';
@@ -49,6 +53,7 @@ describe('Omnibar (experimental)', () => {
   let navigateSpy: jasmine.Spy;
   let postOmnibarMessageSpy: jasmine.Spy;
   let messageIsFromOmnibarSpy: jasmine.Spy;
+  let getTokenSpy: jasmine.Spy;
 
   let messageIsFromOmnibarReturnValue = true;
 
@@ -62,12 +67,22 @@ describe('Omnibar (experimental)', () => {
     ).and.callFake(() => {
       return messageIsFromOmnibarReturnValue;
     });
+
+    getTokenSpy = spyOn(
+      BBAuth,
+      'getToken'
+    ).and.callFake(() => {
+      return Promise.resolve('some_token');
+    });
   });
 
   beforeEach(() => {
     navigateSpy.calls.reset();
     postOmnibarMessageSpy.calls.reset();
     messageIsFromOmnibarSpy.calls.reset();
+    getTokenSpy.calls.reset();
+
+    postOmnibarMessageSpy.and.stub();
   });
 
   afterEach(() => {
@@ -76,6 +91,9 @@ describe('Omnibar (experimental)', () => {
     navigateSpy.calls.reset();
     postOmnibarMessageSpy.calls.reset();
     messageIsFromOmnibarSpy.calls.reset();
+    getTokenSpy.calls.reset();
+
+    postOmnibarMessageSpy.and.stub();
 
     destroyOmnibar();
   });
@@ -186,6 +204,42 @@ describe('Omnibar (experimental)', () => {
       expect(navigateSpy).not.toHaveBeenCalled();
     });
 
+    it('should call the config\'s onSearch() callback when search is invoked', () => {
+      const config = {
+        onSearch: (searchArgs: BBOmnibarSearchArgs) => {
+          return Promise.resolve(undefined);
+        }
+      };
+
+      const onSearchSpy = spyOn(config, 'onSearch').and.callThrough();
+
+      loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'search',
+        searchArgs: {
+          searchText: 'abc'
+        }
+      });
+
+      expect(onSearchSpy).toHaveBeenCalledWith({
+        searchText: 'abc'
+      });
+    });
+
+    it('should not attempt to call the config\'s onSearch() callback when it is not defined', () => {
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'search',
+        searchArgs: {
+          searchText: 'abc'
+        }
+      });
+
+      // Should not throw an error.
+    });
+
   });
 
   describe('interop with omnibar', () => {
@@ -253,6 +307,75 @@ describe('Omnibar (experimental)', () => {
 
       validateHistoryMonkeyPatch('pushState');
       validateHistoryMonkeyPatch('replaceState');
+    });
+
+    it('should notify the omnibar when search results are available', (done) => {
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'search-results',
+            results: {
+              items: [
+                {
+                  title: 'test',
+                  url: 'https://example.com/'
+                }
+              ],
+              searchArgs: {
+                searchText: 'abc'
+              }
+            } as BBOmnibarSearchResults
+          }
+        );
+
+        done();
+      });
+
+      const config = {
+        onSearch: (searchArgs: BBOmnibarSearchArgs) => {
+          return Promise.resolve({
+            searchArgs,
+            items: [
+              {
+                title: 'test',
+                url: 'https://example.com/'
+              }
+            ]
+          });
+        }
+      };
+
+      loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'search',
+        searchArgs: {
+          searchText: 'abc'
+        }
+      });
+    });
+
+    it('should notify the omnibar when a requested token is available', (done) => {
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'token',
+            token: 'some_token',
+            tokenRequestId: 123
+          }
+        );
+
+        done();
+      });
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
     });
 
   });

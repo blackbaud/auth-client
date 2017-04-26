@@ -1,6 +1,8 @@
+import { BBAuth } from '../auth';
 import { BBAuthInterop } from '../shared/interop';
 import { BBOmnibarConfig } from './omnibar-config';
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
+import { BBOmnibarSearchArgs } from './omnibar-search-args';
 
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
@@ -87,6 +89,35 @@ function handleStateChange() {
   );
 }
 
+function handleSearch(searchArgs: BBOmnibarSearchArgs) {
+  if (omnibarConfig.onSearch) {
+    omnibarConfig
+      .onSearch(searchArgs)
+      .then((results: any) => {
+        BBAuthInterop.postOmnibarMessage(
+          iframeEl,
+          {
+            messageType: 'search-results',
+            results
+          }
+        );
+      });
+  }
+}
+
+function handleGetToken(tokenRequestId: any) {
+  BBAuth.getToken().then((token: string) => {
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        messageType: 'token',
+        token,
+        tokenRequestId
+      }
+    );
+  });
+}
+
 function monkeyPatchState() {
   const oldPushState = history.pushState;
   const oldReplaceState = history.replaceState;
@@ -156,6 +187,12 @@ function messageHandler(event: MessageEvent) {
         BBAuthInterop.navigate(navItem.url);
       }
 
+      break;
+    case 'search':
+      handleSearch(message.searchArgs);
+      break;
+    case 'get-token':
+      handleGetToken(message.tokenRequestId);
       break;
   }
 }
