@@ -152,6 +152,14 @@ function messageHandler(event: MessageEvent) {
 
   switch (message.messageType) {
     case 'ready':
+      BBAuthInterop.postOmnibarMessage(
+        iframeEl,
+        {
+          messageType: 'host-ready',
+          origin: location.origin
+        }
+      );
+
       monkeyPatchState();
 
       placeholderEl.classList.remove(CLS_LOADING);
