@@ -67,6 +67,6 @@ export class BBAuthTokenIntegration {
 
     xhr.setRequestHeader('Accept', 'application/json');
     xhr.withCredentials = true;
-    xhr.send(undefined);
+    xhr.send();
   }
 }
