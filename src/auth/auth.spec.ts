@@ -71,38 +71,52 @@ describe('Auth', () => {
   it('should not issue a second request if there is a pending promise to get a new tokens', (done) => {
     let tokenRequestCount: number;
     let resolveTokenPromise: any;
+    let rejectTokenPromise: any;
 
     tokenRequestCount = 0;
 
     authIntegrationGetTokenFake = () => {
         tokenRequestCount = tokenRequestCount + 1;
-        return new Promise((resolve: any) => {
+        return new Promise((resolve: any, reject: any) => {
           resolveTokenPromise = resolve;
+          rejectTokenPromise = reject;
         });
       };
 
-    const firstTokenPromise = BBAuth.getToken();
-    const secondTokenPromise = BBAuth.getToken();
+    const tokenPromise1 = BBAuth.getToken();
+    const tokenPromise2 = BBAuth.getToken();
 
     // Only one auth integration request should have been made, since the second getToken call
     // occured before the first promise resolved
     expect(tokenRequestCount).toBe(1);
-    expect(firstTokenPromise).toBe(secondTokenPromise);
+    expect(tokenPromise1).toBe(tokenPromise2);
 
     resolveTokenPromise({
         access_token: 'tok',
         expires_in: 10
       });
 
-    firstTokenPromise.then((token: string) => {
-      BBAuth.getToken();
-      BBAuth.getToken();
+    tokenPromise1.then((token: string) => {
+      const tokenPromise3 = BBAuth.getToken();
+      const tokenPromise4 = BBAuth.getToken();
 
       // Since the first getToken promise has resolved, calling getToken again should result in a second
       // auth integration requset
       expect(tokenRequestCount).toBe(2);
+      expect(tokenPromise3).toBe(tokenPromise4);
 
-      done();
+      rejectTokenPromise();
+
+      tokenPromise3.catch(() => {
+        done();
+        const tokenPromise5 = BBAuth.getToken();
+        const tokenPromise6 = BBAuth.getToken();
+
+        // Since the pending getToken promise has rejected, calling getToken again should result in a new
+        // auth integration requset
+        expect(tokenRequestCount).toBe(3);
+        expect(tokenPromise5).toBe(tokenPromise6);
+      });
     });
   });
 });
