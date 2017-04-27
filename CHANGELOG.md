@@ -1,3 +1,7 @@
+# 1.3.1 (2017-04-27)
+
+- Fixed issue where making multiple calls to `BBAuth.getToken()` before the first request completed resulted in multiple token requests. (#15) (Thanks @Blackbaud-MatthewBell!)
+
 # 1.3.0 (2017-04-26)
 
 - Fixed an issue retrieving a token in IE (#13) (Thanks @Blackbaud-MatthewBell!)

@@ -29,19 +29,20 @@ export class BBAuth {
       return new Promise<string>((resolve: any, reject: any) => {
         resolve(BBAuth.lastToken);
       });
-    } else {
-      if (!BBAuth.pendingLookupPromise) {
-        BBAuth.pendingLookupPromise = tokenInteraction.getToken().then((tokenResponse: any) => {
-            BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
-            BBAuth.lastToken = tokenResponse['access_token'];
-            BBAuth.pendingLookupPromise = null;
-            return BBAuth.lastToken;
-          }).catch((reason) => {
-            BBAuth.pendingLookupPromise = null;
-            throw reason;
-          });
-      }
-      return BBAuth.pendingLookupPromise;
     }
+
+    if (!BBAuth.pendingLookupPromise) {
+      BBAuth.pendingLookupPromise = tokenInteraction.getToken().then((tokenResponse: any) => {
+          BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
+          BBAuth.lastToken = tokenResponse['access_token'];
+          BBAuth.pendingLookupPromise = null;
+          return BBAuth.lastToken;
+        }).catch((reason) => {
+          BBAuth.pendingLookupPromise = null;
+          throw reason;
+        });
+    }
+
+    return BBAuth.pendingLookupPromise;
   }
 }

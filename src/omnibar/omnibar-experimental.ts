@@ -154,14 +154,13 @@ function messageHandler(event: MessageEvent) {
     case 'ready':
       // Notify the omnibar of the host page's origin.  This MUST be the first
       // message that is posted to the omnibar because all other messages will
-      // be validated against the provided origin.  If the origin provided here
+      // be validated against the provided origin.  If the origin of the host page
       // does not match a whilelist of allowed origins maintained by the omnibar,
       // further communications between the omnibar and host will be blocked.
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
-          messageType: 'host-ready',
-          origin: location.origin
+          messageType: 'host-ready'
         }
       );
 

@@ -269,8 +269,7 @@ describe('Omnibar (experimental)', () => {
       expect(postOmnibarMessageSpy.calls.argsFor(0)).toEqual([
         getIframeEl(),
         {
-          messageType: 'host-ready',
-          origin: location.origin
+          messageType: 'host-ready'
         }
       ]);
 
