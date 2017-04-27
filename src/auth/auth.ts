@@ -5,6 +5,7 @@ export class BBAuth {
 
   private static lastToken: string;
   private static expirationTime: number;
+  private static pendingLookupPromise: Promise<string>;
 
   public static getToken(): Promise<string> {
     if (BBAuth.mock) {
@@ -29,11 +30,18 @@ export class BBAuth {
         resolve(BBAuth.lastToken);
       });
     } else {
-      return tokenInteraction.getToken().then((tokenResponse: any) => {
-        BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
-        BBAuth.lastToken = tokenResponse['access_token'];
-        return BBAuth.lastToken;
-      });
+      if (!BBAuth.pendingLookupPromise) {
+        BBAuth.pendingLookupPromise = tokenInteraction.getToken().then((tokenResponse: any) => {
+            BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
+            BBAuth.lastToken = tokenResponse['access_token'];
+            BBAuth.pendingLookupPromise = null;
+            return BBAuth.lastToken;
+          }).catch((reason) => {
+            BBAuth.pendingLookupPromise = null;
+            throw reason;
+          });
+      }
+      return BBAuth.pendingLookupPromise;
     }
   }
 }
