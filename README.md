@@ -13,6 +13,10 @@ Provides a client-side library for interacting with Blackbaud authentication.
 
 ## Usage
 
+### Prerequisites
+
+The auth client library makes extensive use of [ES6-style Promises](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise), so in order to support browsers that do not yet have native support for Promises (such as Internet Explorer 11) you will need to include a Promise polyfill such as [`es6-promise`](https://github.com/stefanpenner/es6-promise) and use the [auto-polyfill feature](https://github.com/stefanpenner/es6-promise#auto-polyfill) of the library so that `Promise` is added to the global environment.  This will need to be loaded on your page before the auth client library.
+
 ### ES6/TypeScript
 
 There are two classes available in this package: `BBAuth` and `BBOmnibar`.  `BBAuth` allows you to retrieve an auth token from the Blackbaud authentication service, and `BBOmnibar` allows you to render the omnibar at the top of the page.
