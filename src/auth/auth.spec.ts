@@ -1,5 +1,6 @@
 import { BBAuth } from './auth';
 import { BBAuthTokenIntegration } from './auth-token-integration';
+import { BBAuthUserActivity } from './auth-user-activity';
 
 describe('Auth', () => {
   let authIntegrationGetTokenFake: any;
@@ -12,10 +13,14 @@ describe('Auth', () => {
         });
       };
 
-    spyOn(BBAuthTokenIntegration.prototype, 'getToken')
+    spyOn(BBAuthTokenIntegration, 'getToken')
       .and.callFake(() => {
         return authIntegrationGetTokenFake();
       });
+
+    // This effectively disables activity tracking.  Without this, the test page could potentially redirect to
+    // the login page during the test run when it detects no activity.
+    spyOn(BBAuthUserActivity, 'startTracking');
   });
 
   afterEach(() => {
