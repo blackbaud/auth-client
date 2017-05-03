@@ -24,7 +24,12 @@ function trackMouseMove(e: MouseEvent) {
 }
 
 function renewSession() {
-  BBCsrfXhr.request('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew');
+  BBCsrfXhr.request(
+    'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
+    {
+      inactivity: 1
+    }
+  );
 
   lastRenewal = getTimestamp();
 

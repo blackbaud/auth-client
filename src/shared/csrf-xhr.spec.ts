@@ -88,4 +88,29 @@ describe('Auth token integration', () => {
     expect(parseSpy).not.toHaveBeenCalled();
   });
 
+  it('should append the specified signin URL params when redirected to signin', (done) => {
+    navigateSpy.and.callFake((url: string) => {
+      expect(url).toBe(
+        'https://signin.blackbaud.com/signin/?redirectUrl=' +
+        encodeURIComponent(location.href) +
+        '&%3Dfoo%3D=b%26r'
+      );
+      done();
+    });
+
+    const tokenPromise = BBCsrfXhr.request(
+      'https://example.com/token',
+      {
+        '=foo=': 'b&r'
+      }
+    );
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      responseText: undefined,
+      status: 401
+    });
+  });
+
 });

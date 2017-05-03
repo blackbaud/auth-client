@@ -23,6 +23,15 @@ describe('User activity', () => {
     document.dispatchEvent(new KeyboardEvent('keypress'));
   }
 
+  function validateRenewCall() {
+    expect(requestSpy).toHaveBeenCalledWith(
+      RENEW_URL,
+      {
+        inactivity: 1
+      }
+    );
+  }
+
   beforeAll(() => {
     requestSpy = spyOn(BBCsrfXhr, 'request');
   });
@@ -40,7 +49,7 @@ describe('User activity', () => {
   it('should renew the user\'s session as soon as activity starts to be tracked', () => {
     BBAuthUserActivity.startTracking();
 
-    expect(requestSpy).toHaveBeenCalledWith(RENEW_URL);
+    validateRenewCall();
   });
 
   it('should renew the user\'s session when the user moves the mouse', (done) => {
@@ -51,7 +60,7 @@ describe('User activity', () => {
     setTimeout(() => {
       moveMouse();
 
-      expect(requestSpy).toHaveBeenCalledWith(RENEW_URL);
+      validateRenewCall();
 
       done();
     }, 30);
@@ -65,7 +74,7 @@ describe('User activity', () => {
     setTimeout(() => {
       pressKey();
 
-      expect(requestSpy).toHaveBeenCalledWith(RENEW_URL);
+      validateRenewCall();
 
       done();
     }, 30);
