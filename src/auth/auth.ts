@@ -1,5 +1,7 @@
 import { BBAuthTokenIntegration } from './auth-token-integration';
 
+import { BBAuthUserActivity } from './auth-user-activity';
+
 export class BBAuth {
   public static mock = false;
 
@@ -11,12 +13,6 @@ export class BBAuth {
     if (BBAuth.mock) {
       return Promise.resolve('mock_access_token_auth-client@blackbaud.com');
     }
-
-    const tokenInteraction = new BBAuthTokenIntegration(
-      'https://signin.blackbaud.com/api/v2/csrf',
-      'https://signin.blackbaud.com/api/v2/oauth/token',
-      'https://signin.blackbaud.com'
-    );
 
     const now = new Date().valueOf();
 
@@ -32,10 +28,13 @@ export class BBAuth {
     }
 
     if (!BBAuth.pendingLookupPromise) {
-      BBAuth.pendingLookupPromise = tokenInteraction.getToken().then((tokenResponse: any) => {
+      BBAuth.pendingLookupPromise = BBAuthTokenIntegration.getToken().then((tokenResponse: any) => {
           BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
           BBAuth.lastToken = tokenResponse['access_token'];
           BBAuth.pendingLookupPromise = null;
+
+          BBAuthUserActivity.startTracking();
+
           return BBAuth.lastToken;
         }).catch((reason) => {
           BBAuth.pendingLookupPromise = null;
