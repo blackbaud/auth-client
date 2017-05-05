@@ -3,8 +3,10 @@ import { BBOmnibarExperimental } from './omnibar-experimental';
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 import { BBOmnibarSearchArgs } from './omnibar-search-args';
 import { BBOmnibarSearchResults } from './omnibar-search-results';
+import { BBOmnibarUserActivity } from './omnibar-user-activity';
 
 import { BBAuthInterop } from '../shared/interop';
+import { BBAuthNavigator } from '../shared/navigator';
 
 import { BBAuth } from '../auth';
 
@@ -54,11 +56,12 @@ describe('Omnibar (experimental)', () => {
   let postOmnibarMessageSpy: jasmine.Spy;
   let messageIsFromOmnibarSpy: jasmine.Spy;
   let getTokenSpy: jasmine.Spy;
+  let startTrackingSpy: jasmine.Spy;
 
   let messageIsFromOmnibarReturnValue = true;
 
   beforeAll(() => {
-    navigateSpy = spyOn(BBAuthInterop, 'navigate');
+    navigateSpy = spyOn(BBAuthNavigator, 'navigate');
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
 
     messageIsFromOmnibarSpy = spyOn(
@@ -74,6 +77,10 @@ describe('Omnibar (experimental)', () => {
     ).and.callFake(() => {
       return Promise.resolve('some_token');
     });
+
+    // This effectively disables activity tracking.  Without this, the test page could potentially redirect to
+    // the login page during the test run when it detects no activity.
+    startTrackingSpy = spyOn(BBOmnibarUserActivity, 'startTracking');
   });
 
   beforeEach(() => {
@@ -81,8 +88,10 @@ describe('Omnibar (experimental)', () => {
     postOmnibarMessageSpy.calls.reset();
     messageIsFromOmnibarSpy.calls.reset();
     getTokenSpy.calls.reset();
+    startTrackingSpy.calls.reset();
 
     postOmnibarMessageSpy.and.stub();
+    startTrackingSpy.and.stub();
   });
 
   afterEach(() => {
@@ -375,6 +384,37 @@ describe('Omnibar (experimental)', () => {
         );
 
         done();
+      });
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
+
+    it('should notify the omnibar when the current user data should be refreshed', (done) => {
+      postOmnibarMessageSpy.and.callFake(
+        (iframeEl: HTMLIFrameElement, data: any) => {
+          // The first call to this spy will be to return the requested token, so ignore that
+          // one and look for the refresh-user call.
+          if (data.messageType === 'refresh-user') {
+            expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+              getIframeEl(),
+              {
+                messageType: 'refresh-user',
+                token: 'some_token'
+              }
+            );
+
+            done();
+          }
+        }
+      );
+
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
       });
 
       loadOmnibar();

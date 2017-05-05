@@ -1,7 +1,5 @@
 import { BBAuthTokenIntegration } from './auth-token-integration';
 
-import { BBAuthUserActivity } from './auth-user-activity';
-
 export class BBAuth {
   public static mock = false;
 
@@ -9,7 +7,7 @@ export class BBAuth {
   private static expirationTime: number;
   private static pendingLookupPromise: Promise<string>;
 
-  public static getToken(): Promise<string> {
+  public static getToken(forceNewToken?: boolean): Promise<string> {
     if (BBAuth.mock) {
       return Promise.resolve('mock_access_token_auth-client@blackbaud.com');
     }
@@ -17,6 +15,7 @@ export class BBAuth {
     const now = new Date().valueOf();
 
     if (
+      !forceNewToken &&
       BBAuth.lastToken &&
       BBAuth.expirationTime &&
       (BBAuth.expirationTime - now > 60 * 1000) /* Refresh if within 1 minute of expiration */
@@ -28,15 +27,15 @@ export class BBAuth {
     }
 
     if (!BBAuth.pendingLookupPromise) {
-      BBAuth.pendingLookupPromise = BBAuthTokenIntegration.getToken().then((tokenResponse: any) => {
+      BBAuth.pendingLookupPromise = BBAuthTokenIntegration.getToken()
+        .then((tokenResponse: any) => {
           BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
           BBAuth.lastToken = tokenResponse['access_token'];
           BBAuth.pendingLookupPromise = null;
 
-          BBAuthUserActivity.startTracking();
-
           return BBAuth.lastToken;
-        }).catch((reason) => {
+        })
+        .catch((reason) => {
           BBAuth.pendingLookupPromise = null;
           throw reason;
         });

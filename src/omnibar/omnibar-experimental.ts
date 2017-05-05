@@ -4,6 +4,10 @@ import { BBOmnibarConfig } from './omnibar-config';
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 import { BBOmnibarSearchArgs } from './omnibar-search-args';
 
+import { BBOmnibarUserActivity } from './omnibar-user-activity';
+
+import { BBAuthNavigator } from '../shared/navigator';
+
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 
@@ -105,8 +109,22 @@ function handleSearch(searchArgs: BBOmnibarSearchArgs) {
   }
 }
 
+function refreshUserCallback() {
+  BBAuth.getToken(true).then((token: string) => {
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        messageType: 'refresh-user',
+        token
+      }
+    );
+  });
+}
+
 function handleGetToken(tokenRequestId: any) {
   BBAuth.getToken().then((token: string) => {
+    BBOmnibarUserActivity.startTracking(refreshUserCallback);
+
     BBAuthInterop.postOmnibarMessage(
       iframeEl,
       {
@@ -190,13 +208,13 @@ function messageHandler(event: MessageEvent) {
       collapseIframe();
       break;
     case 'navigate-url':
-      BBAuthInterop.navigate(message.url);
+      BBAuthNavigator.navigate(message.url);
       break;
     case 'navigate':
       const navItem: BBOmnibarNavigationItem = message.navItem;
 
       if (!nav || !nav.beforeNavCallback || nav.beforeNavCallback(navItem) !== false) {
-        BBAuthInterop.navigate(navItem.url);
+        BBAuthNavigator.navigate(navItem.url);
       }
 
       break;

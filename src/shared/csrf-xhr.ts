@@ -1,7 +1,7 @@
 const SIGNIN_URL = 'https://signin.blackbaud.com/signin/';
 const CSRF_URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/csrf';
 
-import { BBAuthInterop } from './interop';
+import { BBAuthNavigator } from './navigator';
 
 function post(
   url: string,
@@ -51,6 +51,7 @@ function paramsToQS(params: any) {
   const qs = [];
 
   for (const p in params) {
+    /* istanbul ignore else */
     if (params.hasOwnProperty(p)) {
       qs.push(`${encodeURIComponent(p)}=${encodeURIComponent(params[p])}`);
     }
@@ -78,7 +79,7 @@ export class BBCsrfXhr {
             signinUrl += '&' + paramsToQS(signinRedirectParams);
           }
 
-          BBAuthInterop.navigate(signinUrl);
+          BBAuthNavigator.navigate(signinUrl);
         });
     });
   }
