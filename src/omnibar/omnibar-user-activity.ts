@@ -9,7 +9,7 @@ let lastActivity: number;
 let lastRenewal: number;
 let renewOnNextActivity: boolean;
 let intervalId: any;
-let lastUserRefreshId: string;
+let lastSessionId: string;
 let watcherIFrame: HTMLIFrameElement;
 let currentRefreshUserCallback: () => void;
 
@@ -67,14 +67,6 @@ function startActivityTimer() {
   }, BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL);
 }
 
-function doRedirect() {
-  const url = BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN +
-    '?redirectUrl=' +
-    encodeURIComponent(location.href);
-
-  BBAuthNavigator.navigate(url);
-}
-
 function createWatcherIFrame(url: string) {
   watcherIFrame = document.createElement('iframe');
 
@@ -102,17 +94,16 @@ function messageListener(event: MessageEvent) {
 
     if (data.messageType === 'session_change') {
       const message = data.message;
+      const sessionId = message && message.sessionId;
 
-      if (message && message.sessionId) {
-        const refreshId = message.refreshId;
-
-        if (refreshId && lastUserRefreshId && refreshId !== lastUserRefreshId) {
+      if (sessionId) {
+        if (lastSessionId && sessionId !== lastSessionId) {
           currentRefreshUserCallback();
         }
 
-        lastUserRefreshId = refreshId;
+        lastSessionId = sessionId;
       } else {
-        doRedirect();
+        BBAuthNavigator.redirectToSignin();
       }
     }
   }
@@ -181,7 +172,7 @@ export class BBOmnibarUserActivity {
     lastActivity = undefined;
     lastRenewal = undefined;
     renewOnNextActivity = undefined;
-    lastUserRefreshId = undefined;
+    lastSessionId = undefined;
     currentRefreshUserCallback = undefined;
   }
 }

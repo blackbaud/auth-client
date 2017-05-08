@@ -73,13 +73,7 @@ export class BBCsrfXhr {
         .then(resolve)
         .catch(() => {
           // Not logged in, so go back to Auth Svc.
-          let signinUrl = SIGNIN_URL + '?redirectUrl=' + encodeURIComponent(location.href);
-
-          if (signinRedirectParams) {
-            signinUrl += '&' + paramsToQS(signinRedirectParams);
-          }
-
-          BBAuthNavigator.navigate(signinUrl);
+          BBAuthNavigator.redirectToSignin(signinRedirectParams);
         });
     });
   }

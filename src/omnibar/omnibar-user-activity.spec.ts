@@ -4,6 +4,7 @@ import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBAuthNavigator } from '../shared/navigator';
 
 const RENEW_URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew';
+const SIGNIN_URL = 'https://signin.blackbaud.com/signin/';
 
 describe('User activity', () => {
   let navigateSpy: jasmine.Spy;
@@ -161,7 +162,7 @@ describe('User activity', () => {
     }, 30);
   });
 
-  it('should log the user out if the user logs out in another browser tab', () => {
+  it('should redirect the user to the login page if the user logs out in another browser tab', () => {
     BBOmnibarUserActivity.startTracking(refreshUserCallback);
 
     window.dispatchEvent(
@@ -177,7 +178,7 @@ describe('User activity', () => {
     );
 
     expect(navigateSpy).toHaveBeenCalledWith(
-      BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN +
+      SIGNIN_URL +
       '?redirectUrl=' +
       encodeURIComponent(location.href)
     );
@@ -236,8 +237,8 @@ describe('User activity', () => {
       new MessageEvent('message', {
         data: JSON.stringify({
           message: {
-            refreshId: 'def',
-            sessionId: '123'
+            refreshId: 'abc',
+            sessionId: '456'
           },
           messageType: 'session_change'
         }),
