@@ -1,7 +1,6 @@
-const SIGNIN_URL = 'https://signin.blackbaud.com/signin/';
 const CSRF_URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/csrf';
 
-import { BBAuthInterop } from './interop';
+import { BBAuthNavigator } from './navigator';
 
 function post(
   url: string,
@@ -47,18 +46,6 @@ function requestToken(url: string, csrfValue: string) {
   });
 }
 
-function paramsToQS(params: any) {
-  const qs = [];
-
-  for (const p in params) {
-    if (params.hasOwnProperty(p)) {
-      qs.push(`${encodeURIComponent(p)}=${encodeURIComponent(params[p])}`);
-    }
-  }
-
-  return qs.join('&');
-}
-
 export class BBCsrfXhr {
 
   public static request(url: string, signinRedirectParams?: any) {
@@ -72,13 +59,7 @@ export class BBCsrfXhr {
         .then(resolve)
         .catch(() => {
           // Not logged in, so go back to Auth Svc.
-          let signinUrl = SIGNIN_URL + '?redirectUrl=' + encodeURIComponent(location.href);
-
-          if (signinRedirectParams) {
-            signinUrl += '&' + paramsToQS(signinRedirectParams);
-          }
-
-          BBAuthInterop.navigate(signinUrl);
+          BBAuthNavigator.redirectToSignin(signinRedirectParams);
         });
     });
   }

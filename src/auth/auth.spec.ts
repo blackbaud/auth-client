@@ -1,6 +1,5 @@
 import { BBAuth } from './auth';
 import { BBAuthTokenIntegration } from './auth-token-integration';
-import { BBAuthUserActivity } from './auth-user-activity';
 
 describe('Auth', () => {
   let authIntegrationGetTokenFake: any;
@@ -17,10 +16,6 @@ describe('Auth', () => {
       .and.callFake(() => {
         return authIntegrationGetTokenFake();
       });
-
-    // This effectively disables activity tracking.  Without this, the test page could potentially redirect to
-    // the login page during the test run when it detects no activity.
-    spyOn(BBAuthUserActivity, 'startTracking');
   });
 
   afterEach(() => {
@@ -44,6 +39,16 @@ describe('Auth', () => {
 
     BBAuth.getToken().then((token: string) => {
       expect(token).toBe('abc');
+      done();
+    });
+  });
+
+  it('should return a new token if requested even if there is a cached token', (done) => {
+    (BBAuth as any).lastToken = 'abc';
+    (BBAuth as any).expirationTime = new Date().valueOf() + 100000;
+
+    BBAuth.getToken(true).then((token: string) => {
+      expect(token).toBe('xyz');
       done();
     });
   });

@@ -1,4 +1,4 @@
-import { BBAuthInterop } from '../shared/interop';
+import { BBAuthNavigator } from '../shared/navigator';
 import { BBCsrfXhr } from './csrf-xhr';
 
 import 'jasmine-ajax';
@@ -7,7 +7,7 @@ describe('Auth token integration', () => {
   let navigateSpy: jasmine.Spy;
 
   beforeAll(() => {
-    navigateSpy = spyOn(BBAuthInterop, 'navigate');
+    navigateSpy = spyOn(BBAuthNavigator, 'navigate');
   });
 
   beforeEach(() => {

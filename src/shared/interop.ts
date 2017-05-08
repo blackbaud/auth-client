@@ -1,12 +1,6 @@
 const HOST_ORIGIN = 'https://host.nxt.blackbaud.com';
 
 export class BBAuthInterop {
-
-  /* istanbul ignore next */
-  public static navigate(url: string) {
-    location.href = url;
-  }
-
   /* istanbul ignore next */
   public static postOmnibarMessage(iframeEl: HTMLIFrameElement, message: any) {
     message.source = 'auth-client';
