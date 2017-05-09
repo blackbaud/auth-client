@@ -16,4 +16,6 @@ export class BBOmnibarConfig {
   public url?: string;
 
   public onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
+  
+  public signOutRedirectUrl?: string;
 }
