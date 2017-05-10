@@ -1,3 +1,7 @@
+# 1.3.2 (2017-05-10)
+
+- Fixed dependency reference for `remap-istanbul`.
+
 # 1.3.1 (2017-04-27)
 
 - Fixed issue where making multiple calls to `BBAuth.getToken()` before the first request completed resulted in multiple token requests. (#15) (Thanks @Blackbaud-MatthewBell!)

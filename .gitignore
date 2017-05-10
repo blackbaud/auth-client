@@ -18,3 +18,5 @@ jspm_packages
 
 # Build directory
 dist
+
+.DS_Store
