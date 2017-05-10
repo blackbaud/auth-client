@@ -47,7 +47,7 @@
     "karma-sourcemap-loader": "0.3.7",
     "karma-webpack": "2.0.3",
     "raw-loader": "0.5.1",
-    "remap-istanbul": "github:devcrossnet/remap-istanbul",
+    "remap-istanbul": "0.9.5",
     "rimraf": "2.6.1",
     "source-map-inline-loader": "github:blackbaud-bobbyearl/source-map-inline-loader",
     "ts-loader": "2.0.3",
