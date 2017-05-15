@@ -193,6 +193,7 @@ function messageHandler(event: MessageEvent) {
           envId: omnibarConfig.envId,
           localNavItems: nav && nav.localNavItems,
           messageType: 'nav-ready',
+          services: nav && nav.services,
           svcId: omnibarConfig.svcId
         }
       );

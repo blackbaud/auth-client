@@ -1,6 +1,7 @@
 import { BBOmnibarNavigation } from './omnibar-navigation';
 import { BBOmnibarSearchArgs } from './omnibar-search-args';
 import { BBOmnibarSearchResults } from './omnibar-search-results';
+import { BBOmnibarServiceItem } from './omnibar-service-item';
 
 export class BBOmnibarConfig {
   public serviceName?: string;
@@ -16,4 +17,6 @@ export class BBOmnibarConfig {
   public url?: string;
 
   public onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
+
+  public services?: BBOmnibarServiceItem[];
 }
