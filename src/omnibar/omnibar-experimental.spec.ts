@@ -266,7 +266,18 @@ describe('Omnibar (experimental)', () => {
       loadOmnibar({
         envId,
         nav: {
-          localNavItems
+          localNavItems,
+          services: [
+            {
+              items: [
+                {
+                  title: 'Some item',
+                  url: 'https://example.com/'
+                }
+              ],
+              title: 'Some service'
+            }
+          ]
         },
         svcId
       });
@@ -288,6 +299,17 @@ describe('Omnibar (experimental)', () => {
           localNavItems,
           envId,
           messageType: 'nav-ready',
+          services: [
+            {
+              items: [
+                {
+                  title: 'Some item',
+                  url: 'https://example.com/'
+                }
+              ],
+              title: 'Some service'
+            }
+          ],
           svcId
         }
       ]);
