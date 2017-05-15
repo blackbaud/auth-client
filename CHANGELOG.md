@@ -1,3 +1,7 @@
+# 1.4.0 (2017-05-15)
+
+- Added ability to specify a list of services and their navigation items in the omnibar config object. (#21)
+
 # 1.3.2 (2017-05-10)
 
 - Fixed dependency reference for `remap-istanbul`.
