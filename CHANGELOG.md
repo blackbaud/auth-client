@@ -1,6 +1,6 @@
 # 1.5.0 (2017-05-16)
 
-- Added ability to disable automatic redirect to the sign-in page when failing to retrieve a token. (#23)
+- Added ability to disable automatic redirect to the sign-in page when failing to retrieve a token and instead reject the returned promise. This allows the caller to handle the case when a user is not logged in, such as when retrieving a token to optionally display user data. (#23)
 
 # 1.4.0 (2017-05-15)
 
