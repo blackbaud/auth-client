@@ -10,7 +10,21 @@ describe('Auth token integration', () => {
 
     BBAuthTokenIntegration.getToken();
 
-    expect(requestSpy).toHaveBeenCalledWith('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token');
+    expect(requestSpy).toHaveBeenCalledWith(
+      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
+      undefined,
+      undefined
+    );
+
+    requestSpy.calls.reset();
+
+    BBAuthTokenIntegration.getToken(true);
+
+    expect(requestSpy).toHaveBeenCalledWith(
+      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
+      undefined,
+      true
+    );
   });
 
 });

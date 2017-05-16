@@ -9,13 +9,15 @@ function post(
     value: string
   },
   okCB: (responseText: string) => any,
-  unuthCB: () => any
+  unuthCB: (reason: {message: string}) => any
 ) {
   const xhr = new XMLHttpRequest();
 
   xhr.onreadystatechange = () => {
     if (xhr.readyState === 4 && xhr.status === 401) {
-      unuthCB();
+      unuthCB({
+        message: 'The user is not logged in.'
+      });
     } else if (xhr.readyState === 4 && xhr.status === 200) {
       okCB(xhr.responseText);
     }
@@ -48,7 +50,11 @@ function requestToken(url: string, csrfValue: string) {
 
 export class BBCsrfXhr {
 
-  public static request(url: string, signinRedirectParams?: any) {
+  public static request(
+    url: string,
+    signinRedirectParams?: any,
+    disableRedirect?: boolean
+  ) {
     return new Promise((resolve: any, reject: any) => {
       // First get the CSRF token
       requestToken(CSRF_URL, 'token_needed')
@@ -57,9 +63,13 @@ export class BBCsrfXhr {
           return requestToken(url, csrfResponse['csrf_token']);
         })
         .then(resolve)
-        .catch(() => {
+        .catch((reason: any) => {
           // Not logged in, so go back to Auth Svc.
-          BBAuthNavigator.redirectToSignin(signinRedirectParams);
+          if (disableRedirect) {
+            reject(reason);
+          } else {
+            BBAuthNavigator.redirectToSignin(signinRedirectParams);
+          }
         });
     });
   }

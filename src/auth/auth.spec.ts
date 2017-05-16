@@ -3,25 +3,31 @@ import { BBAuthTokenIntegration } from './auth-token-integration';
 
 describe('Auth', () => {
   let authIntegrationGetTokenFake: any;
+  let getTokenSpy: jasmine.Spy;
 
   beforeAll(() => {
+    getTokenSpy = spyOn(BBAuthTokenIntegration, 'getToken')
+      .and.callFake(() => {
+        return authIntegrationGetTokenFake();
+      });
+  });
+
+  beforeEach(() => {
     authIntegrationGetTokenFake = () => {
         return Promise.resolve({
           access_token: 'xyz',
           expires_in: 5
         });
       };
-
-    spyOn(BBAuthTokenIntegration, 'getToken')
-      .and.callFake(() => {
-        return authIntegrationGetTokenFake();
-      });
   });
 
   afterEach(() => {
     BBAuth.mock = false;
     (BBAuth as any).lastToken = undefined;
     (BBAuth as any).expirationTime = undefined;
+    (BBAuth as any).pendingLookupPromise = undefined;
+
+    getTokenSpy.calls.reset();
   });
 
   it('should return a mock token when mock = true', (done) => {
@@ -118,7 +124,6 @@ describe('Auth', () => {
       rejectTokenPromise();
 
       tokenPromise3.catch(() => {
-        done();
         const tokenPromise5 = BBAuth.getToken();
         const tokenPromise6 = BBAuth.getToken();
 
@@ -126,7 +131,16 @@ describe('Auth', () => {
         // auth integration requset
         expect(tokenRequestCount).toBe(3);
         expect(tokenPromise5).toBe(tokenPromise6);
+
+        done();
       });
+    });
+  });
+
+  it('should allow redirecting to signin to be disabled', (done) => {
+    BBAuth.getToken(false, true).then((token: string) => {
+      expect(getTokenSpy).toHaveBeenCalledWith(true);
+      done();
     });
   });
 });

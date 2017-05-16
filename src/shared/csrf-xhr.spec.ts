@@ -36,6 +36,21 @@ describe('Auth token integration', () => {
     });
   });
 
+  it('should not redirect to the signin page when redirecting is disabled', (done) => {
+    BBCsrfXhr.request('https://example.com/token', undefined, true)
+      .catch((reason: any) => {
+        expect(reason.message).toBe('The user is not logged in.');
+        done();
+      });
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      responseText: undefined,
+      status: 401
+    });
+  });
+
   it('should return a token if the user is signed in', (done) => {
     const tokenPromise = BBCsrfXhr.request('https://example.com/token');
     const csrfRequest = jasmine.Ajax.requests.mostRecent();
