@@ -59,6 +59,7 @@ describe('Omnibar (experimental)', () => {
   let startTrackingSpy: jasmine.Spy;
 
   let messageIsFromOmnibarReturnValue = true;
+  let getTokenFake: () => Promise<string>;
 
   beforeAll(() => {
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
@@ -75,12 +76,16 @@ describe('Omnibar (experimental)', () => {
       BBAuth,
       'getToken'
     ).and.callFake(() => {
-      return Promise.resolve('some_token');
+      return getTokenFake();
     });
 
     // This effectively disables activity tracking.  Without this, the test page could potentially redirect to
     // the login page during the test run when it detects no activity.
     startTrackingSpy = spyOn(BBOmnibarUserActivity, 'startTracking');
+  });
+
+  beforeEach(() => {
+    getTokenFake = () => Promise.resolve('some_token');
   });
 
   beforeEach(() => {
@@ -411,6 +416,33 @@ describe('Omnibar (experimental)', () => {
       loadOmnibar();
 
       fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
+
+    it('should notify the omnibar when a requested token is not available', (done) => {
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'token-fail',
+            reason: 'The user is not logged in.',
+            tokenRequestId: 123
+          }
+        );
+
+        done();
+      });
+
+      getTokenFake = () => {
+        return Promise.reject('The user is not logged in.');
+      };
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        disableRedirect: false,
         messageType: 'get-token',
         tokenRequestId: 123
       });

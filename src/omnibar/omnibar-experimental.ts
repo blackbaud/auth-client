@@ -121,19 +121,30 @@ function refreshUserCallback() {
   });
 }
 
-function handleGetToken(tokenRequestId: any) {
-  BBAuth.getToken().then((token: string) => {
-    BBOmnibarUserActivity.startTracking(refreshUserCallback);
+function handleGetToken(tokenRequestId: any, disableRedirect: boolean) {
+  BBAuth.getToken(false, disableRedirect)
+    .then((token: string) => {
+      BBOmnibarUserActivity.startTracking(refreshUserCallback);
 
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        messageType: 'token',
-        token,
-        tokenRequestId
-      }
-    );
-  });
+      BBAuthInterop.postOmnibarMessage(
+        iframeEl,
+        {
+          messageType: 'token',
+          token,
+          tokenRequestId
+        }
+      );
+    })
+    .catch((reason: any) => {
+      BBAuthInterop.postOmnibarMessage(
+        iframeEl,
+        {
+          messageType: 'token-fail',
+          reason,
+          tokenRequestId
+        }
+      );
+    });
 }
 
 function monkeyPatchState() {
@@ -223,7 +234,10 @@ function messageHandler(event: MessageEvent) {
       handleSearch(message.searchArgs);
       break;
     case 'get-token':
-      handleGetToken(message.tokenRequestId);
+      handleGetToken(
+        message.tokenRequestId,
+        message.disableRedirect
+      );
       break;
   }
 }

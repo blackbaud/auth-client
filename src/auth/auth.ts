@@ -7,7 +7,7 @@ export class BBAuth {
   private static expirationTime: number;
   private static pendingLookupPromise: Promise<string>;
 
-  public static getToken(forceNewToken?: boolean): Promise<string> {
+  public static getToken(forceNewToken?: boolean, disableRedirect?: boolean): Promise<string> {
     if (BBAuth.mock) {
       return Promise.resolve('mock_access_token_auth-client@blackbaud.com');
     }
@@ -27,7 +27,7 @@ export class BBAuth {
     }
 
     if (!BBAuth.pendingLookupPromise) {
-      BBAuth.pendingLookupPromise = BBAuthTokenIntegration.getToken()
+      BBAuth.pendingLookupPromise = BBAuthTokenIntegration.getToken(disableRedirect)
         .then((tokenResponse: any) => {
           BBAuth.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
           BBAuth.lastToken = tokenResponse['access_token'];
