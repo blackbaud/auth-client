@@ -1,3 +1,7 @@
+# 1.5.0 (2017-05-16)
+
+- Added ability to disable automatic redirect to the sign-in page when failing to retrieve a token. (#23)
+
 # 1.4.0 (2017-05-15)
 
 - Added ability to specify a list of services and their navigation items in the omnibar config object. (#21)
