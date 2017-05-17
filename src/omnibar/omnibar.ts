@@ -9,7 +9,7 @@ export class BBOmnibar {
       return BBOmnibarExperimental.load(config);
     }
 
-    return new Promise<any>((resolve: any, reject: any) => {
+    return new Promise<any>((resolve: any) => {
       const jquery = (window as any).jQuery;
       const jqueryVersion = jquery && jquery.fn && jquery.fn.jquery;
       BBOmnibarScriptLoader.smartRegisterScript(

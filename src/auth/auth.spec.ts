@@ -77,7 +77,7 @@ describe('Auth', () => {
   });
 
   it('should cache new tokens', (done) => {
-    BBAuth.getToken().then((token: string) => {
+    BBAuth.getToken().then(() => {
       expect((BBAuth as any).lastToken).toBe('xyz');
       expect((BBAuth as any).expirationTime).toBeGreaterThan(new Date().valueOf());
       done();
@@ -112,7 +112,7 @@ describe('Auth', () => {
         expires_in: 10
       });
 
-    tokenPromise1.then((token: string) => {
+    tokenPromise1.then(() => {
       const tokenPromise3 = BBAuth.getToken();
       const tokenPromise4 = BBAuth.getToken();
 
@@ -138,7 +138,7 @@ describe('Auth', () => {
   });
 
   it('should allow redirecting to signin to be disabled', (done) => {
-    BBAuth.getToken(false, true).then((token: string) => {
+    BBAuth.getToken(false, true).then(() => {
       expect(getTokenSpy).toHaveBeenCalledWith(true);
       done();
     });

@@ -25,7 +25,7 @@ describe('Omnibar script loader', () => {
   });
 
   it('should handle scripts that fail to load', (done) => {
-    const appendChildSpy = spyOn(
+    spyOn(
       document.body,
       'appendChild'
     )

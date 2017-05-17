@@ -24,10 +24,6 @@ describe('Omnibar (experimental)', () => {
     return document.querySelector('.sky-omnibar-iframe') as HTMLIFrameElement;
   }
 
-  function getStyleEl(): HTMLStyleElement {
-    return document.querySelector('head style') as HTMLStyleElement;
-  }
-
   function getPlaceholderEl(): HTMLDivElement {
     return document.querySelector('.sky-omnibar-placeholder') as HTMLDivElement;
   }
@@ -152,8 +148,6 @@ describe('Omnibar (experimental)', () => {
         false
       );
 
-      const iframeEl = getIframeEl();
-
       validateExpanded(false);
     });
 
@@ -163,8 +157,6 @@ describe('Omnibar (experimental)', () => {
       fireMessageEvent({
         messageType: 'expand'
       });
-
-      const iframeEl = getIframeEl();
 
       validateExpanded(true);
 
