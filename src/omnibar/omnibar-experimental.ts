@@ -11,8 +11,6 @@ import { BBAuthNavigator } from '../shared/navigator';
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 
-const HOST_ORIGIN = 'https://host.nxt.blackbaud.com';
-
 let placeholderEl: HTMLDivElement;
 let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
@@ -243,8 +241,6 @@ function messageHandler(event: MessageEvent) {
 }
 
 function buildOmnibarUrl() {
-  const qs: string[] = [];
-
   const omnibarUrl = omnibarConfig.url ||
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/';
