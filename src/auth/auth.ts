@@ -21,9 +21,7 @@ export class BBAuth {
       (BBAuth.expirationTime - now > 60 * 1000) /* Refresh if within 1 minute of expiration */
     ) {
       // Return the stored token.
-      return new Promise<string>((resolve: any, reject: any) => {
-        resolve(BBAuth.lastToken);
-      });
+      return Promise.resolve(BBAuth.lastToken);
     }
 
     if (!BBAuth.pendingLookupPromise) {

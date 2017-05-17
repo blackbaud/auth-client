@@ -27,7 +27,7 @@ describe('Auth token integration', () => {
       done();
     });
 
-    const tokenPromise = BBCsrfXhr.request('https://example.com/token');
+    BBCsrfXhr.request('https://example.com/token');
     const request = jasmine.Ajax.requests.mostRecent();
 
     request.respondWith({
@@ -90,7 +90,7 @@ describe('Auth token integration', () => {
   });
 
   it('should not try to parse an empty response', () => {
-    const tokenPromise = BBCsrfXhr.request('https://example.com/token');
+    BBCsrfXhr.request('https://example.com/token');
     const request = jasmine.Ajax.requests.mostRecent();
 
     const parseSpy = spyOn(JSON, 'parse').and.callThrough();
@@ -113,7 +113,7 @@ describe('Auth token integration', () => {
       done();
     });
 
-    const tokenPromise = BBCsrfXhr.request(
+    BBCsrfXhr.request(
       'https://example.com/token',
       {
         '=foo=': 'b&r'

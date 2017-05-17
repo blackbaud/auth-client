@@ -252,7 +252,7 @@ export class BBOmnibarExperimental {
   public static load(config: BBOmnibarConfig): Promise<any> {
     omnibarConfig = omnibarConfig = config;
 
-    return new Promise<any>((resolve: any, reject: any) => {
+    return new Promise<any>((resolve: any) => {
       promiseResolve = resolve;
 
       addStyleEl();
