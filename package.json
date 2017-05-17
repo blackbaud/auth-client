@@ -29,17 +29,17 @@
   "devDependencies": {
     "@types/core-js": "0.9.41",
     "@types/jasmine": "2.5.47",
-    "@types/jasmine-ajax": "3.1.35",
+    "@types/jasmine-ajax": "3.1.36",
     "@types/webpack": "2.2.15",
     "core-js": "2.4.1",
-    "fs-extra": "2.1.2",
+    "fs-extra": "3.0.1",
     "istanbul": "0.4.5",
     "istanbul-instrumenter-loader": "0.1.0",
     "jasmine": "2.6.0",
     "jasmine-ajax": "3.3.1",
-    "karma": "1.6.0",
+    "karma": "1.7.0",
     "karma-browserstack-launcher": "1.2.0",
-    "karma-chrome-launcher": "2.0.0",
+    "karma-chrome-launcher": "2.1.1",
     "karma-coverage": "1.1.1",
     "karma-firefox-launcher": "1.0.1",
     "karma-jasmine": "1.1.0",
@@ -51,9 +51,9 @@
     "rimraf": "2.6.1",
     "source-map-inline-loader": "github:blackbaud-bobbyearl/source-map-inline-loader",
     "ts-loader": "2.0.3",
-    "tslint": "5.1.0",
+    "tslint": "5.2.0",
     "tslint-loader": "3.5.3",
-    "typescript": "2.2.2",
-    "webpack": "2.4.1"
+    "typescript": "2.3.2",
+    "webpack": "2.5.1"
   }
 }
