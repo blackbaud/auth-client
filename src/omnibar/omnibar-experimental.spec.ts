@@ -294,6 +294,7 @@ describe('Omnibar (experimental)', () => {
         getIframeEl(),
         {
           localNavItems,
+          enableHelp: undefined,
           envId,
           messageType: 'nav-ready',
           services: [
