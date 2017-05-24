@@ -36,6 +36,10 @@ body {
   margin-top: 50px;
 }
 
+#bb-help-container {
+  padding-top: 1px;
+}
+
 .sky-omnibar-iframe,
 .sky-omnibar-placeholder {
   border: none;
@@ -199,6 +203,7 @@ function messageHandler(event: MessageEvent) {
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
+          enableHelp: omnibarConfig.enableHelp,
           envId: omnibarConfig.envId,
           localNavItems: nav && nav.localNavItems,
           messageType: 'nav-ready',

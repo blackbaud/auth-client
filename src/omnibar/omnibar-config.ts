@@ -19,4 +19,6 @@ export class BBOmnibarConfig {
   public onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
 
   public services?: BBOmnibarServiceItem[];
+
+  public enableHelp?: boolean;
 }
