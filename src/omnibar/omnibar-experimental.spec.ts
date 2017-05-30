@@ -81,10 +81,10 @@ describe('Omnibar (experimental)', () => {
   });
 
   beforeEach(() => {
-    getTokenFake = () => Promise.resolve('some_token');
-  });
+    delete (window as any).BBHELP;
 
-  beforeEach(() => {
+    getTokenFake = () => Promise.resolve('some_token');
+
     navigateSpy.calls.reset();
     postOmnibarMessageSpy.calls.reset();
     messageIsFromOmnibarSpy.calls.reset();
@@ -241,6 +241,34 @@ describe('Omnibar (experimental)', () => {
         searchArgs: {
           searchText: 'abc'
         }
+      });
+
+      // Should not throw an error.
+    });
+
+    it('should open the help widget if the help widget is present on the page', () => {
+      loadOmnibar();
+
+      const openSpy = jasmine.createSpy('open');
+
+      (window as any).BBHELP = {
+        HelpWidget: {
+          open: openSpy
+        }
+      };
+
+      fireMessageEvent({
+        messageType: 'help-open'
+      });
+
+      expect(openSpy).toHaveBeenCalled();
+    });
+
+    it('should not attempt to open the help widget if the help widget is not present on the page', () => {
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'help-open'
       });
 
       // Should not throw an error.

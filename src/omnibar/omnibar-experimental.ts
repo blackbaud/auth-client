@@ -149,6 +149,14 @@ function handleGetToken(tokenRequestId: any, disableRedirect: boolean) {
     });
 }
 
+function handleHelp() {
+  const BBHELP = (window as any).BBHELP;
+
+  if (BBHELP) {
+    BBHELP.HelpWidget.open();
+  }
+}
+
 function monkeyPatchState() {
   const oldPushState = history.pushState;
   const oldReplaceState = history.replaceState;
@@ -241,6 +249,9 @@ function messageHandler(event: MessageEvent) {
         message.tokenRequestId,
         message.disableRedirect
       );
+      break;
+    case 'help-open':
+      handleHelp();
       break;
   }
 }
