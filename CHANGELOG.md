@@ -1,3 +1,7 @@
+# 1.7.0 (2017-05-30)
+
+- Added ability to open the help widget from the experimental omnibar. (#30)
+
 # 1.6.0 (2017-05-24)
 
 - Added `subtitle` and `label` properties to search results object. (#28)
