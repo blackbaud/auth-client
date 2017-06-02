@@ -1,6 +1,6 @@
 # 1.8.0 (2017-06-02)
 
-- Added minified bundle for vanilla JavaScript projects. (#30)
+- Added minified bundle for vanilla JavaScript projects. (#32)
 
 # 1.7.0 (2017-05-30)
 
