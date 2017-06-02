@@ -1,6 +1,6 @@
 {
   "name": "@blackbaud/auth-client",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
   "main": "dist/bundles/auth-client.umd.js",
   "module": "index.ts",
@@ -12,7 +12,8 @@
     "test:unit:ci": "npm run test:unit:base -- config/karma/ci.karma.conf.js",
     "test:unit:base": "node --max-old-space-size=4096 node_modules/karma/bin/karma start",
     "pretest": "npm run lint",
-    "build": "rimraf dist && tsc && webpack --config config/webpack/webpack.prod.config.js",
+    "compress": "uglifyjs dist/bundles/auth-client.umd.js -m -o dist/bundles/auth-client.umd.min.js",
+    "build": "rimraf dist && tsc && webpack --config config/webpack/webpack.prod.config.js && npm run compress",
     "watch": "npm run test:unit -- --auto-watch --no-single-run",
     "lint": "tslint 'src/**/*.ts'"
   },
@@ -54,6 +55,7 @@
     "tslint": "5.2.0",
     "tslint-loader": "3.5.3",
     "typescript": "2.3.2",
+    "uglify-js": "3.0.15",
     "webpack": "2.5.1"
   }
 }
