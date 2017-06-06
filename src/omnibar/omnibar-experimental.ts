@@ -22,7 +22,15 @@ function addIframeEl() {
   iframeEl.className = `sky-omnibar-iframe ${CLS_LOADING}`;
   iframeEl.src = buildOmnibarUrl();
 
-  document.body.appendChild(iframeEl);
+  const body = document.body;
+
+  /* istanbul ignore else */
+  /* This can't be tested without clearing out all child elements of body which is not practical in a unit test */
+  if (body.firstChild) {
+    body.insertBefore(iframeEl, body.firstChild);
+  } else {
+    body.appendChild(iframeEl);
+  }
 }
 
 function collapseIframe() {
