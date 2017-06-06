@@ -1,3 +1,7 @@
+# 1.8.1 (2017-06-06)
+
+- Fixed issue where the experimental omnibar's tab order was not first on the page. (#33)
+
 # 1.8.0 (2017-06-02)
 
 - Added minified bundle for vanilla JavaScript projects. (#32)
