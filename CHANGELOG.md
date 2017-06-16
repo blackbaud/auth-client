@@ -1,3 +1,7 @@
+# 1.8.2 (2017-06-16)
+
+- Fixed issue where background watcher iframe was keyboard focusable and interfered with assistive technology. (#34)
+
 # 1.8.1 (2017-06-06)
 
 - Fixed issue where the experimental omnibar's tab order was not first on the page. (#33)
