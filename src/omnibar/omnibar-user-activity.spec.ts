@@ -249,4 +249,12 @@ describe('User activity', () => {
     expect(refreshUserCallbackSpy).toHaveBeenCalled();
   });
 
+  it('should hide the session watcher IFRAME from assistive technology', () => {
+    BBOmnibarUserActivity.startTracking(refreshUserCallback);
+
+    const iframeEl = document.querySelector('.sky-omnibar-iframe-session-watcher');
+
+    expect(iframeEl.getAttribute('tabindex')).toBe('-1');
+  });
+
 });

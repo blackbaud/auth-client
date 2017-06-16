@@ -70,10 +70,12 @@ function startActivityTimer() {
 function createWatcherIFrame(url: string) {
   watcherIFrame = document.createElement('iframe');
 
+  watcherIFrame.className = 'sky-omnibar-iframe-session-watcher';
   watcherIFrame.width = '0';
   watcherIFrame.height = '0';
   watcherIFrame.frameBorder = '0';
   watcherIFrame.src = url;
+  watcherIFrame.tabIndex = -1;
 
   document.body.appendChild(watcherIFrame);
 }
