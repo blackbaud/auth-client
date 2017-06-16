@@ -254,7 +254,7 @@ describe('User activity', () => {
 
     const iframeEl = document.querySelector('.sky-omnibar-iframe-session-watcher');
 
-    expect(iframeEl.getAttribute('aria-hidden')).toBe('true');
+    expect(iframeEl.getAttribute('tabindex')).toBe('-1');
   });
 
 });

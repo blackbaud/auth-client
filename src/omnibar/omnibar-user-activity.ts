@@ -75,8 +75,7 @@ function createWatcherIFrame(url: string) {
   watcherIFrame.height = '0';
   watcherIFrame.frameBorder = '0';
   watcherIFrame.src = url;
-
-  watcherIFrame.setAttribute('aria-hidden', 'true');
+  watcherIFrame.tabIndex = -1;
 
   document.body.appendChild(watcherIFrame);
 }
