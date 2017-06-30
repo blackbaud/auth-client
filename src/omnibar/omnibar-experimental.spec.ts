@@ -308,6 +308,9 @@ describe('Omnibar (experimental)', () => {
             }
           ]
         },
+        onSearch: (searchArgs) => {
+          return undefined;
+        },
         svcId
       });
 
@@ -328,6 +331,7 @@ describe('Omnibar (experimental)', () => {
           localNavItems,
           enableHelp: undefined,
           envId,
+          localSearch: true,
           messageType: 'nav-ready',
           services: [
             {

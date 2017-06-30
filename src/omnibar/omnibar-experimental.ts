@@ -222,6 +222,7 @@ function messageHandler(event: MessageEvent) {
           enableHelp: omnibarConfig.enableHelp,
           envId: omnibarConfig.envId,
           localNavItems: nav && nav.localNavItems,
+          localSearch: !!omnibarConfig.onSearch,
           messageType: 'nav-ready',
           services: nav && nav.services,
           svcId: omnibarConfig.svcId
