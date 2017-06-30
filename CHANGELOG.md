@@ -1,3 +1,7 @@
+# 1.9.0 (2017-06-30)
+
+- Added `localSearch` property to the `nav-ready` event when the consumer has defined a local search callback. (#35)
+
 # 1.8.2 (2017-06-16)
 
 - Fixed issue where background watcher iframe was keyboard focusable and interfered with assistive technology. (#34)
