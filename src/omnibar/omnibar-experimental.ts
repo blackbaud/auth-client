@@ -38,8 +38,7 @@ function collapseIframe() {
 }
 
 function addStyleEl() {
-  styleEl = document.createElement('style');
-  styleEl.innerText = `
+  const css = `
 body {
   margin-top: 50px;
 }
@@ -78,6 +77,10 @@ body {
   height: 100%;
 }
   `;
+
+  styleEl = document.createElement('style');
+
+  styleEl.appendChild(document.createTextNode(css));
 
   document.head.appendChild(styleEl);
 }

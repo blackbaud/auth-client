@@ -1,3 +1,7 @@
+# 1.9.1 (2017-07-14)
+
+- Fixed experimental omnibar rendering issue in IE 11. (#36)
+
 # 1.9.0 (2017-06-30)
 
 - Added `localSearch` property to the `nav-ready` event when the consumer has defined a local search callback. (#35)
