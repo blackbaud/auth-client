@@ -23,9 +23,7 @@ describe('Auth', () => {
 
   afterEach(() => {
     BBAuth.mock = false;
-    (BBAuth as any).lastToken = undefined;
-    (BBAuth as any).expirationTime = undefined;
-    (BBAuth as any).pendingLookupPromise = undefined;
+    (BBAuth as any).tokenCache = {};
 
     getTokenSpy.calls.reset();
   });
@@ -40,8 +38,12 @@ describe('Auth', () => {
   });
 
   it('should return the cached token if it has not expired', (done) => {
-    (BBAuth as any).lastToken = 'abc';
-    (BBAuth as any).expirationTime = new Date().valueOf() + 100000;
+    const tokenCache = (BBAuth as any).tokenCache;
+
+    tokenCache['token|-|-'] = {
+      expirationTime: new Date().valueOf() + 100000,
+      lastToken: 'abc'
+    };
 
     BBAuth.getToken().then((token: string) => {
       expect(token).toBe('abc');
@@ -50,8 +52,12 @@ describe('Auth', () => {
   });
 
   it('should return a new token if requested even if there is a cached token', (done) => {
-    (BBAuth as any).lastToken = 'abc';
-    (BBAuth as any).expirationTime = new Date().valueOf() + 100000;
+    const tokenCache = (BBAuth as any).tokenCache;
+
+    tokenCache['token|-|-'] = {
+      expirationTime: new Date().valueOf() + 100000,
+      lastToken: 'abc'
+    };
 
     BBAuth.getToken(true).then((token: string) => {
       expect(token).toBe('xyz');
@@ -67,8 +73,12 @@ describe('Auth', () => {
   });
 
   it('should return a new token if the cached token is expired', (done) => {
-    (BBAuth as any).lastToken = 'abc';
-    (BBAuth as any).expirationTime = new Date().valueOf() - 100000;
+    const tokenCache = (BBAuth as any).tokenCache;
+
+    tokenCache['token|-|-'] = {
+      expirationTime: new Date().valueOf() - 100000,
+      lastToken: 'abc'
+    };
 
     BBAuth.getToken().then((token: string) => {
       expect(token).toBe('xyz');
@@ -78,8 +88,23 @@ describe('Auth', () => {
 
   it('should cache new tokens', (done) => {
     BBAuth.getToken().then(() => {
-      expect((BBAuth as any).lastToken).toBe('xyz');
-      expect((BBAuth as any).expirationTime).toBeGreaterThan(new Date().valueOf());
+      const tokenCache = (BBAuth as any).tokenCache;
+
+      expect(tokenCache['token|-|-'].lastToken).toBe('xyz');
+      expect(tokenCache['token|-|-'].expirationTime).toBeGreaterThan(new Date().valueOf());
+      done();
+    });
+  });
+
+  it('should cache tokens based on the specified environment ID and permission scope', (done) => {
+    BBAuth.getToken({
+      envId: '123',
+      permissionScope: 'abc'
+    }).then(() => {
+      const tokenCache = (BBAuth as any).tokenCache;
+
+      expect(tokenCache['token|123|abc'].lastToken).toBe('xyz');
+      expect(tokenCache['token|123|abc'].expirationTime).toBeGreaterThan(new Date().valueOf());
       done();
     });
   });
@@ -139,7 +164,17 @@ describe('Auth', () => {
 
   it('should allow redirecting to signin to be disabled', (done) => {
     BBAuth.getToken(false, true).then(() => {
-      expect(getTokenSpy).toHaveBeenCalledWith(true);
+      expect(getTokenSpy).toHaveBeenCalledWith(true, undefined, undefined);
+      done();
+    });
+  });
+
+  it('should pass environment ID and permission scope', (done) => {
+    BBAuth.getToken({
+      envId: 'abc',
+      permissionScope: '123'
+    }).then((token: string) => {
+      expect(getTokenSpy).toHaveBeenCalledWith(undefined, 'abc', '123');
       done();
     });
   });
