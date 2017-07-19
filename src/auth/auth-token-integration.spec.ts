@@ -13,17 +13,21 @@ describe('Auth token integration', () => {
     expect(requestSpy).toHaveBeenCalledWith(
       'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
       undefined,
+      undefined,
+      undefined,
       undefined
     );
 
     requestSpy.calls.reset();
 
-    BBAuthTokenIntegration.getToken(true);
+    BBAuthTokenIntegration.getToken(true, 'abc', '123');
 
     expect(requestSpy).toHaveBeenCalledWith(
       'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
       undefined,
-      true
+      true,
+      'abc',
+      '123'
     );
   });
 

@@ -128,4 +128,41 @@ describe('Auth token integration', () => {
     });
   });
 
+  it('should add the environment ID and permission scope to the request body', (done) => {
+    BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      'abc',
+      '123'
+    );
+
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc'
+      }),
+      status: 200
+    });
+
+    // Wait for the token request to kick off.
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        const requestData: any = tokenRequest.data();
+
+        expect(requestData).toEqual({
+          environment_id: 'abc',
+          permission_scope: '123'
+        });
+
+        done();
+      }
+    });
+  });
+
 });
