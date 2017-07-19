@@ -1,3 +1,7 @@
+# 1.10.0 (2017-07-19)
+
+- Added ability to specify a permission scope when requesting an auth token so that permissions can be returned in the token. (#37)
+
 # 1.9.1 (2017-07-14)
 
 - Fixed experimental omnibar rendering issue in IE 11. (#36)
