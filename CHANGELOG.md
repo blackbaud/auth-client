@@ -1,3 +1,7 @@
+# 1.10.1 (2017-07-25)
+
+- Export `BBAuthGetTokenArgs` class in main barrel file. (#38)
+
 # 1.10.0 (2017-07-19)
 
 - Added ability to specify a permission scope when requesting an auth token so that permissions can be returned in the token. (#37)
