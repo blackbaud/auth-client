@@ -5,3 +5,5 @@ export * from './omnibar-navigation-item';
 export * from './omnibar-search-args';
 export * from './omnibar-search-result-item';
 export * from './omnibar-search-results';
+export * from './omnibar-notifications';
+export * from './omnibar-notification-item';

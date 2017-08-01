@@ -2,6 +2,7 @@ import { BBAuth } from '../auth';
 import { BBAuthInterop } from '../shared/interop';
 import { BBOmnibarConfig } from './omnibar-config';
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
+import { BBOmnibarNotificationItem } from './omnibar-notification-item';
 import { BBOmnibarSearchArgs } from './omnibar-search-args';
 
 import { BBOmnibarUserActivity } from './omnibar-user-activity';
@@ -168,6 +169,14 @@ function handleHelp() {
   }
 }
 
+function handleNotificationRead(notification: BBOmnibarNotificationItem) {
+  const notificationsConfig = omnibarConfig.notifications;
+
+  if (notificationsConfig && notificationsConfig.onNotificationRead) {
+    notificationsConfig.onNotificationRead(notification);
+  }
+}
+
 function monkeyPatchState() {
   const oldPushState = history.pushState;
   const oldReplaceState = history.replaceState;
@@ -190,6 +199,24 @@ function monkeyPatchState() {
 
   history.pushState = newPushState;
   history.replaceState = newReplaceState;
+}
+
+function setupNotifications() {
+  const notificationsConfig = omnibarConfig.notifications;
+
+  if (notificationsConfig) {
+    notificationsConfig.onReady({
+      updateNotifications: (notifications) => {
+        BBAuthInterop.postOmnibarMessage(
+          iframeEl,
+          {
+            messageType: 'notifications-update',
+            notifications
+          }
+        );
+      }
+    });
+  }
 }
 
 function messageHandler(event: MessageEvent) {
@@ -225,12 +252,15 @@ function messageHandler(event: MessageEvent) {
           enableHelp: omnibarConfig.enableHelp,
           envId: omnibarConfig.envId,
           localNavItems: nav && nav.localNavItems,
+          localNotifications: !!omnibarConfig.notifications,
           localSearch: !!omnibarConfig.onSearch,
           messageType: 'nav-ready',
           services: nav && nav.services,
           svcId: omnibarConfig.svcId
         }
       );
+
+      setupNotifications();
 
       handleStateChange();
 
@@ -264,6 +294,11 @@ function messageHandler(event: MessageEvent) {
       break;
     case 'help-open':
       handleHelp();
+      break;
+    case 'notification-read':
+      handleNotificationRead(
+        message.notification
+      );
       break;
   }
 }

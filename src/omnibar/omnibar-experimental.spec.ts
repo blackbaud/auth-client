@@ -250,6 +250,63 @@ describe('Omnibar (experimental)', () => {
       // Should not throw an error.
     });
 
+    it('should call the notification config\'s onReady() callback', () => {
+      const config = {
+        notifications: {
+          onReady: jasmine.createSpy('onReady')
+        }
+      };
+
+      loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'ready'
+      });
+
+      expect(config.notifications.onReady).toHaveBeenCalled();
+    });
+
+    it('should call the notification config\'s onNotificationRead() callback', () => {
+      const config = {
+        notifications: {
+          onNotificationRead: jasmine.createSpy('onNotificationRead'),
+          onReady: jasmine.createSpy('onReady')
+        }
+      };
+
+      loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'notification-read',
+        notification: {
+          id: 1
+        }
+      });
+
+      expect(config.notifications.onNotificationRead).toHaveBeenCalledWith({
+        id: 1
+      });
+    });
+
+    it('should not call the notification config\'s onNotificationRead() callback if not specified', () => {
+      const config = {
+        notifications: {
+          onReady: jasmine.createSpy('onReady')
+        }
+      };
+
+      loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'notification-read',
+        notification: {
+          id: 1
+        }
+      });
+
+      // Should not throw an error.
+    });
+
     it('should open the help widget if the help widget is present on the page', () => {
       loadOmnibar();
 
@@ -331,6 +388,7 @@ describe('Omnibar (experimental)', () => {
           localNavItems,
           enableHelp: undefined,
           envId,
+          localNotifications: false,
           localSearch: true,
           messageType: 'nav-ready',
           services: [
@@ -506,6 +564,39 @@ describe('Omnibar (experimental)', () => {
         messageType: 'get-token',
         tokenRequestId: 123
       });
+    });
+
+    it('should notify the omnibar when notifications are updated', () => {
+      const notifications = {
+        items: [
+          {
+            id: 1,
+            title: 'Hi'
+          }
+        ]
+      };
+
+      const config: BBOmnibarConfig = {
+        notifications: {
+          onReady: (readyArgs) => {
+            readyArgs.updateNotifications(notifications);
+          }
+        }
+      };
+
+      loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'ready'
+      });
+
+      expect(postOmnibarMessageSpy.calls.argsFor(2)).toEqual([
+        getIframeEl(),
+        {
+          messageType: 'notifications-update',
+          notifications
+        }
+      ]);
     });
 
   });
