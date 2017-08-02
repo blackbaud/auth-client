@@ -1,4 +1,5 @@
 import { BBOmnibarNavigation } from './omnibar-navigation';
+import { BBOmnibarNotificationsConfig } from './omnibar-notifications-config';
 import { BBOmnibarSearchArgs } from './omnibar-search-args';
 import { BBOmnibarSearchResults } from './omnibar-search-results';
 import { BBOmnibarServiceItem } from './omnibar-service-item';
@@ -21,4 +22,6 @@ export class BBOmnibarConfig {
   public services?: BBOmnibarServiceItem[];
 
   public enableHelp?: boolean;
+
+  public notifications?: BBOmnibarNotificationsConfig;
 }
