@@ -1,3 +1,7 @@
+# 1.11.0 (2017-08-02)
+
+- Added support for local notifications. (#39)
+
 # 1.10.1 (2017-07-25)
 
 - Export `BBAuthGetTokenArgs` class in main barrel file. (#38)
