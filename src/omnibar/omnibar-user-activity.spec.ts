@@ -65,6 +65,10 @@ describe('User activity', () => {
     );
   }
 
+  function getWatcherIFrame() {
+    return document.querySelectorAll('.sky-omnibar-iframe-session-watcher');
+  }
+
   beforeAll(() => {
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
       if (url === 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/ttl') {
@@ -165,23 +169,33 @@ describe('User activity', () => {
     }
   );
 
-  it(
-    'should not start tracking again if tracking has already started',
-    (done) => {
-      startTracking();
-      startTracking();
+  it('should not start tracking again if tracking has already started', () => {
+    startTracking();
 
-      requestSpy.calls.reset();
+    let watcherIFrameEl = getWatcherIFrame();
 
-      setTimeout(() => {
-        moveMouse();
+    startTracking();
 
-        expect(requestSpy.calls.count()).toBe(1);
+    expect(getWatcherIFrame().length).toBe(1);
+    expect(getWatcherIFrame()[0]).toBe(watcherIFrameEl[0]);
 
-        done();
-      }, 30);
-    }
-  );
+    watcherIFrameEl = undefined;
+  });
+
+  it('should start tracking again if tracking has already started and the allow anonymous flag changes', () => {
+    startTracking();
+
+    let watcherIFrameEl = getWatcherIFrame();
+
+    startTracking(true);
+
+    // When tracking is restarted, the session watcher IFRAME should be removed from the DOM and
+    // a new one created and added to the DOM.
+    expect(getWatcherIFrame().length).toBe(1);
+    expect(getWatcherIFrame()[0]).not.toBe(watcherIFrameEl[0]);
+
+    watcherIFrameEl = undefined;
+  });
 
   it(
     'should allow the user to close the inactivity prompt and renew the session',

@@ -96,6 +96,7 @@ function showInactivityPrompt() {
 
 function closeInactivityPrompt() {
   isShowingInactivityPrompt = false;
+  trackUserActivity();
   currentHideInactivityCallback();
 }
 
@@ -222,7 +223,9 @@ export class BBOmnibarUserActivity {
     hideInactivityCallback: () => void,
     allowAnonymous: boolean
   ) {
-    if (!isTracking) {
+    if (!isTracking || allowAnonymous !== currentAllowAnonymous) {
+      BBOmnibarUserActivity.stopTracking();
+
       currentRefreshUserCallback = refreshUserCallback;
       currentShowInactivityCallback = showInactivityCallback;
       currentHideInactivityCallback = hideInactivityCallback;
@@ -237,7 +240,7 @@ export class BBOmnibarUserActivity {
   }
 
   public static userRenewedSession() {
-    isShowingInactivityPrompt = false;
+    closeInactivityPrompt();
     renewSession();
   }
 
