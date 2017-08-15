@@ -23,4 +23,17 @@ describe('Navigator', () => {
         '&a=%3D&b=%26'
     );
   });
+
+  it('should allow redirecting to signout due to inactivity', () => {
+    BBAuthNavigator.redirectToSignoutForInactivity();
+
+    expect(navigateSpy).toHaveBeenCalledWith(
+      'https://signin.blackbaud.com/signin/sign-out?redirectUrl=' +
+      encodeURIComponent(
+        'https://signin.blackbaud.com/signin/?redirectUrl=' +
+        encodeURIComponent(location.href) +
+        '&inactivity=1'
+      )
+    );
+  });
 });

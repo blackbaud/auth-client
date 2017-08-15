@@ -5,16 +5,28 @@ import { BBAuthNavigator } from '../shared/navigator';
 let isTracking: boolean;
 let clientX: number;
 let clientY: number;
+let currentHideInactivityCallback: () => void;
+let currentRefreshUserCallback: () => void;
+let currentShowInactivityCallback: () => void;
+let isShowingInactivityPrompt: boolean;
 let lastActivity: number;
 let lastRenewal: number;
-let renewOnNextActivity: boolean;
 let intervalId: any;
 let lastSessionId: string;
+let lastRefreshId = '';
+let ttlCache: {
+  promise: Promise<number>,
+  refreshId: string
+};
 let watcherIFrame: HTMLIFrameElement;
-let currentRefreshUserCallback: () => void;
+let currentAllowAnonymous: boolean;
 
 function getTimestamp() {
   return new Date().getTime();
+}
+
+function trackUserActivity() {
+  lastActivity = getTimestamp();
 }
 
 function trackMouseMove(e: MouseEvent) {
@@ -28,24 +40,47 @@ function trackMouseMove(e: MouseEvent) {
   }
 }
 
-function renewSession() {
-  BBCsrfXhr.request(
-    'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
-    {
-      inactivity: 1
-    }
-  );
+function getSessionTtl(refreshId: any): Promise<number> {
+  if (ttlCache && ttlCache.refreshId === refreshId) {
+    return ttlCache.promise;
+  }
 
-  lastRenewal = getTimestamp();
+  const promise = new Promise<number>((resolve, reject) => {
+    BBCsrfXhr.request(
+      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/ttl',
+      undefined,
+      currentAllowAnonymous
+    )
+      .then((ttl: number) => {
+        const expirationDate = (ttl === null) ? null : getTimestamp() + ttl * 1000;
 
-  renewOnNextActivity = false;
+        resolve(expirationDate);
+      })
+      .catch(() => {
+        resolve(null);
+      });
+  });
+
+  ttlCache = {
+    promise,
+    refreshId
+  };
+
+  return promise;
 }
 
-function trackUserActivity() {
-  lastActivity = getTimestamp();
+function renewSession() {
+  const now = getTimestamp();
 
-  if (renewOnNextActivity) {
-    renewSession();
+  if (!lastRenewal || now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY) {
+    lastRenewal = now;
+
+    BBCsrfXhr.request(
+      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
+      {
+        inactivity: 1
+      }
+    );
   }
 }
 
@@ -54,20 +89,65 @@ function addActivityListeners() {
   document.addEventListener('mousemove', trackMouseMove);
 }
 
+function showInactivityPrompt() {
+  isShowingInactivityPrompt = true;
+  currentShowInactivityCallback();
+}
+
+function closeInactivityPrompt() {
+  isShowingInactivityPrompt = false;
+  currentHideInactivityCallback();
+}
+
 function startActivityTimer() {
   // It's possible the user was active on another web page and just navigated to this
   // one.  Since the activity tracking does not carry over from the previous page,
   // play it safe and renew the session immediately.
-  renewSession();
+  if (!currentAllowAnonymous) {
+    renewSession();
+  }
 
   intervalId = setInterval(() => {
-    if (getTimestamp() - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_AGE) {
-      renewOnNextActivity = true;
-    }
+    getSessionTtl(lastRefreshId).then((expirationDate) => {
+      const now = getTimestamp();
+
+      // This is for the edge case where the user has signed out in another window but session
+      // watcher hasn't  yet redirected this window to the sign in page.  Just return and let
+      // session watcher trigger the redirect.
+      if (expirationDate === null) {
+        return;
+      }
+
+      if (now > expirationDate) {
+        BBAuthNavigator.redirectToSignoutForInactivity();
+      }
+
+      const promptDate = expirationDate - BBOmnibarUserActivity.ABOUT_TO_EXPIRE_PROMPT_TIMEFRAME;
+      const renewDate = expirationDate - BBOmnibarUserActivity.MAX_SESSION_AGE + BBOmnibarUserActivity.MIN_RENEWAL_AGE;
+
+      // If we're showing the prompt, then don't process renewals based on activity.  They will need to
+      // physically click on the prompt now.
+      if (isShowingInactivityPrompt) {
+        // The inactivity prompt was dismissed in another window.  Hide this one.
+        if (now < promptDate) {
+          closeInactivityPrompt();
+        }
+      } else {
+        if (lastActivity > renewDate) {
+          renewSession();
+        } else if (now > promptDate && !currentAllowAnonymous) {
+          showInactivityPrompt();
+        }
+      }
+    });
   }, BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL);
 }
 
-function createWatcherIFrame(url: string) {
+function createWatcherIFrame() {
+  const url = BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN +
+    '/SessionWatcher.html?origin=' +
+    encodeURIComponent(location.origin);
+
   watcherIFrame = document.createElement('iframe');
 
   watcherIFrame.className = 'sky-omnibar-iframe-session-watcher';
@@ -97,28 +177,25 @@ function messageListener(event: MessageEvent) {
     if (data.messageType === 'session_change') {
       const message = data.message;
       const sessionId = message && message.sessionId;
+      const refreshId = message && message.refreshId;
 
-      if (sessionId) {
-        if (lastSessionId && sessionId !== lastSessionId) {
-          currentRefreshUserCallback();
-        }
-
-        lastSessionId = sessionId;
-      } else {
+      if (!sessionId && !currentAllowAnonymous) {
         BBAuthNavigator.redirectToSignin();
       }
+
+      if (lastSessionId !== undefined && sessionId !== lastSessionId) {
+        currentRefreshUserCallback();
+      }
+
+      lastRefreshId = refreshId;
+      lastSessionId = sessionId;
     }
   }
 }
 
 function redirectIfUserLogsOutLater() {
   window.addEventListener('message', messageListener, false);
-
-  createWatcherIFrame(
-    BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN +
-    '/SessionWatcher.html?origin=' +
-    encodeURIComponent(location.origin)
-  );
+  createWatcherIFrame();
 }
 
 export class BBOmnibarUserActivity {
@@ -128,27 +205,40 @@ export class BBOmnibarUserActivity {
   public static ABOUT_TO_EXPIRE_PROMPT_TIMEFRAME = 2 * 60 * 1000;
 
   // The amount of millseconds that a session is allowed without activity.
-  public static MAX_SESSION_AGE = 30 * 60 * 1000;
+  public static MAX_SESSION_AGE = 15 * 60 * 1000;
 
   // The minimum age in milliseconds of the session before it will be renewed in response to user activity.
   public static MIN_RENEWAL_AGE = 5 * 60 * 1000;
 
-  // The minimum amount of milliseconds that must ellapse before this omnibar instance will issue a session renewal
-  // after the previos time one is
+  // The minimum amount of milliseconds that must elapse before this omnibar instance will issue a session renewal
+  // after the previous time one is
   public static MIN_RENEWAL_RETRY = 60 * 1000;
 
   public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
-  public static startTracking(refreshUserCallback: () => void) {
+  public static startTracking(
+    refreshUserCallback: () => void,
+    showInactivityCallback: () => void,
+    hideInactivityCallback: () => void,
+    allowAnonymous: boolean
+  ) {
     if (!isTracking) {
+      currentRefreshUserCallback = refreshUserCallback;
+      currentShowInactivityCallback = showInactivityCallback;
+      currentHideInactivityCallback = hideInactivityCallback;
+      currentAllowAnonymous = allowAnonymous;
+
       addActivityListeners();
       startActivityTimer();
       redirectIfUserLogsOutLater();
 
-      currentRefreshUserCallback = refreshUserCallback;
-
       isTracking = true;
     }
+  }
+
+  public static userRenewedSession() {
+    isShowingInactivityPrompt = false;
+    renewSession();
   }
 
   public static stopTracking() {
@@ -173,8 +263,12 @@ export class BBOmnibarUserActivity {
     clientY = undefined;
     lastActivity = undefined;
     lastRenewal = undefined;
-    renewOnNextActivity = undefined;
     lastSessionId = undefined;
+    ttlCache = undefined;
+    isShowingInactivityPrompt = undefined;
     currentRefreshUserCallback = undefined;
+    currentShowInactivityCallback = undefined;
+    currentHideInactivityCallback = undefined;
+    currentAllowAnonymous = undefined;
   }
 }
