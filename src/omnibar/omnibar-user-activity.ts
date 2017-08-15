@@ -40,7 +40,7 @@ function trackMouseMove(e: MouseEvent) {
   }
 }
 
-function getSessionTtl(refreshId: any): Promise<number> {
+function getSessionExpiration(refreshId: any): Promise<number> {
   if (ttlCache && ttlCache.refreshId === refreshId) {
     return ttlCache.promise;
   }
@@ -80,7 +80,7 @@ function renewSession() {
       {
         inactivity: 1
       }
-    );
+    ).catch(() => undefined);
   }
 }
 
@@ -109,11 +109,11 @@ function startActivityTimer() {
   }
 
   intervalId = setInterval(() => {
-    getSessionTtl(lastRefreshId).then((expirationDate) => {
+    getSessionExpiration(lastRefreshId).then((expirationDate) => {
       const now = getTimestamp();
 
       // This is for the edge case where the user has signed out in another window but session
-      // watcher hasn't  yet redirected this window to the sign in page.  Just return and let
+      // watcher hasn't yet redirected this window to the sign in page.  Just return and let
       // session watcher trigger the redirect.
       if (expirationDate === null) {
         return;
@@ -123,7 +123,10 @@ function startActivityTimer() {
         BBAuthNavigator.redirectToSignoutForInactivity();
       }
 
-      const promptDate = expirationDate - BBOmnibarUserActivity.ABOUT_TO_EXPIRE_PROMPT_TIMEFRAME;
+      // When the inactivity prompt is scheduled to be shown.
+      const promptDate = expirationDate - BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION;
+
+      // When the next renewal opportunity will occur.
       const renewDate = expirationDate - BBOmnibarUserActivity.MAX_SESSION_AGE + BBOmnibarUserActivity.MIN_RENEWAL_AGE;
 
       // If we're showing the prompt, then don't process renewals based on activity.  They will need to
@@ -136,7 +139,7 @@ function startActivityTimer() {
       } else {
         if (lastActivity > renewDate) {
           renewSession();
-        } else if (now > promptDate && !currentAllowAnonymous) {
+        } else if (!currentAllowAnonymous && now > promptDate) {
           showInactivityPrompt();
         }
       }
@@ -200,20 +203,24 @@ function redirectIfUserLogsOutLater() {
 }
 
 export class BBOmnibarUserActivity {
+  // The interval in milliseconds that the last activity is evaluated against the session timeout period.
   public static ACTIVITY_TIMER_INTERVAL = 1000;
 
-  // The amount of millseconds that the expiration prompt will show before the session actually expires.
-  public static ABOUT_TO_EXPIRE_PROMPT_TIMEFRAME = 2 * 60 * 1000;
+  // The minimum time in milliseconds that must elapse before this omnibar instance will issue a session renewal
+  // after the previous session renewal.
+  public static MIN_RENEWAL_RETRY = 1 * 60 * 1000;
 
-  // The amount of millseconds that a session is allowed without activity.
-  public static MAX_SESSION_AGE = 15 * 60 * 1000;
+  // The tim in millseconds that the expiration prompt will show before the session actually expires.  When the
+  // prompt shows will be determined by subtracting this value from the MAX_SESSION_AGE; for instance, if the
+  // prompt duration is 2 minutes and the max session age is 15 minutes, the inactivity prompt will be displayed
+  // 13 minutes after the last user activity.
+  public static INACTIVITY_PROMPT_DURATION = 2 * 60 * 1000;
 
   // The minimum age in milliseconds of the session before it will be renewed in response to user activity.
   public static MIN_RENEWAL_AGE = 5 * 60 * 1000;
 
-  // The minimum amount of milliseconds that must elapse before this omnibar instance will issue a session renewal
-  // after the previous time one is
-  public static MIN_RENEWAL_RETRY = 60 * 1000;
+  // The time in millseconds that a session is allowed without activity.
+  public static MAX_SESSION_AGE = 15 * 60 * 1000;
 
   public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 

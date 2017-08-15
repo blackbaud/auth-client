@@ -74,6 +74,8 @@ describe('User activity', () => {
       if (url === 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/ttl') {
         return ttlPromiseOverride || Promise.resolve(ttl);
       }
+
+      return Promise.resolve();
     });
 
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
@@ -309,7 +311,7 @@ describe('User activity', () => {
 
     ttl = .01;
 
-    BBOmnibarUserActivity.ABOUT_TO_EXPIRE_PROMPT_TIMEFRAME = .005;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
 
     setTimeout(() => {
       expect(showInactivityCallbackSpy).toHaveBeenCalled();
@@ -322,7 +324,7 @@ describe('User activity', () => {
 
     ttl = .01;
 
-    BBOmnibarUserActivity.ABOUT_TO_EXPIRE_PROMPT_TIMEFRAME = .005;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
 
     setTimeout(() => {
       expect(showInactivityCallbackSpy).toHaveBeenCalled();
@@ -337,7 +339,7 @@ describe('User activity', () => {
   });
 
   function validateNullTllBehavior(done: DoneFn) {
-    BBOmnibarUserActivity.ABOUT_TO_EXPIRE_PROMPT_TIMEFRAME = .005;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
 
     setTimeout(() => {
       expect(showInactivityCallbackSpy).not.toHaveBeenCalled();
@@ -358,7 +360,9 @@ describe('User activity', () => {
   it('should treat a non-200 TTL response as null', (done) => {
     startTracking();
 
-    ttlPromiseOverride = Promise.reject('Not logged in');
+    ttlPromiseOverride = Promise
+      .reject(new Error('Not logged in'))
+      .catch(() => undefined);
 
     validateNullTllBehavior(done);
   });
