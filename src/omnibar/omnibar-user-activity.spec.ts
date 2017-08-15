@@ -361,8 +361,7 @@ describe('User activity', () => {
     startTracking();
 
     ttlPromiseOverride = Promise
-      .reject(new Error('Not logged in'))
-      .catch(() => undefined);
+      .reject(new Error('Not logged in'));
 
     validateNullTllBehavior(done);
   });

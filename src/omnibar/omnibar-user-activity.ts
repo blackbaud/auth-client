@@ -80,7 +80,7 @@ function renewSession() {
       {
         inactivity: 1
       }
-    ).catch(() => undefined);
+    ).catch(/* istanbul ignore next */ () => undefined);
   }
 }
 
