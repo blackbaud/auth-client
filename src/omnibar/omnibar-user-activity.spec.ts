@@ -4,7 +4,7 @@ import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBAuthNavigator } from '../shared/navigator';
 
 const SIGNIN_URL = 'https://signin.blackbaud.com/signin/';
-const TEST_TIMEOUT = 150;
+const TEST_TIMEOUT = 50;
 
 describe('User activity', () => {
   let navigateSpy: jasmine.Spy;
@@ -99,7 +99,7 @@ describe('User activity', () => {
     BBOmnibarUserActivity.MIN_RENEWAL_RETRY = TEST_TIMEOUT - 20;
     BBOmnibarUserActivity.MIN_RENEWAL_AGE = 0;
     BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = (ttl * 1000) - 5;
-    BBOmnibarUserActivity.MAX_SESSION_AGE = TEST_TIMEOUT;
+    BBOmnibarUserActivity.MAX_SESSION_AGE = TEST_TIMEOUT * 2;
 
     ttlPromiseOverride = undefined;
     renewWasCalled = false;

@@ -21,12 +21,8 @@ let ttlCache: {
 let watcherIFrame: HTMLIFrameElement;
 let currentAllowAnonymous: boolean;
 
-function getTimestamp() {
-  return new Date().getTime();
-}
-
 function trackUserActivity() {
-  lastActivity = getTimestamp();
+  lastActivity = Date.now();
 }
 
 function trackMouseMove(e: MouseEvent) {
@@ -52,7 +48,7 @@ function getSessionExpiration(refreshId: any): Promise<number> {
       currentAllowAnonymous
     )
       .then((ttl: number) => {
-        const expirationDate = (ttl === null) ? null : getTimestamp() + ttl * 1000;
+        const expirationDate = (ttl === null) ? null : Date.now() + ttl * 1000;
 
         resolve(expirationDate);
       })
@@ -70,7 +66,7 @@ function getSessionExpiration(refreshId: any): Promise<number> {
 }
 
 function renewSession() {
-  const now = getTimestamp();
+  const now = Date.now();
 
   if (!lastRenewal || now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY) {
     lastRenewal = now;
@@ -110,7 +106,7 @@ function startActivityTimer() {
 
   intervalId = setInterval(() => {
     getSessionExpiration(lastRefreshId).then((expirationDate) => {
-      const now = getTimestamp();
+      const now = Date.now();
 
       // This is for the edge case where the user has signed out in another window but session
       // watcher hasn't yet redirected this window to the sign in page.  Just return and let
