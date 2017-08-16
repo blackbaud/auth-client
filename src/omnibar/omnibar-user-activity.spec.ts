@@ -3,8 +3,8 @@ import { BBOmnibarUserActivity } from './omnibar-user-activity';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBAuthNavigator } from '../shared/navigator';
 
-const RENEW_URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew';
 const SIGNIN_URL = 'https://signin.blackbaud.com/signin/';
+const TEST_TIMEOUT = 50;
 
 describe('User activity', () => {
   let navigateSpy: jasmine.Spy;
@@ -15,6 +15,7 @@ describe('User activity', () => {
   let hideInactivityCallbackSpy: jasmine.Spy;
   let ttl: number;
   let ttlPromiseOverride: Promise<number>;
+  let renewWasCalled: boolean;
 
   function moveMouse(clientX = 1, clientY = 1) {
     document.dispatchEvent(
@@ -32,13 +33,8 @@ describe('User activity', () => {
     document.dispatchEvent(new KeyboardEvent('keypress'));
   }
 
-  function validateRenewCall() {
-    expect(requestSpy).toHaveBeenCalledWith(
-      RENEW_URL,
-      {
-        inactivity: 1
-      }
-    );
+  function validateRenewCall(called = true) {
+    expect(renewWasCalled).toBe(called);
   }
 
   function startTracking(allowAnonymous = false) {
@@ -71,8 +67,12 @@ describe('User activity', () => {
 
   beforeAll(() => {
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
-      if (url === 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/ttl') {
-        return ttlPromiseOverride || Promise.resolve(ttl);
+      switch (url.substr('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/'.length)) {
+        case 'ttl':
+          return ttlPromiseOverride || Promise.resolve(ttl);
+        case 'renew':
+          renewWasCalled = true;
+          break;
       }
 
       return Promise.resolve();
@@ -92,11 +92,18 @@ describe('User activity', () => {
     refreshUserCallbackSpy.calls.reset();
     showInactivityCallbackSpy.calls.reset();
     hideInactivityCallbackSpy.calls.reset();
-    BBOmnibarUserActivity.MIN_RENEWAL_AGE = 20;
-    BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL = 10;
-    BBOmnibarUserActivity.MIN_RENEWAL_RETRY = 10;
-    ttl = 15;
+
+    ttl = .015;
+    console.log('ttl ' + ttl);
+
+    BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL = TEST_TIMEOUT / 2;
+    BBOmnibarUserActivity.MIN_RENEWAL_RETRY = TEST_TIMEOUT - 20;
+    BBOmnibarUserActivity.MIN_RENEWAL_AGE = 0;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = (ttl * 1000) - 5;
+    BBOmnibarUserActivity.MAX_SESSION_AGE = TEST_TIMEOUT;
+
     ttlPromiseOverride = undefined;
+    renewWasCalled = false;
   });
 
   afterEach(() => {
@@ -112,7 +119,7 @@ describe('User activity', () => {
   it('should renew the user\'s session when the user moves the mouse', (done) => {
     startTracking();
 
-    requestSpy.calls.reset();
+    renewWasCalled = false;
 
     moveMouse();
 
@@ -120,13 +127,13 @@ describe('User activity', () => {
       validateRenewCall();
 
       done();
-    }, 30);
+    }, TEST_TIMEOUT);
   });
 
   it('should renew the user\'s session when the user presses a key', (done) => {
     startTracking();
 
-    requestSpy.calls.reset();
+    renewWasCalled = false;
 
     pressKey();
 
@@ -134,21 +141,7 @@ describe('User activity', () => {
       validateRenewCall();
 
       done();
-    }, 30);
-  });
-
-  it('should close the inactivity prompt when the session', (done) => {
-    startTracking();
-
-    requestSpy.calls.reset();
-
-    pressKey();
-
-    setTimeout(() => {
-      validateRenewCall();
-
-      done();
-    }, 30);
+    }, TEST_TIMEOUT);
   });
 
   it(
@@ -159,15 +152,15 @@ describe('User activity', () => {
       setTimeout(() => {
         moveMouse();
 
-        requestSpy.calls.reset();
+        renewWasCalled = false;
 
         moveMouse();
 
         setTimeout(() => {
-          expect(requestSpy).not.toHaveBeenCalled();
+          validateRenewCall(false);
           done();
-        }, 30);
-      }, 30);
+        }, TEST_TIMEOUT);
+      }, TEST_TIMEOUT);
     }
   );
 
@@ -204,20 +197,15 @@ describe('User activity', () => {
     (done) => {
       startTracking();
 
-      requestSpy.calls.reset();
+      renewWasCalled = false;
 
       setTimeout(() => {
         BBOmnibarUserActivity.userRenewedSession();
 
-        expect(requestSpy).toHaveBeenCalledWith(
-          'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
-          {
-            inactivity: 1
-          }
-        );
+        validateRenewCall();
 
         done();
-      }, 30);
+      }, TEST_TIMEOUT);
     }
   );
 
@@ -226,50 +214,40 @@ describe('User activity', () => {
     (done) => {
       startTracking();
 
-      requestSpy.calls.reset();
+      renewWasCalled = false;
 
       BBOmnibarUserActivity.MIN_RENEWAL_RETRY = 100;
 
       setTimeout(() => {
         BBOmnibarUserActivity.userRenewedSession();
 
-        expect(requestSpy).not.toHaveBeenCalledWith(
-          'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
-          {
-            inactivity: 1
-          }
-        );
+        validateRenewCall(false);
 
         done();
-      }, 30);
+      }, TEST_TIMEOUT);
     }
   );
 
   it('should not renew the user\'s session on startup if allow anonymous is true', () => {
     startTracking(true);
 
-    expect(requestSpy).not.toHaveBeenCalledWith(
-      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
-      {
-        inactivity: 1
-      }
-    );
+    validateRenewCall(false);
   });
 
   it('should stop tracking activity', (done) => {
     startTracking();
     BBOmnibarUserActivity.stopTracking();
 
-    requestSpy.calls.reset();
+    renewWasCalled = false;
 
     setTimeout(() => {
       moveMouse();
       pressKey();
 
-      expect(requestSpy).not.toHaveBeenCalled();
+      validateRenewCall(false);
 
       done();
-    }, 30);
+    }, TEST_TIMEOUT);
   });
 
   it('should redirect the user to the login page if the user logs out in another browser tab', () => {
@@ -303,7 +281,7 @@ describe('User activity', () => {
       expect(redirectForInactivitySpy).toHaveBeenCalled();
 
       done();
-    }, 30);
+    }, TEST_TIMEOUT);
   });
 
   it('should show an inactivity prompt', (done) => {
@@ -316,7 +294,7 @@ describe('User activity', () => {
     setTimeout(() => {
       expect(showInactivityCallbackSpy).toHaveBeenCalled();
       done();
-    }, 30);
+    }, TEST_TIMEOUT);
   });
 
   it('should hide the inactivity prompt when closed in another window', (done) => {
@@ -334,8 +312,8 @@ describe('User activity', () => {
       setTimeout(() => {
         expect(hideInactivityCallbackSpy).toHaveBeenCalled();
         done();
-      }, 30);
-    }, 30);
+      }, TEST_TIMEOUT);
+    }, TEST_TIMEOUT);
   });
 
   function validateNullTllBehavior(done: DoneFn) {
@@ -346,7 +324,7 @@ describe('User activity', () => {
       expect(hideInactivityCallbackSpy).not.toHaveBeenCalled();
       expect(redirectForInactivitySpy).not.toHaveBeenCalled();
       done();
-    }, 30);
+    }, TEST_TIMEOUT);
   }
 
   it('should ignore a null TTL and let session watcher redirect', (done) => {
