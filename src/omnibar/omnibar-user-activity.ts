@@ -180,7 +180,12 @@ function messageListener(event: MessageEvent) {
 
     if (data.messageType === 'session_change') {
       const message = data.message;
+
+      // Session ID changes whenever the user logs in the user profile information
+      // (e.g. name, email address ,etc.) changes
       const sessionId = message && message.sessionId;
+
+      // Refresh ID changes whenever a user's session is extended due to activity.
       const refreshId = message && message.refreshId;
 
       if (!sessionId && !currentAllowAnonymous) {
