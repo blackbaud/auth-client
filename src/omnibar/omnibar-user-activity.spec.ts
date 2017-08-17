@@ -1,4 +1,6 @@
 import { BBOmnibarUserActivity } from './omnibar-user-activity';
+import { BBOmnibarUserActivityProcessArgs } from './omnibar-user-activity-process-args';
+import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
 
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBAuthNavigator } from '../shared/navigator';
@@ -17,7 +19,7 @@ describe('User activity', () => {
   let ttlPromiseOverride: Promise<number>;
   let renewWasCalled: boolean;
 
-  function moveMouse(clientX = 1, clientY = 1) {
+  function moveMouse(clientX: number, clientY: number) {
     document.dispatchEvent(
       new MouseEvent(
         'mousemove',
@@ -63,6 +65,47 @@ describe('User activity', () => {
 
   function getWatcherIFrame() {
     return document.querySelectorAll('.sky-omnibar-iframe-session-watcher');
+  }
+
+  function validateActivityTracking(
+    doActivity1: () => void,
+    doActivity2: () => void,
+    shouldTrack: boolean,
+    done: DoneFn
+  ) {
+    const activityLog: any[] = [];
+
+    spyOn(BBOmnibarUserActivityProcessor, 'process')
+      .and
+      .callFake((args: BBOmnibarUserActivityProcessArgs) => {
+        if (args.lastActivity !== activityLog[activityLog.length - 1]) {
+          activityLog.push(args.lastActivity);
+        }
+      }
+    );
+
+    startTracking();
+
+    expect(activityLog.length).toBe(0);
+
+    doActivity1();
+
+    setTimeout(() => {
+      expect(activityLog.length).toBe(1);
+
+      doActivity2();
+
+      setTimeout(() => {
+        if (shouldTrack) {
+          expect(activityLog.length).toBe(2);
+          expect(activityLog[1]).toBeGreaterThan(activityLog[0]);
+        } else {
+          expect(activityLog.length).toBe(1);
+        }
+
+        done();
+      }, TEST_TIMEOUT);
+    }, TEST_TIMEOUT);
   }
 
   beforeAll(() => {
@@ -115,51 +158,33 @@ describe('User activity', () => {
     validateRenewCall();
   });
 
-  it('should renew the user\'s session when the user moves the mouse', (done) => {
-    startTracking();
-
-    renewWasCalled = false;
-
-    moveMouse();
-
-    setTimeout(() => {
-      validateRenewCall();
-
-      done();
-    }, TEST_TIMEOUT);
+  it('should track activity when the user moves the mouse', (done) => {
+    validateActivityTracking(
+      () => moveMouse(1, 1),
+      () => moveMouse(1, 2),
+      true,
+      done
+    );
   });
 
-  it('should renew the user\'s session when the user presses a key', (done) => {
-    startTracking();
-
-    renewWasCalled = false;
-
-    pressKey();
-
-    setTimeout(() => {
-      validateRenewCall();
-
-      done();
-    }, TEST_TIMEOUT);
+  it('should track activity when the user presses a key', (done) => {
+    validateActivityTracking(
+      pressKey,
+      pressKey,
+      true,
+      done
+    );
   });
 
   it(
-    'should not renew the user\'s session when the mouse move event has fired but the mouse did not actually move',
+    'should track activity when the mouse move event has fired but the mouse did not actually move',
     (done) => {
-      startTracking();
-
-      setTimeout(() => {
-        moveMouse();
-
-        renewWasCalled = false;
-
-        moveMouse();
-
-        setTimeout(() => {
-          validateRenewCall(false);
-          done();
-        }, TEST_TIMEOUT);
-      }, TEST_TIMEOUT);
+      validateActivityTracking(
+        () => moveMouse(1, 1),
+        () => moveMouse(1, 1),
+        false,
+        done
+      );
     }
   );
 
@@ -191,22 +216,17 @@ describe('User activity', () => {
     watcherIFrameEl = undefined;
   });
 
-  it(
-    'should allow the user to close the inactivity prompt and renew the session',
-    (done) => {
-      startTracking();
+  it('should allow the user to close the inactivity prompt and renew the session', () => {
+    startTracking();
 
-      renewWasCalled = false;
+    renewWasCalled = false;
 
-      setTimeout(() => {
-        BBOmnibarUserActivity.userRenewedSession();
+    BBOmnibarUserActivity.MIN_RENEWAL_RETRY = 0;
 
-        validateRenewCall();
+    BBOmnibarUserActivity.userRenewedSession();
 
-        done();
-      }, TEST_TIMEOUT);
-    }
-  );
+    validateRenewCall();
+  });
 
   it(
     'should not renew the user\'s session if the min renewal retry time has not been reached',
@@ -215,7 +235,7 @@ describe('User activity', () => {
 
       renewWasCalled = false;
 
-      BBOmnibarUserActivity.MIN_RENEWAL_RETRY = TEST_TIMEOUT + 50;
+      BBOmnibarUserActivity.MIN_RENEWAL_RETRY = TEST_TIMEOUT + 500000;
 
       setTimeout(() => {
         BBOmnibarUserActivity.userRenewedSession();
@@ -235,18 +255,16 @@ describe('User activity', () => {
 
   it('should stop tracking activity', (done) => {
     startTracking();
-    BBOmnibarUserActivity.stopTracking();
 
-    renewWasCalled = false;
-
-    setTimeout(() => {
-      moveMouse();
-      pressKey();
-
-      validateRenewCall(false);
-
-      done();
-    }, TEST_TIMEOUT);
+    validateActivityTracking(
+      () => moveMouse(1, 2),
+      () => {
+        BBOmnibarUserActivity.stopTracking();
+        pressKey();
+      },
+      false,
+      done
+    );
   });
 
   it('should redirect the user to the login page if the user logs out in another browser tab', () => {
@@ -288,7 +306,7 @@ describe('User activity', () => {
 
     ttl = .01;
 
-    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = BBOmnibarUserActivity.MAX_SESSION_AGE;
 
     setTimeout(() => {
       expect(showInactivityCallbackSpy).toHaveBeenCalled();

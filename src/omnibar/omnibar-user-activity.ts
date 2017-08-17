@@ -1,3 +1,5 @@
+import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
+
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 import { BBAuthNavigator } from '../shared/navigator';
@@ -106,39 +108,19 @@ function startActivityTimer() {
 
   intervalId = setInterval(() => {
     getSessionExpiration(lastRefreshId).then((expirationDate) => {
-      const now = Date.now();
-
-      // This is for the edge case where the user has signed out in another window but session
-      // watcher hasn't yet redirected this window to the sign in page.  Just return and let
-      // session watcher trigger the redirect.
-      if (expirationDate === null) {
-        return;
-      }
-
-      if (now > expirationDate) {
-        BBAuthNavigator.redirectToSignoutForInactivity();
-      }
-
-      // When the inactivity prompt is scheduled to be shown.
-      const promptDate = expirationDate - BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION;
-
-      // When the next renewal opportunity will occur.
-      const renewDate = expirationDate - BBOmnibarUserActivity.MAX_SESSION_AGE + BBOmnibarUserActivity.MIN_RENEWAL_AGE;
-
-      // If we're showing the prompt, then don't process renewals based on activity.  They will need to
-      // physically click on the prompt now.
-      if (isShowingInactivityPrompt) {
-        // The inactivity prompt was dismissed in another window.  Hide this one.
-        if (now < promptDate) {
-          closeInactivityPrompt();
-        }
-      } else {
-        if (lastActivity > renewDate) {
-          renewSession();
-        } else if (!currentAllowAnonymous && now > promptDate) {
-          showInactivityPrompt();
-        }
-      }
+      BBOmnibarUserActivityProcessor.process({
+        allowAnonymous: currentAllowAnonymous,
+        closeInactivityPrompt,
+        expirationDate,
+        inactivityPromptDuration: BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION,
+        isShowingInactivityPrompt,
+        lastActivity,
+        maxSessionAge: BBOmnibarUserActivity.MAX_SESSION_AGE,
+        minRenewalAge: BBOmnibarUserActivity.MIN_RENEWAL_AGE,
+        redirectForInactivity: BBAuthNavigator.redirectToSignoutForInactivity,
+        renewSession,
+        showInactivityPrompt
+      });
     });
   }, BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL);
 }
