@@ -289,18 +289,6 @@ describe('User activity', () => {
     );
   });
 
-  it('should redirect the user to the login page due to inactivity', (done) => {
-    startTracking();
-
-    ttl = .01;
-
-    setTimeout(() => {
-      expect(redirectForInactivitySpy).toHaveBeenCalled();
-
-      done();
-    }, TEST_TIMEOUT);
-  });
-
   it('should show an inactivity prompt', (done) => {
     startTracking();
 
