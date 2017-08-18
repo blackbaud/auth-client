@@ -42,6 +42,10 @@ export class BBAuth {
     return BBAuth.getTokenInternal(args);
   }
 
+  public static clearTokenCache() {
+    BBAuth.tokenCache = {};
+  }
+
   private static getTokenInternal(args: BBAuthGetTokenArgs): Promise<string> {
     const { forceNewToken, disableRedirect } = args;
 
@@ -69,7 +73,9 @@ export class BBAuth {
 
     if (!cachedItem.pendingLookupPromise) {
       cachedItem.pendingLookupPromise = BBAuthTokenIntegration.getToken(
-        disableRedirect, args.envId, args.permissionScope
+        disableRedirect,
+        args.envId,
+        args.permissionScope
       )
         .then((tokenResponse: any) => {
           cachedItem.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;

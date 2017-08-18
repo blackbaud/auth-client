@@ -1,3 +1,7 @@
+# 1.12.0 (2017-08-15)
+
+- Added support for showing an inactivity prompt. (#41)
+
 # 1.11.0 (2017-08-02)
 
 - Added support for local notifications. (#39)

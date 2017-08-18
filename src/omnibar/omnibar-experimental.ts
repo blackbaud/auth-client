@@ -124,7 +124,7 @@ function handleSearch(searchArgs: BBOmnibarSearchArgs) {
 }
 
 function refreshUserCallback() {
-  BBAuth.getToken(true).then((token: string) => {
+  function refreshUser(token: string) {
     BBAuthInterop.postOmnibarMessage(
       iframeEl,
       {
@@ -132,13 +132,45 @@ function refreshUserCallback() {
         token
       }
     );
-  });
+  }
+
+  BBAuth.clearTokenCache();
+
+  BBAuth.getToken({
+    disableRedirect: true,
+    forceNewToken: true
+  })
+    .then(refreshUser)
+    .catch(() => refreshUser(undefined));
+}
+
+function showInactivityCallback() {
+  BBAuthInterop.postOmnibarMessage(
+    iframeEl,
+    {
+      messageType: 'inactivity-show'
+    }
+  );
+}
+
+function hideInactivityCallback() {
+  BBAuthInterop.postOmnibarMessage(
+    iframeEl,
+    {
+      messageType: 'inactivity-hide'
+    }
+  );
 }
 
 function handleGetToken(tokenRequestId: any, disableRedirect: boolean) {
   BBAuth.getToken(false, disableRedirect)
     .then((token: string) => {
-      BBOmnibarUserActivity.startTracking(refreshUserCallback);
+      BBOmnibarUserActivity.startTracking(
+        refreshUserCallback,
+        showInactivityCallback,
+        hideInactivityCallback,
+        disableRedirect
+      );
 
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
@@ -150,6 +182,13 @@ function handleGetToken(tokenRequestId: any, disableRedirect: boolean) {
       );
     })
     .catch((reason: any) => {
+      BBOmnibarUserActivity.startTracking(
+        refreshUserCallback,
+        showInactivityCallback,
+        hideInactivityCallback,
+        disableRedirect
+      );
+
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
@@ -299,6 +338,9 @@ function messageHandler(event: MessageEvent) {
       handleNotificationRead(
         message.notification
       );
+      break;
+    case 'session-renew':
+      BBOmnibarUserActivity.userRenewedSession();
       break;
   }
 }

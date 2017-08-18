@@ -335,6 +335,17 @@ describe('Omnibar (experimental)', () => {
       // Should not throw an error.
     });
 
+    it('should provide a way to renew the user session', () => {
+      loadOmnibar();
+
+      const userRenewedSessionSpy = spyOn(BBOmnibarUserActivity, 'userRenewedSession');
+
+      fireMessageEvent({
+        messageType: 'session-renew'
+      });
+
+      expect(userRenewedSessionSpy).toHaveBeenCalled();
+    });
   });
 
   describe('interop with omnibar', () => {
@@ -566,6 +577,41 @@ describe('Omnibar (experimental)', () => {
       });
     });
 
+    it('should notify the omnibar when the current user has logged out', (done) => {
+      postOmnibarMessageSpy.and.callFake(
+        (iframeEl: HTMLIFrameElement, data: any) => {
+          // The first call to this spy will be to return the requested token, so ignore that
+          // one and look for the refresh-user call.
+          if (data.messageType === 'refresh-user') {
+            expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+              getIframeEl(),
+              {
+                messageType: 'refresh-user',
+                token: undefined
+              }
+            );
+
+            done();
+          }
+        }
+      );
+
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+      });
+
+      getTokenFake = () => {
+        return Promise.reject('The user is not logged in.');
+      };
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
+
     it('should notify the omnibar when notifications are updated', () => {
       const notifications = {
         items: [
@@ -597,6 +643,61 @@ describe('Omnibar (experimental)', () => {
           notifications
         }
       ]);
+    });
+
+    it('should notify the omnibar to show the inactivity prompt', (done) => {
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'inactivity-show'
+          }
+        );
+
+        done();
+      });
+
+      startTrackingSpy.and.callFake((
+        refreshUserCallback: () => void,
+        showInactivityCallback: () => void
+      ) => {
+        showInactivityCallback();
+      });
+
+      loadOmnibar();
+
+      // Getting a token starts the activity tracking.
+      fireMessageEvent({
+        messageType: 'get-token'
+      });
+    });
+
+    it('should notify the omnibar to hide the inactivity prompt', (done) => {
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'inactivity-hide'
+          }
+        );
+
+        done();
+      });
+
+      startTrackingSpy.and.callFake((
+        refreshUserCallback: () => void,
+        showInactivityCallback: () => void,
+        hideInactivityCallback: () => void
+      ) => {
+        hideInactivityCallback();
+      });
+
+      loadOmnibar();
+
+      // Getting a token starts the activity tracking.
+      fireMessageEvent({
+        messageType: 'get-token'
+      });
     });
 
   });

@@ -67,7 +67,6 @@ function requestToken(url: string, csrfValue: string, envId?: string, permission
 }
 
 export class BBCsrfXhr {
-
   public static request(
     url: string,
     signinRedirectParams?: any,
