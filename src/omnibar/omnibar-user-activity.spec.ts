@@ -302,25 +302,6 @@ describe('User activity', () => {
     }, TEST_TIMEOUT);
   });
 
-  it('should hide the inactivity prompt when closed in another window', (done) => {
-    startTracking();
-
-    ttl = .01;
-
-    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
-
-    setTimeout(() => {
-      expect(showInactivityCallbackSpy).toHaveBeenCalled();
-
-      postSessionChange('def', '456');
-
-      setTimeout(() => {
-        expect(hideInactivityCallbackSpy).toHaveBeenCalled();
-        done();
-      }, TEST_TIMEOUT);
-    }, TEST_TIMEOUT);
-  });
-
   function validateNullTllBehavior(done: DoneFn) {
     BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
 
