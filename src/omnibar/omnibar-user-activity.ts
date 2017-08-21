@@ -1,4 +1,6 @@
 import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
+import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
+import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
 
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
@@ -14,14 +16,9 @@ let isShowingInactivityPrompt: boolean;
 let lastActivity: number;
 let lastRenewal: number;
 let intervalId: any;
-let lastSessionId: string;
 let lastRefreshId = '';
-let ttlCache: {
-  promise: Promise<number>,
-  refreshId: string
-};
-let watcherIFrame: HTMLIFrameElement;
 let currentAllowAnonymous: boolean;
+let legacyTtl: number;
 
 function trackUserActivity() {
   lastActivity = Date.now();
@@ -36,35 +33,6 @@ function trackMouseMove(e: MouseEvent) {
     clientY = e.clientY;
     trackUserActivity();
   }
-}
-
-function getSessionExpiration(refreshId: any): Promise<number> {
-  if (ttlCache && ttlCache.refreshId === refreshId) {
-    return ttlCache.promise;
-  }
-
-  const promise = new Promise<number>((resolve, reject) => {
-    BBCsrfXhr.request(
-      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/ttl',
-      undefined,
-      currentAllowAnonymous
-    )
-      .then((ttl: number) => {
-        const expirationDate = (ttl === null) ? null : Date.now() + ttl * 1000;
-
-        resolve(expirationDate);
-      })
-      .catch(() => {
-        resolve(null);
-      });
-  });
-
-  ttlCache = {
-    promise,
-    refreshId
-  };
-
-  return promise;
 }
 
 function renewSession() {
@@ -107,7 +75,11 @@ function startActivityTimer() {
   }
 
   intervalId = setInterval(() => {
-    getSessionExpiration(lastRefreshId).then((expirationDate) => {
+    BBOmnibarUserSessionExpiration.getSessionExpiration(
+      lastRefreshId,
+      legacyTtl,
+      currentAllowAnonymous
+    ).then((expirationDate) => {
       BBOmnibarUserActivityProcessor.process({
         allowAnonymous: currentAllowAnonymous,
         closeInactivityPrompt,
@@ -123,66 +95,6 @@ function startActivityTimer() {
       });
     });
   }, BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL);
-}
-
-function createWatcherIFrame() {
-  const url = BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN +
-    '/SessionWatcher.html?origin=' +
-    encodeURIComponent(location.origin);
-
-  watcherIFrame = document.createElement('iframe');
-
-  watcherIFrame.className = 'sky-omnibar-iframe-session-watcher';
-  watcherIFrame.width = '0';
-  watcherIFrame.height = '0';
-  watcherIFrame.frameBorder = '0';
-  watcherIFrame.src = url;
-  watcherIFrame.tabIndex = -1;
-
-  document.body.appendChild(watcherIFrame);
-}
-
-function messageListener(event: MessageEvent) {
-  if (
-    event.origin === BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN &&
-    typeof event.data === 'string'
-  ) {
-    let data: any;
-
-    try {
-      data = JSON.parse(event.data);
-    } catch (err) {
-      // This is irrelevant data posted by a browser plugin or some other IFRAME, so just discard it.
-      return;
-    }
-
-    if (data.messageType === 'session_change') {
-      const message = data.message;
-
-      // Session ID changes whenever the user logs in the user profile information
-      // (e.g. name, email address ,etc.) changes
-      const sessionId = message && message.sessionId;
-
-      // Refresh ID changes whenever a user's session is extended due to activity.
-      const refreshId = message && message.refreshId;
-
-      if (!sessionId && !currentAllowAnonymous) {
-        BBAuthNavigator.redirectToSignin();
-      }
-
-      if (lastSessionId !== undefined && sessionId !== lastSessionId) {
-        currentRefreshUserCallback();
-      }
-
-      lastRefreshId = refreshId;
-      lastSessionId = sessionId;
-    }
-  }
-}
-
-function redirectIfUserLogsOutLater() {
-  window.addEventListener('message', messageListener, false);
-  createWatcherIFrame();
 }
 
 export class BBOmnibarUserActivity {
@@ -211,7 +123,8 @@ export class BBOmnibarUserActivity {
     refreshUserCallback: () => void,
     showInactivityCallback: () => void,
     hideInactivityCallback: () => void,
-    allowAnonymous: boolean
+    allowAnonymous: boolean,
+    legacyKeepAliveUrl: string
   ) {
     if (!isTracking || allowAnonymous !== currentAllowAnonymous) {
       BBOmnibarUserActivity.stopTracking();
@@ -223,7 +136,16 @@ export class BBOmnibarUserActivity {
 
       addActivityListeners();
       startActivityTimer();
-      redirectIfUserLogsOutLater();
+
+      BBOmnibarUserSessionWatcher.start(
+        allowAnonymous,
+        legacyKeepAliveUrl,
+        currentRefreshUserCallback,
+        (state) => {
+          legacyTtl = state.legacyTtl;
+          lastRefreshId = state.refreshId;
+        }
+      );
 
       isTracking = true;
     }
@@ -235,12 +157,8 @@ export class BBOmnibarUserActivity {
   }
 
   public static stopTracking() {
-    if (watcherIFrame) {
-      document.body.removeChild(watcherIFrame);
-      watcherIFrame = undefined;
-    }
-
-    window.removeEventListener('message', messageListener, false);
+    BBOmnibarUserSessionWatcher.stop();
+    BBOmnibarUserSessionExpiration.reset();
 
     document.removeEventListener('keypress', trackUserActivity);
     document.removeEventListener('mousemove', trackMouseMove);
@@ -251,17 +169,16 @@ export class BBOmnibarUserActivity {
       intervalId = undefined;
     }
 
-    isTracking = undefined;
-    clientX = undefined;
-    clientY = undefined;
-    lastActivity = undefined;
-    lastRenewal = undefined;
-    lastSessionId = undefined;
-    ttlCache = undefined;
-    isShowingInactivityPrompt = undefined;
-    currentRefreshUserCallback = undefined;
-    currentShowInactivityCallback = undefined;
-    currentHideInactivityCallback = undefined;
-    currentAllowAnonymous = undefined;
+    isTracking =
+      clientX =
+      clientY =
+      lastActivity =
+      lastRenewal =
+      isShowingInactivityPrompt =
+      currentRefreshUserCallback =
+      currentShowInactivityCallback =
+      currentHideInactivityCallback =
+      currentAllowAnonymous =
+      undefined;
   }
 }

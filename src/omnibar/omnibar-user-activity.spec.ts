@@ -1,23 +1,23 @@
 import { BBOmnibarUserActivity } from './omnibar-user-activity';
 import { BBOmnibarUserActivityProcessArgs } from './omnibar-user-activity-process-args';
 import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
+import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
+import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
 
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBAuthNavigator } from '../shared/navigator';
 
-const SIGNIN_URL = 'https://signin.blackbaud.com/signin/';
 const TEST_TIMEOUT = 50;
 
-describe('User activity', () => {
-  let navigateSpy: jasmine.Spy;
+describe('Omnibar user activity', () => {
   let requestSpy: jasmine.Spy;
   let redirectForInactivitySpy: jasmine.Spy;
   let refreshUserCallbackSpy: jasmine.Spy;
   let showInactivityCallbackSpy: jasmine.Spy;
   let hideInactivityCallbackSpy: jasmine.Spy;
-  let ttl: number;
-  let ttlPromiseOverride: Promise<number>;
+  let getSessionExpirationSpy: jasmine.Spy;
   let renewWasCalled: boolean;
+  let expirationDate: number;
 
   function moveMouse(clientX: number, clientY: number) {
     document.dispatchEvent(
@@ -39,32 +39,14 @@ describe('User activity', () => {
     expect(renewWasCalled).toBe(called);
   }
 
-  function startTracking(allowAnonymous = false) {
+  function startTracking(allowAnonymous = false, legacyKeepAliveUrl?: string) {
     BBOmnibarUserActivity.startTracking(
       refreshUserCallbackSpy,
       showInactivityCallbackSpy,
       hideInactivityCallbackSpy,
-      allowAnonymous
+      allowAnonymous,
+      legacyKeepAliveUrl
     );
-  }
-
-  function postSessionChange(refreshId: string, sessionId: string) {
-    window.dispatchEvent(
-      new MessageEvent('message', {
-        data: JSON.stringify({
-          message: {
-            refreshId,
-            sessionId
-          },
-          messageType: 'session_change'
-        }),
-        origin: BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
-      })
-    );
-  }
-
-  function getWatcherIFrame() {
-    return document.querySelectorAll('.sky-omnibar-iframe-session-watcher');
   }
 
   function validateActivityTracking(
@@ -108,11 +90,24 @@ describe('User activity', () => {
     }, TEST_TIMEOUT);
   }
 
+  function validateNullExpirationBehavior(done: DoneFn) {
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
+
+    setTimeout(() => {
+      expect(showInactivityCallbackSpy).not.toHaveBeenCalled();
+      expect(hideInactivityCallbackSpy).not.toHaveBeenCalled();
+      expect(redirectForInactivitySpy).not.toHaveBeenCalled();
+      done();
+    }, TEST_TIMEOUT);
+  }
+
   beforeAll(() => {
+    getSessionExpirationSpy = spyOn(BBOmnibarUserSessionExpiration, 'getSessionExpiration').and.callFake(() => {
+      return Promise.resolve(expirationDate);
+    });
+
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
       switch (url.substr('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/'.length)) {
-        case 'ttl':
-          return ttlPromiseOverride || Promise.resolve(ttl);
         case 'renew':
           renewWasCalled = true;
           break;
@@ -121,7 +116,6 @@ describe('User activity', () => {
       return Promise.resolve();
     });
 
-    navigateSpy = spyOn(BBAuthNavigator, 'navigate');
     redirectForInactivitySpy = spyOn(BBAuthNavigator, 'redirectToSignoutForInactivity');
     refreshUserCallbackSpy = jasmine.createSpy('refreshUserCallback');
     showInactivityCallbackSpy = jasmine.createSpy('showInactivityCallback');
@@ -130,21 +124,20 @@ describe('User activity', () => {
 
   beforeEach(() => {
     requestSpy.calls.reset();
-    navigateSpy.calls.reset();
     redirectForInactivitySpy.calls.reset();
     refreshUserCallbackSpy.calls.reset();
     showInactivityCallbackSpy.calls.reset();
     hideInactivityCallbackSpy.calls.reset();
+    getSessionExpirationSpy.calls.reset();
 
-    ttl = .015;
+    expirationDate = Date.now() + 15;
 
     BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL = TEST_TIMEOUT / 2;
     BBOmnibarUserActivity.MIN_RENEWAL_RETRY = TEST_TIMEOUT - 20;
     BBOmnibarUserActivity.MIN_RENEWAL_AGE = 0;
-    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = (ttl * 1000) - 5;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = (.015 * 1000) - 5;
     BBOmnibarUserActivity.MAX_SESSION_AGE = TEST_TIMEOUT * 2;
 
-    ttlPromiseOverride = undefined;
     renewWasCalled = false;
   });
 
@@ -189,31 +182,25 @@ describe('User activity', () => {
   );
 
   it('should not start tracking again if tracking has already started', () => {
-    startTracking();
-
-    let watcherIFrameEl = getWatcherIFrame();
+    const startWatchingSpy = spyOn(BBOmnibarUserSessionWatcher, 'start');
 
     startTracking();
 
-    expect(getWatcherIFrame().length).toBe(1);
-    expect(getWatcherIFrame()[0]).toBe(watcherIFrameEl[0]);
+    startTracking();
 
-    watcherIFrameEl = undefined;
+    expect(startWatchingSpy).toHaveBeenCalledTimes(1);
   });
 
   it('should start tracking again if tracking has already started and the allow anonymous flag changes', () => {
+    const startWatchingSpy = spyOn(BBOmnibarUserSessionWatcher, 'start');
+
     startTracking();
 
-    let watcherIFrameEl = getWatcherIFrame();
+    startTracking(true, 'https://example.com/test');
 
-    startTracking(true);
-
-    // When tracking is restarted, the session watcher IFRAME should be removed from the DOM and
-    // a new one created and added to the DOM.
-    expect(getWatcherIFrame().length).toBe(1);
-    expect(getWatcherIFrame()[0]).not.toBe(watcherIFrameEl[0]);
-
-    watcherIFrameEl = undefined;
+    // When tracking is restarted, the IFRAMEs should be removed from the DOM and
+    // new ones created and added to the DOM.
+    expect(startWatchingSpy).toHaveBeenCalledTimes(2);
   });
 
   it('should allow the user to close the inactivity prompt and renew the session', () => {
@@ -267,32 +254,10 @@ describe('User activity', () => {
     );
   });
 
-  it('should redirect the user to the login page if the user logs out in another browser tab', () => {
-    startTracking();
-
-    window.dispatchEvent(
-      new MessageEvent('message', {
-        data: JSON.stringify({
-          message: {
-            sessionId: undefined
-          },
-          messageType: 'session_change'
-        }),
-        origin: BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
-      })
-    );
-
-    expect(navigateSpy).toHaveBeenCalledWith(
-      SIGNIN_URL +
-      '?redirectUrl=' +
-      encodeURIComponent(location.href)
-    );
-  });
-
   it('should show an inactivity prompt', (done) => {
     startTracking();
 
-    ttl = .01;
+    expirationDate = Date.now() + 10;
 
     BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = BBOmnibarUserActivity.MAX_SESSION_AGE;
 
@@ -302,81 +267,46 @@ describe('User activity', () => {
     }, TEST_TIMEOUT);
   });
 
-  function validateNullTllBehavior(done: DoneFn) {
-    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
-
-    setTimeout(() => {
-      expect(showInactivityCallbackSpy).not.toHaveBeenCalled();
-      expect(hideInactivityCallbackSpy).not.toHaveBeenCalled();
-      expect(redirectForInactivitySpy).not.toHaveBeenCalled();
-      done();
-    }, TEST_TIMEOUT);
-  }
-
-  it('should ignore a null TTL and let session watcher redirect', (done) => {
+  it('should ignore a null expiration date and let session watcher redirect', (done) => {
     startTracking();
 
-    ttl = null;
+    expirationDate = null;
 
-    validateNullTllBehavior(done);
+    validateNullExpirationBehavior(done);
   });
 
-  it('should treat a non-200 TTL response as null', (done) => {
+  it('should pick up state changes from session watcher', (done) => {
+    let currentStateChange: (args: any) => void;
+
+    spyOn(BBOmnibarUserSessionWatcher, 'start')
+      .and
+      .callFake((
+        allowAnonymous: boolean,
+        legacyKeepAliveUrl: string,
+        refreshUserCallback: () => void,
+        stateChange: (args: any) => void
+      ) => {
+        currentStateChange = stateChange;
+      });
+
+    getSessionExpirationSpy
+      .and
+      .callFake((
+        refreshId: string,
+        legacyTtl: number
+      ) => {
+        expect(refreshId).toBe('123');
+        expect(legacyTtl).toBe(456);
+        done();
+        return Promise.resolve(123);
+      });
+
     startTracking();
 
-    ttlPromiseOverride = Promise
-      .reject(new Error('Not logged in'));
-
-    validateNullTllBehavior(done);
-  });
-
-  it('should ignore unexpected event data without throwing an error', () => {
-    startTracking();
-
-    window.dispatchEvent(
-      new MessageEvent('message', {
-        data: {
-          foo: 'bar'
-        },
-        origin: BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
-      })
-    );
-
-    window.dispatchEvent(
-      new MessageEvent('message', {
-        data: 'asdf',
-        origin: BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
-      })
-    );
-
-    window.dispatchEvent(
-      new MessageEvent('message', {
-        data: JSON.stringify({
-          messageType: 'foo'
-        }),
-        origin: BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
-      })
-    );
-  });
-
-  it('should call the specified callback when the current user\'s info changes' , () => {
-    startTracking();
-
-    postSessionChange('abc', '123');
-
-    expect(refreshUserCallbackSpy).not.toHaveBeenCalled();
-
-    postSessionChange('abc', '456');
-
-    expect(refreshUserCallbackSpy).toHaveBeenCalled();
-  });
-
-  it('should hide the session watcher IFRAME from assistive technology', () => {
-    startTracking();
-
-    const iframeEl = document.querySelector('.sky-omnibar-iframe-session-watcher');
-
-    expect(iframeEl.getAttribute('tabindex')).toBe('-1');
+    currentStateChange({
+      legacyTtl: 456,
+      refreshId: '123'
+    });
   });
 
 });
