@@ -309,4 +309,36 @@ describe('Omnibar user activity', () => {
     });
   });
 
+  it('should navigate to the legacy signin URL on session expiration when specified', (done) => {
+    let currentStateChange: (args: any) => void;
+
+    const navigateSpy = spyOn(BBAuthNavigator, 'navigate');
+
+    spyOn(BBOmnibarUserSessionWatcher, 'start')
+      .and
+      .callFake((
+        allowAnonymous: boolean,
+        legacyKeepAliveUrl: string,
+        refreshUserCallback: () => void,
+        stateChange: (args: any) => void
+      ) => {
+        currentStateChange = stateChange;
+      });
+
+    BBOmnibarUserActivity.MAX_SESSION_AGE = TEST_TIMEOUT / 2;
+
+    startTracking();
+
+    currentStateChange({
+      legacySigninUrl: 'https://example.com/legacy',
+      legacyTtl: 456,
+      refreshId: '123'
+    });
+
+    setTimeout(() => {
+      expect(navigateSpy).toHaveBeenCalledWith('https://example.com/legacy');
+      done();
+    }, TEST_TIMEOUT);
+  });
+
 });

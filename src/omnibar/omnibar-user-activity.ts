@@ -19,6 +19,7 @@ let intervalId: any;
 let lastRefreshId = '';
 let currentAllowAnonymous: boolean;
 let legacyTtl: number;
+let legacySigninUrl: string;
 
 function trackUserActivity() {
   lastActivity = Date.now();
@@ -66,6 +67,14 @@ function closeInactivityPrompt() {
   currentHideInactivityCallback();
 }
 
+function redirectForInactivity() {
+  if (legacySigninUrl) {
+    BBAuthNavigator.navigate(legacySigninUrl);
+  } else {
+    BBAuthNavigator.redirectToSignoutForInactivity();
+  }
+}
+
 function startActivityTimer() {
   // It's possible the user was active on another web page and just navigated to this
   // one.  Since the activity tracking does not carry over from the previous page,
@@ -89,7 +98,7 @@ function startActivityTimer() {
         lastActivity,
         maxSessionAge: BBOmnibarUserActivity.MAX_SESSION_AGE,
         minRenewalAge: BBOmnibarUserActivity.MIN_RENEWAL_AGE,
-        redirectForInactivity: BBAuthNavigator.redirectToSignoutForInactivity,
+        redirectForInactivity,
         renewSession,
         showInactivityPrompt
       });
@@ -144,6 +153,7 @@ export class BBOmnibarUserActivity {
         (state) => {
           legacyTtl = state.legacyTtl;
           lastRefreshId = state.refreshId;
+          legacySigninUrl = state.legacySigninUrl;
         }
       );
 

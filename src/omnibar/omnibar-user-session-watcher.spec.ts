@@ -25,11 +25,12 @@ describe('Omnibar user session watcher', () => {
     );
   }
 
-  function postLegacyKeepAliveReady(legacyTtl: number) {
+  function postLegacyKeepAliveReady(legacyTtl: number, legacySigninUrl?: string) {
     window.dispatchEvent(
       new MessageEvent('message', {
         data: {
           messageType: 'ready',
+          signinUrl: legacySigninUrl,
           ttl: legacyTtl
         },
         origin: TEST_LEGACY_KEEP_ALIVE_ORIGIN
@@ -70,7 +71,7 @@ describe('Omnibar user session watcher', () => {
     BBOmnibarUserSessionWatcher.stop();
   });
 
-  it('should not start watching again if tracking has already started', () => {
+  it('should not start watching again if watching has already started', () => {
     startWatching();
 
     let watcherIFrameEl = getWatcherIFrame();
@@ -83,7 +84,7 @@ describe('Omnibar user session watcher', () => {
     watcherIFrameEl = undefined;
   });
 
-  it('should start watching again if tracking has already started and the allow anonymous flag changes', () => {
+  it('should start watching again if watching has already started and the allow anonymous flag changes', () => {
     startWatching(undefined);
 
     let watcherIFrameEl = getWatcherIFrame();
@@ -152,6 +153,28 @@ describe('Omnibar user session watcher', () => {
       SIGNIN_URL +
       '?redirectUrl=' +
       encodeURIComponent(location.href)
+    );
+  });
+
+  it('should redirect the user to the legacy sign in page if specified', () => {
+    startWatching(false, TEST_LEGACY_KEEP_ALIVE_ORIGIN + '/legacy');
+
+    postLegacyKeepAliveReady(10000, 'https://example.com/legacy-signin');
+
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: JSON.stringify({
+          message: {
+            sessionId: undefined
+          },
+          messageType: 'session_change'
+        }),
+        origin: BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
+      })
+    );
+
+    expect(navigateSpy).toHaveBeenCalledWith(
+      'https://example.com/legacy-signin'
     );
   });
 

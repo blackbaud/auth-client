@@ -141,8 +141,8 @@ describe('Omnibar user session expiration', () => {
             undefined,
             false
           )
-            .then((cachedExpirationDate) => {
-              expect(cachedExpirationDate).toBe(250000);
+            .then((newExpirationDate) => {
+              expect(newExpirationDate).toBe(250000);
               done();
             });
         }, 200);

@@ -1,21 +1,16 @@
+import { BBOmnibarUserSessionState } from './omnibar-user-session-state';
+
 import { BBAuthNavigator } from '../shared/navigator';
 
 let isWatching: boolean;
 let currentLegacyKeepAliveUrl: string;
 let currentRefreshUserCallback: () => void;
-let currentStateChange: (state: {
-  legacyTtl?: number,
-  refreshId?: string,
-  sessionId?: string
-}) => void;
+let currentStateChange: (state: BBOmnibarUserSessionState) => void;
 let currentAllowAnonymous: boolean;
 let watcherIFrame: HTMLIFrameElement;
 let legacyKeepAliveIFrame: HTMLIFrameElement;
-let state: {
-  legacyTtl?: number,
-  refreshId?: string,
-  sessionId?: string
-} = {};
+let state: BBOmnibarUserSessionState = {};
+let currentLegacySigninUrl: string;
 
 function createIFrame(cls: string, url: string): HTMLIFrameElement {
   const iframe = document.createElement('iframe');
@@ -71,7 +66,11 @@ function processSessionWatcherMessage(event: MessageEvent) {
       const refreshId = message && message.refreshId;
 
       if (!sessionId && !currentAllowAnonymous) {
-        BBAuthNavigator.redirectToSignin();
+        if (currentLegacySigninUrl) {
+          BBAuthNavigator.navigate(currentLegacySigninUrl);
+        } else {
+          BBAuthNavigator.redirectToSignin();
+        }
       }
 
       if (state.sessionId !== undefined && sessionId !== state.sessionId) {
@@ -104,6 +103,7 @@ function processLegacyKeepAliveMessage(event: MessageEvent) {
   switch (data.messageType) {
     case 'ready':
       state.legacyTtl = data.ttl;
+      currentLegacySigninUrl = data.signinUrl;
       currentStateChange(state);
       break;
   }
@@ -127,11 +127,7 @@ export class BBOmnibarUserSessionWatcher {
     allowAnonymous: boolean,
     legacyKeepAliveUrl: string,
     refreshUserCallback: () => void,
-    stateChange: (state: {
-      legacyTtl?: number,
-      refreshId?: string,
-      sessionId?: string
-    }) => void
+    stateChange: (state: BBOmnibarUserSessionState) => void
   ) {
     if (!isWatching || allowAnonymous !== currentAllowAnonymous) {
       BBOmnibarUserSessionWatcher.stop();
@@ -169,6 +165,7 @@ export class BBOmnibarUserSessionWatcher {
       currentAllowAnonymous =
       currentRefreshUserCallback =
       currentLegacyKeepAliveUrl =
+      currentLegacySigninUrl =
       currentStateChange =
       undefined;
   }
