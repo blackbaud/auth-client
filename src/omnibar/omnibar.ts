@@ -3,6 +3,10 @@ declare const BBAUTH: any;
 import { BBOmnibarExperimental } from './omnibar-experimental';
 import { BBOmnibarScriptLoader } from './omnibar-script-loader';
 
+function getJQuery() {
+  return (window as any).jQuery;
+}
+
 export class BBOmnibar {
   public static load(config: any): Promise<any> {
     if (config && config.experimental) {
@@ -10,8 +14,9 @@ export class BBOmnibar {
     }
 
     return new Promise<any>((resolve: any) => {
-      const jquery = (window as any).jQuery;
+      const jquery = getJQuery();
       const jqueryVersion = jquery && jquery.fn && jquery.fn.jquery;
+
       BBOmnibarScriptLoader.smartRegisterScript(
         'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js',
         '2.1.0',
@@ -38,6 +43,14 @@ export class BBOmnibar {
 
           config['z-index'] = 1000;
           config.afterLoad = resolve;
+
+          if (config.menuEl) {
+            // BBAUTH.Omnibar assumes the host page has access to jQuery before load() is called
+            // and can pass in menuEl as a jQuery object, but not every host page will be using
+            // jQuery.  As a courtesy, just ensure menuEl is a jQuery object before passing it
+            // to load().
+            config.menuEl = getJQuery()(config.menuEl);
+          }
 
           BBAUTH.Omnibar.load(
             omnibarEl,
