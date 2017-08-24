@@ -24,15 +24,16 @@ describe('Omnibar', () => {
 
     fakeAuth = {
       Omnibar: {
-        load: (omnibarEl: any, config: any) => {
+        load: jasmine.createSpy('load').and.callFake((omnibarEl: any, config: any) => {
           config.afterLoad();
-        }
+        })
       }
     };
   });
 
   afterEach(() => {
     registerScriptSpy.calls.reset();
+    (window as any).jQuery = undefined;
   });
 
   it('should register the required JavaScript libraries', (done) => {
@@ -125,13 +126,29 @@ describe('Omnibar', () => {
     });
   });
 
-  it('should pass the expected config to the base omnibar load method', (done) => {
-    const omnibarLoadSpy = spyOn(fakeAuth.Omnibar, 'load').and.callThrough();
+  it('should ensure that menuEl is a jQuery object if specified', (done) => {
+    const menuEl = {};
+    const jQueryMenuEl = {};
 
+    (window as any).jQuery = () => jQueryMenuEl;
+
+    fakeAuth.Omnibar.load.and.callFake((omnibarEl: any, config: any) => {
+      expect(config.menuEl).toBe(jQueryMenuEl);
+
+      done();
+    });
+
+    BBOmnibar.load({
+      menuEl,
+      serviceName: 'test'
+    });
+  });
+
+  it('should pass the expected config to the base omnibar load method', (done) => {
     BBOmnibar.load({
       serviceName: 'test'
     }).then(() => {
-      expect(omnibarLoadSpy).toHaveBeenCalledWith(
+      expect(fakeAuth.Omnibar.load).toHaveBeenCalledWith(
         document.body.querySelector('[data-omnibar-el]'),
         {
           'afterLoad': jasmine.any(Function),
@@ -145,10 +162,8 @@ describe('Omnibar', () => {
   });
 
   it('should support an undefined config', (done) => {
-    const omnibarLoadSpy = spyOn(fakeAuth.Omnibar, 'load').and.callThrough();
-
     BBOmnibar.load(undefined).then(() => {
-      expect(omnibarLoadSpy).toHaveBeenCalledWith(
+      expect(fakeAuth.Omnibar.load).toHaveBeenCalledWith(
         document.body.querySelector('[data-omnibar-el]'),
         {
           'afterLoad': jasmine.any(Function),
