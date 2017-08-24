@@ -162,42 +162,48 @@ function hideInactivityCallback() {
   );
 }
 
-function handleGetToken(tokenRequestId: any, disableRedirect: boolean) {
+function handleGetToken(
+  tokenRequestId: any,
+  disableRedirect: boolean,
+  legacyKeepAliveUrl: string
+) {
+  function startActivityTracking() {
+    BBOmnibarUserActivity.startTracking(
+      refreshUserCallback,
+      showInactivityCallback,
+      hideInactivityCallback,
+      disableRedirect,
+      legacyKeepAliveUrl
+    );
+  }
+
   BBAuth.getToken(false, disableRedirect)
-    .then((token: string) => {
-      BBOmnibarUserActivity.startTracking(
-        refreshUserCallback,
-        showInactivityCallback,
-        hideInactivityCallback,
-        disableRedirect
-      );
+    .then(
+      (token: string) => {
+        startActivityTracking();
 
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          messageType: 'token',
-          token,
-          tokenRequestId
-        }
-      );
-    })
-    .catch((reason: any) => {
-      BBOmnibarUserActivity.startTracking(
-        refreshUserCallback,
-        showInactivityCallback,
-        hideInactivityCallback,
-        disableRedirect
-      );
+        BBAuthInterop.postOmnibarMessage(
+          iframeEl,
+          {
+            messageType: 'token',
+            token,
+            tokenRequestId
+          }
+        );
+      },
+      (reason: any) => {
+        startActivityTracking();
 
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          messageType: 'token-fail',
-          reason,
-          tokenRequestId
-        }
-      );
-    });
+        BBAuthInterop.postOmnibarMessage(
+          iframeEl,
+          {
+            messageType: 'token-fail',
+            reason,
+            tokenRequestId
+          }
+        );
+      }
+    );
 }
 
 function handleHelp() {
@@ -328,7 +334,8 @@ function messageHandler(event: MessageEvent) {
     case 'get-token':
       handleGetToken(
         message.tokenRequestId,
-        message.disableRedirect
+        message.disableRedirect,
+        omnibarConfig.legacyKeepAliveUrl
       );
       break;
     case 'help-open':

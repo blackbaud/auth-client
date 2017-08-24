@@ -24,4 +24,6 @@ export class BBOmnibarConfig {
   public enableHelp?: boolean;
 
   public notifications?: BBOmnibarNotificationsConfig;
+
+  public legacyKeepAliveUrl?: string;
 }

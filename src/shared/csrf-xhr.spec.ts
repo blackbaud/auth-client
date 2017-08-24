@@ -7,17 +7,18 @@ describe('Auth token integration', () => {
   let navigateSpy: jasmine.Spy;
 
   beforeAll(() => {
+    jasmine.Ajax.install();
+
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
   });
 
   beforeEach(() => {
-    jasmine.Ajax.install();
 
     navigateSpy.and.stub();
     navigateSpy.calls.reset();
   });
 
-  afterEach(() => {
+  afterAll(() => {
     jasmine.Ajax.uninstall();
   });
 
