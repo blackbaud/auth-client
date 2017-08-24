@@ -1,3 +1,8 @@
+# 1.13.0 (2017-08-24)
+
+- Added basic support for a legacy keep-alive IFRAME when using the experimental omnibar. (#43)
+- Ensure `menuEl` is a jQuery object before passing it through to the underlying omnibar widget. (#44)
+
 # 1.12.0 (2017-08-15)
 
 - Added support for showing an inactivity prompt. (#41)
