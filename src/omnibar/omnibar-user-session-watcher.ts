@@ -1,5 +1,7 @@
 import { BBOmnibarUserSessionState } from './omnibar-user-session-state';
 
+import { BBAuthInterop } from '../shared/interop';
+
 import { BBAuthNavigator } from '../shared/navigator';
 
 let isWatching: boolean;
@@ -11,6 +13,28 @@ let watcherIFrame: HTMLIFrameElement;
 let legacyKeepAliveIFrame: HTMLIFrameElement;
 let state: BBOmnibarUserSessionState = {};
 let currentLegacySigninUrl: string;
+
+function parseOrigin(url: string) {
+  if (url) {
+    const urlParts = url.split('://');
+    const protocol = urlParts[0];
+    const hostname = urlParts[1].split('/')[0];
+
+    return `${protocol}://${hostname}`;
+  }
+
+  return undefined;
+}
+
+function postLegacyKeepAliveMessage(message: any) {
+  if (legacyKeepAliveIFrame) {
+    BBAuthInterop.postOmnibarMessage(
+      legacyKeepAliveIFrame,
+      message,
+      parseOrigin(currentLegacyKeepAliveUrl)
+    );
+  }
+}
 
 function createIFrame(cls: string, url: string): HTMLIFrameElement {
   const iframe = document.createElement('iframe');
@@ -73,6 +97,12 @@ function processSessionWatcherMessage(event: MessageEvent) {
         }
       }
 
+      if (state.refreshId !== undefined && refreshId !== state.refreshId) {
+        postLegacyKeepAliveMessage({
+          messageType: 'session-refresh'
+        });
+      }
+
       if (state.sessionId !== undefined && sessionId !== state.sessionId) {
         currentRefreshUserCallback();
       }
@@ -83,18 +113,6 @@ function processSessionWatcherMessage(event: MessageEvent) {
       currentStateChange(state);
     }
   }
-}
-
-function parseOrigin(url: string) {
-  if (url) {
-    const urlParts = url.split('://');
-    const protocol = urlParts[0];
-    const hostname = urlParts[1].split('/')[0];
-
-    return `${protocol}://${hostname}`;
-  }
-
-  return undefined;
 }
 
 function processLegacyKeepAliveMessage(event: MessageEvent) {
