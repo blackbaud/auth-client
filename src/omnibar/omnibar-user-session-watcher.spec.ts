@@ -1,5 +1,6 @@
 import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
 
+import { BBAuthInterop } from '../shared/interop';
 import { BBAuthNavigator } from '../shared/navigator';
 
 describe('Omnibar user session watcher', () => {
@@ -132,6 +133,38 @@ describe('Omnibar user session watcher', () => {
     expect(stateChangeSpy).toHaveBeenCalledWith({
       legacyTtl: 456
     });
+  });
+
+  it('should notify the legacy keep-alive IFRAME when the user\'s session is refreshed' , () => {
+    startWatching(false, TEST_LEGACY_KEEP_ALIVE_ORIGIN + '/legacy');
+
+    const postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
+
+    postLegacyKeepAliveReady(123);
+
+    postSessionChange('abc', '123');
+    postSessionChange('def', '123');
+
+    expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+      getLegacyKeepAliveIFrame()[0],
+      {
+        messageType: 'session-refresh'
+      },
+      TEST_LEGACY_KEEP_ALIVE_ORIGIN
+    );
+  });
+
+  it('should attempt to post a message to the legacy keep-alive IFRAME if it doesn\'t exist' , () => {
+    startWatching(false);
+
+    const postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
+
+    postLegacyKeepAliveReady(123);
+
+    postSessionChange('abc', '123');
+    postSessionChange('def', '123');
+
+    expect(postOmnibarMessageSpy).not.toHaveBeenCalled();
   });
 
   it('should redirect the user to the login page if the user logs out in another browser tab', () => {

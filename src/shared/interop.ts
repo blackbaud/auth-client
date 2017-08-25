@@ -2,9 +2,9 @@ const HOST_ORIGIN = 'https://host.nxt.blackbaud.com';
 
 export class BBAuthInterop {
   /* istanbul ignore next */
-  public static postOmnibarMessage(iframeEl: HTMLIFrameElement, message: any) {
+  public static postOmnibarMessage(iframeEl: HTMLIFrameElement, message: any, origin?: string) {
     message.source = 'auth-client';
-    iframeEl.contentWindow.postMessage(message, HOST_ORIGIN);
+    iframeEl.contentWindow.postMessage(message, origin || HOST_ORIGIN);
   }
 
   public static messageIsFromOmnibar(event: {origin: string, data: any}): boolean {
