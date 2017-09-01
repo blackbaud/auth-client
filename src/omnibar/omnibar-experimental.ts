@@ -60,6 +60,10 @@ body {
   z-index: 1000;
 }
 
+.sky-omnibar-iframe {
+  z-index: 1001;
+}
+
 .sky-omnibar-placeholder {
   background-color: #4d5259;
   border-top: 5px solid #00b4f1;
@@ -77,6 +81,124 @@ body {
 .sky-omnibar-iframe-expanded {
   height: 100%;
 }
+
+.sky-omnibar-placeholder-service {
+  margin: 10px 10px 0 10px;
+  width: 150px;
+  height: 20px;
+}
+
+.sky-omnibar-placeholder-nav-item {
+  margin: 10px 10px 0 10px;
+  width: 100px;
+  height: 15px;
+}
+
+.animated-background {
+  animation-duration: 1s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-name: placeHolderShimmer;
+  animation-timing-function: linear;
+  background: #f6f7f8;
+  background: linear-gradient(to right, #eeeeee 8%, #999999 18%, #eeeeee 33%);
+  background-size: 800px 104px;
+  height: 45px;
+  opacity: 0.3;
+  position: relative;
+}
+
+.sky-omnibar-placeholder-mask {
+  background-color: #4d5259;
+  position: absolute;
+}
+
+.sky-omnibar-placeholder-mask-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 32px;
+}
+
+.sky-omnibar-placeholder-mask-bottom {
+  top: 32px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.sky-omnibar-placeholder-mask-left {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 15px;
+}
+
+.sky-omnibar-placeholder-mask-right {
+  top: 0;
+  left: 650px;
+  bottom: 0;
+  right: 0;
+}
+
+.sky-omnibar-placeholder-divider {
+  background-color: rgba(255, 255, 255, 0.35);
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  left: 170px;
+}
+
+.sky-omnibar-placeholder-mask-service-right {
+  top: 0;
+  bottom: 0;
+  left: 150px;
+  width: 40px;
+}
+
+.sky-omnibar-placeholder-mask-service-right-1 {
+  top: 0;
+  bottom: 0;
+  left: 150px;
+  width: 40px;
+}
+
+.sky-omnibar-placeholder-mask-nav-item-right-1 {
+  top: 0;
+  bottom: 0;
+  left: 250px;
+  width: 40px;
+}
+
+.sky-omnibar-placeholder-mask-nav-item-right-2 {
+  top: 0;
+  bottom: 0;
+  left: 380px;
+  width: 40px;
+}
+
+.sky-omnibar-placeholder-mask-nav-item-right-3 {
+  top: 0;
+  bottom: 0;
+  left: 460px;
+  width: 40px;
+}
+
+.sky-omnibar-placeholder-mask-nav-items-top {
+  top: 0;
+  left: 165px;
+  right: 0;
+  bottom: 30px;
+}
+
+@keyframes placeHolderShimmer {
+  0% {
+      background-position: -468px 0
+  }
+  100% {
+      background-position: 468px 0
+  }
+}
   `;
 
   styleEl = document.createElement('style');
@@ -88,6 +210,23 @@ body {
 
 function addPlaceholderEl() {
   placeholderEl = document.createElement('div');
+  placeholderEl.setAttribute('aria-hidden', 'true');
+
+  placeholderEl.innerHTML = `
+<div class="animated-background">
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-top"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-bottom"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-left"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-service-right"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-nav-items-top"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-nav-item-right-1"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-nav-item-right-2"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-nav-item-right-3"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-mask-right"></div>
+  <div class="sky-omnibar-placeholder-mask sky-omnibar-placeholder-divider"></div>
+</div>
+  `;
+
   placeholderEl.className = `sky-omnibar-placeholder ${CLS_LOADING}`;
 
   document.body.appendChild(placeholderEl);
@@ -288,7 +427,7 @@ function messageHandler(event: MessageEvent) {
 
       monkeyPatchState();
 
-      placeholderEl.classList.remove(CLS_LOADING);
+      // placeholderEl.classList.remove(CLS_LOADING);
       iframeEl.classList.remove(CLS_LOADING);
 
       BBAuthInterop.postOmnibarMessage(
