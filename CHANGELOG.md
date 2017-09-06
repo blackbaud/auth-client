@@ -1,3 +1,7 @@
+# 1.15.0 (2017-09-06)
+
+- Added additional search results properties. (#48)
+
 # 1.14.0 (2017-09-05)
 
 - Added `session-refresh` message that will be posted to the legacy keep-alive IFRAME when the user's Blackbaud session changes. (#46)
