@@ -139,6 +139,32 @@ describe('Omnibar (experimental)', () => {
     expect(getComputedStyle(iframeEl).visibility).toBe('visible');
   });
 
+  it('should disable redirect when the session ends if configured with allow anonymous is true', (done) => {
+    postOmnibarMessageSpy.and.callFake(
+      (iframeEl: HTMLIFrameElement, data: any) => {
+        if (data.messageType === 'token') {
+          expect(startTrackingSpy).toHaveBeenCalledWith(
+            jasmine.any(Function),
+            jasmine.any(Function),
+            jasmine.any(Function),
+            true,
+            undefined
+          );
+
+          done();
+        }
+    });
+
+    loadOmnibar({
+      allowAnonymous: true
+    });
+
+    fireMessageEvent({
+      messageType: 'get-token',
+      tokenRequestId: 123
+    });
+  });
+
   describe('interop with host page', () => {
     it('should ignore messages that do not originate from omnibar', () => {
       messageIsFromOmnibarReturnValue = false;
