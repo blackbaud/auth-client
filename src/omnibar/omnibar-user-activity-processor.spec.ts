@@ -54,6 +54,17 @@ describe('Omnibar user activity processor', () => {
     expect(redirectForInactivitySpy).toHaveBeenCalled();
   });
 
+  it('should not redirect for inactivity when allow anonymous is true', () => {
+    const args = createDefaultArgs();
+    args.allowAnonymous = true;
+
+    args.expirationDate = Date.now() - 10;
+
+    BBOmnibarUserActivityProcessor.process(args);
+
+    expect(redirectForInactivitySpy).not.toHaveBeenCalled();
+  });
+
   it('should close the inactivity prompt when the expiration date after the prompt timeframe', () => {
     const args = createDefaultArgs();
 

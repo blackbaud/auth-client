@@ -172,7 +172,7 @@ function handleGetToken(
       refreshUserCallback,
       showInactivityCallback,
       hideInactivityCallback,
-      disableRedirect,
+      omnibarConfig.allowAnonymous,
       legacyKeepAliveUrl
     );
   }

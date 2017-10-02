@@ -26,4 +26,6 @@ export class BBOmnibarConfig {
   public notifications?: BBOmnibarNotificationsConfig;
 
   public legacyKeepAliveUrl?: string;
+
+  public allowAnonymous?: boolean;
 }
