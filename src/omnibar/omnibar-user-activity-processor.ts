@@ -25,7 +25,7 @@ export class BBOmnibarUserActivityProcessor {
       return;
     }
 
-    if (now > expirationDate) {
+    if (!allowAnonymous && now > expirationDate) {
       redirectForInactivity();
     }
 
