@@ -139,7 +139,7 @@ describe('Omnibar (experimental)', () => {
     expect(getComputedStyle(iframeEl).visibility).toBe('visible');
   });
 
-  it('should disable redirect when the session ends if configured with allow anonymous is true', (done) => {
+  it('should disable redirect when the session ends and allow anonymous is true', (done) => {
     postOmnibarMessageSpy.and.callFake(
       (iframeEl: HTMLIFrameElement, data: any) => {
         if (data.messageType === 'token') {
