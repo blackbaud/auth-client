@@ -1,3 +1,8 @@
+# 1.16.0 (2017-10-02)
+
+- Added configuration option to omnibar to allow anonymous users to access pages that do not require authentication. (#49)
+- Fixed bug where users were redirected to signin on inactivity when the site allowed anonymous access. (#49)
+
 # 1.15.0 (2017-09-06)
 
 - Added additional search results properties. (#48)
