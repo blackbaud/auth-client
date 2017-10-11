@@ -8,4 +8,6 @@ export class BBOmnibarSearchResults {
   public items: BBOmnibarSearchResultItem[];
 
   public moreResults?: BBOmnibarSearchMoreResults;
+
+  public htmlFields?: string[];
 }
