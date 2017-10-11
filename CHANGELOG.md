@@ -1,3 +1,7 @@
+# 1.17.0 (2017-10-11)
+
+- Added `htmlFields` property to search results object for specifying which search result fields contain HTML elements and should not be escaped when displayed. (#50)
+
 # 1.16.0 (2017-10-02)
 
 - Added configuration option to omnibar to allow anonymous users to access pages that do not require authentication. (#49)
