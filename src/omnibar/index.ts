@@ -6,5 +6,6 @@ export * from './omnibar-search-args';
 export * from './omnibar-search-more-results';
 export * from './omnibar-search-result-item';
 export * from './omnibar-search-results';
+export * from './omnibar-search-results-html-fields';
 export * from './omnibar-notifications';
 export * from './omnibar-notification-item';
