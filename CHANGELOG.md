@@ -1,3 +1,7 @@
+# 1.17.1 (2017-10-12)
+
+- Fixed flicker when new omnibar is rendered. (#51)
+
 # 1.17.0 (2017-10-11)
 
 - Added `htmlFields` property to search results object for specifying which search result fields contain HTML elements and should not be escaped when displayed. (#50)
