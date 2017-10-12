@@ -288,9 +288,6 @@ function messageHandler(event: MessageEvent) {
 
       monkeyPatchState();
 
-      placeholderEl.classList.remove(CLS_LOADING);
-      iframeEl.classList.remove(CLS_LOADING);
-
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
@@ -310,6 +307,10 @@ function messageHandler(event: MessageEvent) {
       handleStateChange();
 
       promiseResolve();
+      break;
+    case 'display-ready':
+      placeholderEl.classList.remove(CLS_LOADING);
+      iframeEl.classList.remove(CLS_LOADING);
       break;
     case 'expand':
       expandIframe();

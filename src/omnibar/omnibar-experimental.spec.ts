@@ -122,7 +122,7 @@ describe('Omnibar (experimental)', () => {
     expect(iframeEl.src).toBe(BASE_URL);
   });
 
-  it('should display a placeholder element until the host page is ready', () => {
+  it('should display a placeholder element until the omnibar is ready for display', () => {
     loadOmnibar();
 
     const placeholderEl = getPlaceholderEl();
@@ -132,7 +132,7 @@ describe('Omnibar (experimental)', () => {
     expect(getComputedStyle(iframeEl).visibility).toBe('hidden');
 
     fireMessageEvent({
-      messageType: 'ready'
+      messageType: 'display-ready'
     });
 
     expect(getComputedStyle(placeholderEl).display).toBe('none');
