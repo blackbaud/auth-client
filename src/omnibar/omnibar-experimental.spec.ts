@@ -79,7 +79,7 @@ describe('Omnibar (experimental)', () => {
     // the login page during the test run when it detects no activity.
     startTrackingSpy = spyOn(BBOmnibarUserActivity, 'startTracking');
 
-    // Disable animations so computed styles work without waiting for animations to complete.
+    // Disable animations so computed styles can be validated without waiting for animations to complete.
     const styleEl = document.createElement('style');
 
     styleEl.appendChild(document.createTextNode('* { transition: none !important }'));
