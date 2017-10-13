@@ -1,3 +1,7 @@
+# 1.18.0 (2017-10-13)
+
+- The new omnibar will now display the current environment name in a bar under the main omnibar when the user exists in more than one envrionment. (#52)
+
 # 1.17.1 (2017-10-12)
 
 - Fixed flicker when new omnibar is rendered. (#51)
