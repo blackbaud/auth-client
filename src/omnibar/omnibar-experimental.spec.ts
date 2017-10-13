@@ -78,6 +78,13 @@ describe('Omnibar (experimental)', () => {
     // This effectively disables activity tracking.  Without this, the test page could potentially redirect to
     // the login page during the test run when it detects no activity.
     startTrackingSpy = spyOn(BBOmnibarUserActivity, 'startTracking');
+
+    // Disable animations so computed styles work without waiting for animations to complete.
+    const styleEl = document.createElement('style');
+
+    styleEl.appendChild(document.createTextNode('* { transition: none !important }'));
+
+    document.head.appendChild(styleEl);
   });
 
   beforeEach(() => {
@@ -371,6 +378,34 @@ describe('Omnibar (experimental)', () => {
       });
 
       expect(userRenewedSessionSpy).toHaveBeenCalled();
+    });
+
+    it('should display the current environment when specified by the omnibar', () => {
+      loadOmnibar();
+
+      const environmentEl = document.querySelector('.sky-omnibar-environment') as any;
+
+      const validateVisible = (visible: boolean) => {
+        expect(document.body.classList.contains('sky-omnibar-environment-visible')).toBe(visible);
+        expect(getComputedStyle(environmentEl).height).toBe(visible ? '24px' : '0px');
+        expect(environmentEl.innerText.trim()).toBe(visible ? 'Environment name' : '');
+      };
+
+      validateVisible(false);
+
+      fireMessageEvent({
+        messageType: 'environment-update',
+        name: 'Environment name'
+      });
+
+      validateVisible(true);
+
+      fireMessageEvent({
+        messageType: 'environment-update',
+        name: undefined
+      });
+
+      validateVisible(false);
     });
   });
 

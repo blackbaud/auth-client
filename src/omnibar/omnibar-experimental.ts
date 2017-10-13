@@ -12,26 +12,38 @@ import { BBAuthNavigator } from '../shared/navigator';
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 
+let envEl: HTMLDivElement;
 let placeholderEl: HTMLDivElement;
 let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
 let omnibarConfig: BBOmnibarConfig;
 let promiseResolve: () => void;
 
-function addIframeEl() {
-  iframeEl = document.createElement('iframe');
-  iframeEl.className = `sky-omnibar-iframe ${CLS_LOADING}`;
-  iframeEl.src = buildOmnibarUrl();
-
+function addElToBodyTop(el: any) {
   const body = document.body;
 
   /* istanbul ignore else */
   /* This can't be tested without clearing out all child elements of body which is not practical in a unit test */
   if (body.firstChild) {
-    body.insertBefore(iframeEl, body.firstChild);
+    body.insertBefore(el, body.firstChild);
   } else {
-    body.appendChild(iframeEl);
+    body.appendChild(el);
   }
+}
+
+function addIframeEl() {
+  iframeEl = document.createElement('iframe');
+  iframeEl.className = `sky-omnibar-iframe ${CLS_LOADING}`;
+  iframeEl.src = buildOmnibarUrl();
+
+  addElToBodyTop(iframeEl);
+}
+
+function addEnvironmentEl() {
+  envEl = document.createElement('div');
+  envEl.className = 'sky-omnibar-environment';
+
+  addElToBodyTop(envEl);
 }
 
 function collapseIframe() {
@@ -76,6 +88,25 @@ body {
 
 .sky-omnibar-iframe-expanded {
   height: 100%;
+}
+
+.sky-omnibar-environment {
+  background-color: #e1e1e3;
+  color: #282b31;
+  font-family: "Blackbaud Sans", "Open Sans", "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  height: 0;
+  line-height: 24px;
+  overflow: hidden;
+  padding: 0 15px;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sky-omnibar-environment-visible .sky-omnibar-environment {
+  height: 24px;
 }
   `;
 
@@ -222,6 +253,21 @@ function handleNotificationRead(notification: BBOmnibarNotificationItem) {
   }
 }
 
+function handleEnvironmentUpdate(name: string) {
+  const bodyCls = 'sky-omnibar-environment-visible';
+  const bodyClassList = document.body.classList;
+
+  name = name || '';
+
+  envEl.innerText = name;
+
+  if (name) {
+    bodyClassList.add(bodyCls);
+  } else {
+    bodyClassList.remove(bodyCls);
+  }
+}
+
 function monkeyPatchState() {
   const oldPushState = history.pushState;
   const oldReplaceState = history.replaceState;
@@ -350,6 +396,9 @@ function messageHandler(event: MessageEvent) {
     case 'session-renew':
       BBOmnibarUserActivity.userRenewedSession();
       break;
+    case 'environment-update':
+      handleEnvironmentUpdate(message.name);
+      break;
   }
 }
 
@@ -370,6 +419,10 @@ export class BBOmnibarExperimental {
 
       addStyleEl();
       addPlaceholderEl();
+
+      // Add these in reverse order since each will be inserted at the top of the
+      // document; this will ensure the proper order in the DOM.
+      addEnvironmentEl();
       addIframeEl();
 
       window.addEventListener('message', messageHandler);
@@ -381,14 +434,16 @@ export class BBOmnibarExperimental {
 
     document.body.removeChild(placeholderEl);
     document.body.removeChild(iframeEl);
+    document.body.removeChild(envEl);
 
     window.removeEventListener('message', messageHandler);
 
-    omnibarConfig = undefined;
-
-    styleEl = undefined;
-    placeholderEl = undefined;
-    iframeEl = undefined;
-    promiseResolve = undefined;
+    omnibarConfig =
+      styleEl =
+      placeholderEl =
+      iframeEl =
+      envEl =
+      promiseResolve =
+      undefined;
   }
 }
