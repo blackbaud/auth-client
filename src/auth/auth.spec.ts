@@ -59,7 +59,9 @@ describe('Auth', () => {
       lastToken: 'abc'
     };
 
-    BBAuth.getToken(true).then((token: string) => {
+    BBAuth.getToken({
+      forceNewToken: true
+    }).then((token: string) => {
       expect(token).toBe('xyz');
       done();
     });
@@ -163,7 +165,9 @@ describe('Auth', () => {
   });
 
   it('should allow redirecting to signin to be disabled', (done) => {
-    BBAuth.getToken(false, true).then(() => {
+    BBAuth.getToken({
+      disableRedirect: true
+    }).then(() => {
       expect(getTokenSpy).toHaveBeenCalledWith(true, undefined, undefined);
       done();
     });

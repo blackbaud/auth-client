@@ -20,7 +20,7 @@ export class BBAuth {
   } = {};
 
   public static getToken(
-    args: BBAuthGetTokenArgs
+    args?: BBAuthGetTokenArgs
   ): Promise<string> {
     return BBAuth.getTokenInternal(args);
   }
@@ -30,6 +30,8 @@ export class BBAuth {
   }
 
   private static getTokenInternal(args: BBAuthGetTokenArgs): Promise<string> {
+    args = args || {};
+
     const { forceNewToken, disableRedirect } = args;
 
     if (BBAuth.mock) {
