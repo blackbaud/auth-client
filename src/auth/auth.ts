@@ -20,25 +20,8 @@ export class BBAuth {
   } = {};
 
   public static getToken(
-    argsOrForceNewToken?: boolean | BBAuthGetTokenArgs,
-    disableRedirect?: boolean
+    args?: BBAuthGetTokenArgs
   ): Promise<string> {
-    let args: BBAuthGetTokenArgs;
-
-    switch (typeof argsOrForceNewToken) {
-      case 'undefined':
-        args = {};
-        break;
-      case 'boolean':
-        args = {
-          disableRedirect,
-          forceNewToken: argsOrForceNewToken as boolean
-        };
-        break;
-      default:
-        args = argsOrForceNewToken as BBAuthGetTokenArgs;
-    }
-
     return BBAuth.getTokenInternal(args);
   }
 
@@ -47,6 +30,8 @@ export class BBAuth {
   }
 
   private static getTokenInternal(args: BBAuthGetTokenArgs): Promise<string> {
+    args = args || {};
+
     const { forceNewToken, disableRedirect } = args;
 
     if (BBAuth.mock) {
