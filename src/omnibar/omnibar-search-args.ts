@@ -1,3 +1,3 @@
-export class BBOmnibarSearchArgs {
-  public searchText: string;
+export interface BBOmnibarSearchArgs {
+  searchText: string;
 }

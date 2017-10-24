@@ -1,11 +1,11 @@
-export class BBOmnibarSearchResultItem {
-  public title: string;
+export interface BBOmnibarSearchResultItem {
+  title: string;
 
-  public subtitle?: string;
+  subtitle?: string;
 
-  public label?: string;
+  label?: string;
 
-  public description?: string;
+  description?: string;
 
-  public url: string;
+  url: string;
 }
