@@ -1,5 +1,6 @@
 export * from './omnibar';
 export * from './omnibar-config';
+export * from './omnibar-legacy';
 export * from './omnibar-navigation';
 export * from './omnibar-navigation-item';
 export * from './omnibar-search-args';
