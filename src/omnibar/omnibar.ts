@@ -208,7 +208,9 @@ function handleGetToken(
     );
   }
 
-  BBAuth.getToken(false, disableRedirect)
+  BBAuth.getToken({
+    disableRedirect
+  })
     .then(
       (token: string) => {
         startActivityTracking();
