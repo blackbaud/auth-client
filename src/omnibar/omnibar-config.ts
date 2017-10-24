@@ -4,28 +4,28 @@ import { BBOmnibarSearchArgs } from './omnibar-search-args';
 import { BBOmnibarSearchResults } from './omnibar-search-results';
 import { BBOmnibarServiceItem } from './omnibar-service-item';
 
-export class BBOmnibarConfig {
-  public serviceName?: string;
+export interface BBOmnibarConfig {
+  serviceName?: string;
 
-  public svcId?: string;
+  svcId?: string;
 
-  public envId?: string;
+  envId?: string;
 
-  public nav?: BBOmnibarNavigation;
+  nav?: BBOmnibarNavigation;
 
-  public experimental?: boolean;
+  legacy?: boolean;
 
-  public url?: string;
+  url?: string;
 
-  public onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
+  onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
 
-  public services?: BBOmnibarServiceItem[];
+  services?: BBOmnibarServiceItem[];
 
-  public enableHelp?: boolean;
+  enableHelp?: boolean;
 
-  public notifications?: BBOmnibarNotificationsConfig;
+  notifications?: BBOmnibarNotificationsConfig;
 
-  public legacyKeepAliveUrl?: string;
+  legacyKeepAliveUrl?: string;
 
-  public allowAnonymous?: boolean;
+  allowAnonymous?: boolean;
 }

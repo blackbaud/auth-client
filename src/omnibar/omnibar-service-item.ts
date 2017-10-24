@@ -1,7 +1,7 @@
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 
-export class BBOmnibarServiceItem {
-  public title: string;
+export interface BBOmnibarServiceItem {
+  title: string;
 
-  public items?: BBOmnibarNavigationItem[];
+  items?: BBOmnibarNavigationItem[];
 }

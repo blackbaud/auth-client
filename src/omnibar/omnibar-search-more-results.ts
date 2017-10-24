@@ -1,7 +1,7 @@
-export class BBOmnibarSearchMoreResults {
+export interface BBOmnibarSearchMoreResults {
 
-  public label: string;
+  label: string;
 
-  public url: string;
+  url: string;
 
 }

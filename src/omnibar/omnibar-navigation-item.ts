@@ -1,9 +1,9 @@
-export class BBOmnibarNavigationItem {
-  public title: string;
+export interface BBOmnibarNavigationItem {
+  title: string;
 
-  public url?: string;
+  url?: string;
 
-  public items?: BBOmnibarNavigationItem[];
+  items?: BBOmnibarNavigationItem[];
 
-  public data?: any;
+  data?: any;
 }
