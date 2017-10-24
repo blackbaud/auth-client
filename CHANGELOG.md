@@ -4,6 +4,8 @@
 
  - The `experimental` omnibar config option has been removed, and what was formerly referred to as the "experimental" omnibar is now the default omnibar.  To load the legacy omnibar (equivalent to not specifying the `experimental` flag in auth-client 1.x), use the new `BBOmnibarLegacy` class and call its `load()` rather than the `load()` method on `BBOmnibar`.
 
+ - `BBAuth.getToken()` now only accepts an `args` parameter of type `BBAuthGetTokenArgs`.  Previously, the method overloaded the first argument to accept either an `args` parameter or a `forceNewToken` boolean parameter as well as a second `disableRedirect` parameter.  `forceNewToken` and `disableRedirect` should now be specified on the `args` object.
+
  - Several TypeScript config/DTO-style `class`es have been converted to `interface`s.  This keeps these types from being reified (i.e. generating a runtime artifact after transpilation to JavaScript) and results in a smaller bundle.  This should have no effect on your code unless you're doing something unusual like calling one of these type's constructors.
 
 # 1.18.0 (2017-10-13)
