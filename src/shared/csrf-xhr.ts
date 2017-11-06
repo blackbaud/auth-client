@@ -1,5 +1,10 @@
 const CSRF_URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/csrf';
 
+import {
+  BBAuthTokenError,
+  BBAuthTokenErrorCode
+} from '../auth';
+
 import { BBAuthNavigator } from './navigator';
 
 function post(
@@ -10,17 +15,38 @@ function post(
   },
   body: any,
   okCB: (responseText: string) => any,
-  unuthCB: (reason: {message: string}) => any
+  unuthCB: (reason: BBAuthTokenError) => any
 ) {
   const xhr = new XMLHttpRequest();
 
   xhr.onreadystatechange = () => {
-    if (xhr.readyState === 4 && xhr.status === 401) {
-      unuthCB({
-        message: 'The user is not logged in.'
-      });
-    } else if (xhr.readyState === 4 && xhr.status === 200) {
-      okCB(xhr.responseText);
+    if (xhr.readyState === 4) {
+      switch (xhr.status) {
+        case 200:
+          okCB(xhr.responseText);
+          break;
+        case 401:
+          unuthCB({
+            code: BBAuthTokenErrorCode.NotLoggedIn,
+            message: 'The user is not logged in.'
+          });
+          break;
+        case 403:
+          unuthCB({
+            code: BBAuthTokenErrorCode.InvalidEnvironment,
+            message: 'The user is not a member of the specified environment.'
+          });
+          break;
+        default:
+          /* istanbul ignore else */
+          if (xhr.status === 0 || xhr.status >= 400) {
+            unuthCB({
+              code: BBAuthTokenErrorCode.Unspecified,
+              message: 'An unknown error occurred.'
+            });
+          }
+          break;
+      }
     }
   };
 
@@ -40,13 +66,19 @@ function post(
 }
 
 function requestToken(url: string, csrfValue: string, envId?: string, permissionScope?: string) {
-  let body: any;
+  let body: {
+    environment_id?: string,
+    permission_scope?: string
+  };
 
-  if (envId && permissionScope) {
+  if (envId) {
     body = {
-      environment_id: envId,
-      permission_scope: permissionScope
+      environment_id: envId
     };
+
+    if (permissionScope) {
+      body.permission_scope = permissionScope;
+    }
   }
 
   return new Promise((resolve: any, reject: any) => {
@@ -74,6 +106,13 @@ export class BBCsrfXhr {
     envId?: string,
     permissionScope?: string
   ) {
+    if (permissionScope && !envId) {
+      return Promise.reject({
+        code: BBAuthTokenErrorCode.PermissionScopeNoEnvironment,
+        message: 'You must also specify an environment when specifying a permission scope.'
+      });
+    }
+
     return new Promise((resolve: any, reject: any) => {
       // First get the CSRF token
       requestToken(CSRF_URL, 'token_needed')
@@ -82,11 +121,11 @@ export class BBCsrfXhr {
           return requestToken(url, csrfResponse['csrf_token'], envId, permissionScope);
         })
         .then(resolve)
-        .catch((reason: any) => {
-          // Not logged in, so go back to Auth Svc.
-          if (disableRedirect) {
+        .catch((reason: BBAuthTokenError) => {
+          if (disableRedirect || reason.code !== BBAuthTokenErrorCode.NotLoggedIn) {
             reject(reason);
           } else {
+            // Not logged in, so go back to Auth Svc.
             BBAuthNavigator.redirectToSignin(signinRedirectParams);
           }
         });
