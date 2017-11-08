@@ -1,3 +1,7 @@
+# 2.1.0 (2017-11-08)
+
+- Added ability to specify an environment ID when retrieving a token.  When not a member of the specified environment, the user will be redirected to an error page.  Specifying an environment ID also adds the environment ID to the JWT token so that consumers of the token can know the user is part of the specified environment.  Note that previously an environment ID could be specified but only when combined with a permission scope. (#55)
+
 # 2.0.0 (2017-10-24)
 
 - The 2.0.0 release introduces a few breaking changes, so upgrading to it will require changes to your code.

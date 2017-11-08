@@ -1,6 +1,11 @@
 import { BBAuthNavigator } from '../shared/navigator';
 import { BBCsrfXhr } from './csrf-xhr';
 
+import {
+  BBAuthTokenError,
+  BBAuthTokenErrorCode
+} from '../auth';
+
 import 'jasmine-ajax';
 
 describe('Auth token integration', () => {
@@ -39,7 +44,8 @@ describe('Auth token integration', () => {
 
   it('should not redirect to the signin page when redirecting is disabled', (done) => {
     BBCsrfXhr.request('https://example.com/token', undefined, true)
-      .catch((reason: any) => {
+      .catch((reason: BBAuthTokenError) => {
+        expect(reason.code).toBe(BBAuthTokenErrorCode.NotLoggedIn);
         expect(reason.message).toBe('The user is not logged in.');
         done();
       });
@@ -49,6 +55,47 @@ describe('Auth token integration', () => {
     request.respondWith({
       responseText: undefined,
       status: 401
+    });
+  });
+
+  it('should redirect when the user is not a member of the specified environment', (done) => {
+    navigateSpy.and.callFake((url: string) => {
+      expect(url).toBe(
+        'https://host.nxt.blackbaud.com/errors/security?source=auth-client&url=' +
+        encodeURIComponent(location.href) +
+        '&code=invalid_env'
+      );
+
+      done();
+    });
+
+    BBCsrfXhr.request('https://example.com/token');
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      responseText: undefined,
+      status: 403
+    });
+  });
+
+  it('should redirect when an unknown error occurs', (done) => {
+    navigateSpy.and.callFake((url: string) => {
+      expect(url).toBe(
+        'https://host.nxt.blackbaud.com/errors/broken?source=auth-client&url=' +
+        encodeURIComponent(location.href)
+      );
+
+      done();
+    });
+
+    BBCsrfXhr.request('https://example.com/token');
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      responseText: undefined,
+      status: 500
     });
   });
 
@@ -129,6 +176,41 @@ describe('Auth token integration', () => {
     });
   });
 
+  it('should add the environment ID to the request body', (done) => {
+    BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      'abc'
+    );
+
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc'
+      }),
+      status: 200
+    });
+
+    // Wait for the token request to kick off.
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        const requestData: any = tokenRequest.data();
+
+        expect(requestData).toEqual({
+          environment_id: 'abc'
+        });
+
+        done();
+      }
+    });
+  });
+
   it('should add the environment ID and permission scope to the request body', (done) => {
     BBCsrfXhr.request(
       'https://example.com/token',
@@ -163,6 +245,20 @@ describe('Auth token integration', () => {
 
         done();
       }
+    });
+  });
+
+  it('should require environment ID when permission scope is specified', (done) => {
+    BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      undefined,
+      '123'
+    ).catch((reason: BBAuthTokenError) => {
+      expect(reason.code).toBe(BBAuthTokenErrorCode.PermissionScopeNoEnvironment);
+      expect(reason.message).toBe('You must also specify an environment when specifying a permission scope.');
+      done();
     });
   });
 

@@ -1,6 +1,5 @@
 import { BBOmnibar } from './omnibar';
 import { BBOmnibarConfig } from './omnibar-config';
-import { BBOmnibarLegacy } from './omnibar-legacy';
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 import { BBOmnibarSearchArgs } from './omnibar-search-args';
 import { BBOmnibarSearchResults } from './omnibar-search-results';
