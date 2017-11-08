@@ -60,7 +60,12 @@ describe('Auth token integration', () => {
 
   it('should redirect when the user is not a member of the specified environment', (done) => {
     navigateSpy.and.callFake((url: string) => {
-      expect(url).toBe('https://host.nxt.blackbaud.com/errors/security?url=' + encodeURIComponent(location.href));
+      expect(url).toBe(
+        'https://host.nxt.blackbaud.com/errors/security?source=auth-client&url=' +
+        encodeURIComponent(location.href) +
+        '&code=invalid_env'
+      );
+
       done();
     });
 
@@ -74,13 +79,17 @@ describe('Auth token integration', () => {
     });
   });
 
-  it('should not redirect when an unknown error has occurred', (done) => {
-    BBCsrfXhr.request('https://example.com/token')
-      .catch((reason: BBAuthTokenError) => {
-        expect(reason.code).toBe(BBAuthTokenErrorCode.Unspecified);
-        expect(reason.message).toBe('An unknown error occurred.');
-        done();
-      });
+  it('should redirect when an unknown error occurs', (done) => {
+    navigateSpy.and.callFake((url: string) => {
+      expect(url).toBe(
+        'https://host.nxt.blackbaud.com/errors/broken?source=auth-client&url=' +
+        encodeURIComponent(location.href)
+      );
+
+      done();
+    });
+
+    BBCsrfXhr.request('https://example.com/token');
 
     const request = jasmine.Ajax.requests.mostRecent();
 

@@ -129,11 +129,9 @@ export class BBCsrfXhr {
               case BBAuthTokenErrorCode.NotLoggedIn:
                 BBAuthNavigator.redirectToSignin(signinRedirectParams);
                 break;
-              case BBAuthTokenErrorCode.InvalidEnvironment:
+              default:
                 BBAuthNavigator.redirectToError(reason.code);
                 break;
-              default:
-                reject(reason);
             }
           }
         });

@@ -58,9 +58,11 @@ export class BBAuthNavigator {
 
   public static redirectToError(code: BBAuthTokenErrorCode) {
     let path: string;
+    let errorCode: string;
 
     switch (code) {
       case BBAuthTokenErrorCode.InvalidEnvironment:
+        errorCode = 'invalid_env';
         path = 'security';
         break;
       default:
@@ -68,7 +70,11 @@ export class BBAuthNavigator {
         break;
     }
 
-    const url = `${ERROR_BASE_URL}${path}?url=${euc(location.href)}`;
+    let url = `${ERROR_BASE_URL}${path}?source=auth-client&url=${euc(location.href)}`;
+
+    if (errorCode) {
+      url += `&code=${euc(errorCode)}`;
+    }
 
     this.navigate(url);
   }
