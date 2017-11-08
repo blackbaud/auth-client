@@ -58,13 +58,13 @@ describe('Auth token integration', () => {
     });
   });
 
-  it('should not redirect when the user is not a member of the specified environment', (done) => {
-    BBCsrfXhr.request('https://example.com/token')
-      .catch((reason: BBAuthTokenError) => {
-        expect(reason.code).toBe(BBAuthTokenErrorCode.InvalidEnvironment);
-        expect(reason.message).toBe('The user is not a member of the specified environment.');
-        done();
-      });
+  it('should redirect when the user is not a member of the specified environment', (done) => {
+    navigateSpy.and.callFake((url: string) => {
+      expect(url).toBe('https://host.nxt.blackbaud.com/errors/security?url=' + encodeURIComponent(location.href));
+      done();
+    });
+
+    BBCsrfXhr.request('https://example.com/token');
 
     const request = jasmine.Ajax.requests.mostRecent();
 

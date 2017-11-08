@@ -1,4 +1,7 @@
+import { BBAuthTokenErrorCode } from '../auth';
+
 const SIGNIN_BASE_URL = 'https://signin.blackbaud.com/signin/';
+const ERROR_BASE_URL = 'https://host.nxt.blackbaud.com/errors/';
 
 const euc = encodeURIComponent;
 
@@ -27,8 +30,13 @@ function createSigninUrl(inactive?: boolean) {
 
 export class BBAuthNavigator {
   /* istanbul ignore next */
-  public static navigate(url: string) {
-    location.href = url;
+  public static navigate(url: string, replace?: boolean) {
+
+    if (replace) {
+      location.replace(url);
+    } else {
+      location.href = url;
+    }
   }
 
   public static redirectToSignin(signinRedirectParams?: any) {
@@ -46,5 +54,22 @@ export class BBAuthNavigator {
     const signoutUrl = `${SIGNIN_BASE_URL}sign-out?redirectUrl=${euc(signinUrl)}`;
 
     this.navigate(signoutUrl);
+  }
+
+  public static redirectToError(code: BBAuthTokenErrorCode) {
+    let path: string;
+
+    switch (code) {
+      case BBAuthTokenErrorCode.InvalidEnvironment:
+        path = 'security';
+        break;
+      default:
+        path = 'broken';
+        break;
+    }
+
+    const url = `${ERROR_BASE_URL}${path}?url=${euc(location.href)}`;
+
+    this.navigate(url);
   }
 }

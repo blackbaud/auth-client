@@ -122,11 +122,19 @@ export class BBCsrfXhr {
         })
         .then(resolve)
         .catch((reason: BBAuthTokenError) => {
-          if (disableRedirect || reason.code !== BBAuthTokenErrorCode.NotLoggedIn) {
+          if (disableRedirect) {
             reject(reason);
           } else {
-            // Not logged in, so go back to Auth Svc.
-            BBAuthNavigator.redirectToSignin(signinRedirectParams);
+            switch (reason.code) {
+              case BBAuthTokenErrorCode.NotLoggedIn:
+                BBAuthNavigator.redirectToSignin(signinRedirectParams);
+                break;
+              case BBAuthTokenErrorCode.InvalidEnvironment:
+                BBAuthNavigator.redirectToError(reason.code);
+                break;
+              default:
+                reject(reason);
+            }
           }
         });
     });
