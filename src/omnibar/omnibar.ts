@@ -17,6 +17,7 @@ let placeholderEl: HTMLDivElement;
 let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
 let omnibarConfig: BBOmnibarConfig;
+let currentLegacyKeepAliveUrl: string;
 let promiseResolve: () => void;
 
 function addElToBodyTop(el: any) {
@@ -193,21 +194,20 @@ function hideInactivityCallback() {
   );
 }
 
+function startActivityTracking() {
+  BBOmnibarUserActivity.startTracking(
+    refreshUserCallback,
+    showInactivityCallback,
+    hideInactivityCallback,
+    omnibarConfig.allowAnonymous,
+    currentLegacyKeepAliveUrl
+  );
+}
+
 function handleGetToken(
   tokenRequestId: any,
-  disableRedirect: boolean,
-  legacyKeepAliveUrl: string
+  disableRedirect: boolean
 ) {
-  function startActivityTracking() {
-    BBOmnibarUserActivity.startTracking(
-      refreshUserCallback,
-      showInactivityCallback,
-      hideInactivityCallback,
-      omnibarConfig.allowAnonymous,
-      legacyKeepAliveUrl
-    );
-  }
-
   BBAuth.getToken({
     disableRedirect
   })
@@ -383,8 +383,7 @@ function messageHandler(event: MessageEvent) {
     case 'get-token':
       handleGetToken(
         message.tokenRequestId,
-        message.disableRedirect,
-        omnibarConfig.legacyKeepAliveUrl
+        message.disableRedirect
       );
       break;
     case 'help-open':
@@ -401,6 +400,10 @@ function messageHandler(event: MessageEvent) {
     case 'environment-update':
       handleEnvironmentUpdate(message.name);
       break;
+    case 'legacy-keep-alive-url-change':
+      currentLegacyKeepAliveUrl = message.url;
+      startActivityTracking();
+      break;
   }
 }
 
@@ -415,6 +418,10 @@ function buildOmnibarUrl() {
 export class BBOmnibar {
   public static load(config: BBOmnibarConfig): Promise<any> {
     omnibarConfig = omnibarConfig = config;
+
+    // TODO: Deprecate this and only allow it to come from the legacy-keep-alive-url-change message
+    // from the omnibar.
+    currentLegacyKeepAliveUrl = omnibarConfig.legacyKeepAliveUrl;
 
     return new Promise<any>((resolve: any) => {
       promiseResolve = resolve;

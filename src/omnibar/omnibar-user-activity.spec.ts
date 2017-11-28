@@ -341,4 +341,16 @@ describe('Omnibar user activity', () => {
     }, TEST_TIMEOUT);
   });
 
+  it('should restart activity tracking when the legacy keep alive URL changes', () => {
+    const sessionWatcherStartSpy = spyOn(BBOmnibarUserSessionWatcher, 'start');
+
+    startTracking(false, undefined);
+    expect(sessionWatcherStartSpy.calls.count()).toBe(1);
+
+    startTracking(false, undefined);
+    expect(sessionWatcherStartSpy.calls.count()).toBe(1);
+
+    startTracking(false, 'https://example.com/keep-alive');
+    expect(sessionWatcherStartSpy.calls.count()).toBe(2);
+  });
 });
