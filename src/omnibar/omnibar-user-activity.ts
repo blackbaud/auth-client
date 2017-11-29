@@ -18,6 +18,7 @@ let lastRenewal: number;
 let intervalId: any;
 let lastRefreshId = '';
 let currentAllowAnonymous: boolean;
+let currentLegacyKeepAliveUrl: string;
 let legacyTtl: number;
 let legacySigninUrl: string;
 
@@ -135,13 +136,18 @@ export class BBOmnibarUserActivity {
     allowAnonymous: boolean,
     legacyKeepAliveUrl: string
   ) {
-    if (!isTracking || allowAnonymous !== currentAllowAnonymous) {
+    if (
+      !isTracking ||
+      allowAnonymous !== currentAllowAnonymous ||
+      legacyKeepAliveUrl !== currentLegacyKeepAliveUrl
+    ) {
       BBOmnibarUserActivity.stopTracking();
 
       currentRefreshUserCallback = refreshUserCallback;
       currentShowInactivityCallback = showInactivityCallback;
       currentHideInactivityCallback = hideInactivityCallback;
       currentAllowAnonymous = allowAnonymous;
+      currentLegacyKeepAliveUrl = legacyKeepAliveUrl;
 
       addActivityListeners();
       startActivityTimer();
@@ -189,6 +195,7 @@ export class BBOmnibarUserActivity {
       currentShowInactivityCallback =
       currentHideInactivityCallback =
       currentAllowAnonymous =
+      currentLegacyKeepAliveUrl =
       undefined;
   }
 }

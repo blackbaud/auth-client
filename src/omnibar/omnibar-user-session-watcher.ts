@@ -147,7 +147,11 @@ export class BBOmnibarUserSessionWatcher {
     refreshUserCallback: () => void,
     stateChange: (state: BBOmnibarUserSessionState) => void
   ) {
-    if (!isWatching || allowAnonymous !== currentAllowAnonymous) {
+    if (
+      !isWatching ||
+      allowAnonymous !== currentAllowAnonymous ||
+      legacyKeepAliveUrl !== currentLegacyKeepAliveUrl
+    ) {
       BBOmnibarUserSessionWatcher.stop();
 
       currentAllowAnonymous = allowAnonymous;

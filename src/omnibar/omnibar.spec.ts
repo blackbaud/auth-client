@@ -407,6 +407,25 @@ describe('Omnibar', () => {
 
       validateVisible(false);
     });
+
+    it('should restart activity tracking when the legacy session keep-alive URL changes', () => {
+      loadOmnibar();
+
+      startTrackingSpy.calls.reset();
+
+      fireMessageEvent({
+        messageType: 'legacy-keep-alive-url-change',
+        url: 'https://example.com/track'
+      });
+
+      expect(startTrackingSpy).toHaveBeenCalledWith(
+        jasmine.any(Function),
+        jasmine.any(Function),
+        jasmine.any(Function),
+        undefined,
+        'https://example.com/track'
+      );
+    });
   });
 
   describe('interop with omnibar', () => {

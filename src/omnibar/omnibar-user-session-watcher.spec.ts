@@ -260,4 +260,33 @@ describe('Omnibar user session watcher', () => {
     );
   });
 
+  it('should restart watching when the legacy keep alive URL changes', () => {
+    const sessionWatcherStopSpy = spyOn(BBOmnibarUserSessionWatcher, 'stop').and.callThrough();
+
+    function validateWatch(callCount: number, legacyIFramePresent: boolean) {
+      expect(sessionWatcherStopSpy.calls.count()).toBe(callCount);
+
+      const iframeEl = document.querySelector('.sky-omnibar-iframe-legacy-keep-alive') as HTMLIFrameElement;
+
+      if (legacyIFramePresent) {
+        expect(iframeEl).not.toBeNull();
+        expect(iframeEl.src).toBe('https://example.com/keep-alive');
+      } else {
+        expect(iframeEl).toBeNull();
+      }
+    }
+
+    startWatching(false, undefined);
+    validateWatch(1, false);
+
+    startWatching(false, undefined);
+    validateWatch(1, false);
+
+    startWatching(false, 'https://example.com/keep-alive');
+    validateWatch(2, true);
+
+    startWatching(false, undefined);
+    validateWatch(3, false);
+  });
+
 });

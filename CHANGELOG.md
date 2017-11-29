@@ -1,3 +1,7 @@
+# 2.2.0 (2017-11-29)
+
+- The legacy keep-alive URL can now be set by the omnibar through the navigation service response instead of being specified at load time. The `legacyKeepAliveUrl` property of `BBOmnibarConfig` should now be considered deprecated and will be removed in a future major version. (#56)
+
 # 2.1.0 (2017-11-08)
 
 - Added ability to specify an environment ID when retrieving a token.  When not a member of the specified environment, the user will be redirected to an error page.  Specifying an environment ID also adds the environment ID to the JWT token so that consumers of the token can know the user is part of the specified environment.  Note that previously an environment ID could be specified but only when combined with a permission scope. (#55)
