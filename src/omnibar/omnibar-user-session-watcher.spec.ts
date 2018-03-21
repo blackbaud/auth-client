@@ -214,6 +214,7 @@ describe('Omnibar user session watcher', () => {
   it('should hide session tracker IFRAMEs from assistive technology', () => {
     function validateIframe(iframeEl: Element) {
       expect(iframeEl.getAttribute('tabindex')).toBe('-1');
+      expect(iframeEl.getAttribute('aria-hidden')).toBe('true');
     }
 
     startWatching(false, TEST_LEGACY_KEEP_ALIVE_ORIGIN + '/legacy');

@@ -44,7 +44,10 @@ function createIFrame(cls: string, url: string): HTMLIFrameElement {
   iframe.height = '0';
   iframe.frameBorder = '0';
   iframe.src = url;
+
+  // Hide from assistive technologies.
   iframe.tabIndex = -1;
+  iframe.setAttribute('aria-hidden', 'true');
 
   document.body.appendChild(iframe);
 
