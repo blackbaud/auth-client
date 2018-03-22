@@ -1,3 +1,7 @@
+# 2.3.0 (2018-03-22)
+
+- Fixed accessibility issues. (#59)
+
 # 2.2.0 (2017-11-29)
 
 - The legacy keep-alive URL can now be set by the omnibar through the navigation service response instead of being specified at load time. The `legacyKeepAliveUrl` property of `BBOmnibarConfig` should now be considered deprecated and will be removed in a future major version. (#56)
