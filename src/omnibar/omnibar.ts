@@ -35,6 +35,7 @@ function addElToBodyTop(el: any) {
 function addIframeEl() {
   iframeEl = document.createElement('iframe');
   iframeEl.className = `sky-omnibar-iframe ${CLS_LOADING}`;
+  iframeEl.title = 'Navigation';
   iframeEl.src = buildOmnibarUrl();
 
   addElToBodyTop(iframeEl);

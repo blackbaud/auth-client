@@ -127,6 +127,7 @@ describe('Omnibar', () => {
     expect(document.body.firstChild).toBe(iframeEl);
 
     expect(iframeEl.src).toBe(BASE_URL);
+    expect(iframeEl.title).toBe('Navigation');
   });
 
   it('should display a placeholder element until the omnibar is ready for display', () => {
