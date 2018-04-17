@@ -426,9 +426,9 @@ export class BBOmnibar {
   public static destroy() {
     BBAuthDomUtility.removeCss(styleEl);
 
-    document.body.removeChild(placeholderEl);
-    document.body.removeChild(iframeEl);
-    document.body.removeChild(envEl);
+    BBAuthDomUtility.removeEl(placeholderEl);
+    BBAuthDomUtility.removeEl(iframeEl);
+    BBAuthDomUtility.removeEl(envEl);
 
     window.removeEventListener('message', messageHandler);
 

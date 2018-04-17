@@ -26,7 +26,7 @@ describe('Context provider', () => {
   let getTokenFake: () => Promise<string>;
 
   function getIframeEl(): HTMLIFrameElement {
-    return document.querySelector('.sky-omnibar-welcome-iframe');
+    return document.querySelector('.sky-omnibar-welcome-iframe') as HTMLIFrameElement;
   }
 
   function fireMessageEvent(data: any, includeSource = true) {

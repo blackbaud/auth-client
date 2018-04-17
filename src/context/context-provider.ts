@@ -82,7 +82,7 @@ function showPicker(
   }
 
   function destroy() {
-    document.body.removeChild(iframeEl);
+    BBAuthDomUtility.removeEl(iframeEl);
 
     BBAuthDomUtility.removeCss(styleEl);
 

@@ -26,7 +26,13 @@ export class BBAuthDomUtility {
   }
 
   public static removeCss(styleEl: HTMLStyleElement) {
-    document.head.removeChild(styleEl);
+    this.removeEl(styleEl, document.head);
+  }
+
+  public static removeEl(el: HTMLElement, parentEl = document.body) {
+    if (parentEl.contains(el)) {
+       parentEl.removeChild(el);
+    }
   }
 
   public static addElToBodyTop(el: any) {
