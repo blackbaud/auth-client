@@ -1,3 +1,7 @@
+# 2.4.0 (2018-04-17)
+
+- Added `BBContextProvider` class which allows an application to ensure the proper context (such as environment ID) is supplied to the application either by automatically selecting a default context or by allowing the user to select a context. (#61)
+
 # 2.3.0 (2018-03-22)
 
 - Fixed accessibility issues. (#59)

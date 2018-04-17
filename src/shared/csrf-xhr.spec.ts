@@ -262,4 +262,54 @@ describe('Auth token integration', () => {
     });
   });
 
+  it('should provide a method for making a request with a BBID token', (done) => {
+    BBCsrfXhr.requestWithToken(
+      'https://example.com/token',
+      'abc'
+    ).then((response) => {
+      expect(response).toEqual({
+        success: true
+      });
+
+      done();
+    });
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    expect(request.url).toBe('https://example.com/token');
+    expect(request.method).toBe('GET');
+
+    expect(request.requestHeaders).toEqual({
+      Accept: 'application/json',
+      Authorization: 'Bearer abc'
+    });
+
+    request.respondWith({
+      responseText: JSON.stringify({
+        success: true
+      }),
+      status: 200
+    });
+  });
+
+  it('should handle errors when making a request with a BBID token', (done) => {
+    BBCsrfXhr.requestWithToken(
+      'https://example.com/token',
+      'abc'
+    ).then(
+      () => {
+        /* do nothing */
+      },
+      () => {
+        done();
+      }
+    );
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      status: 401
+    });
+  });
+
 });
