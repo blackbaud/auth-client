@@ -1,0 +1,44 @@
+export class BBAuthDomUtility {
+
+  public static addCss(css: string): HTMLStyleElement {
+    const styleEl = document.createElement('style');
+
+    styleEl.appendChild(document.createTextNode(css));
+
+    document.head.appendChild(styleEl);
+
+    return styleEl;
+  }
+
+  public static addIframe(
+    src: string,
+    className: string,
+    title: string
+  ): HTMLIFrameElement {
+    const iframeEl = document.createElement('iframe');
+    iframeEl.className = className;
+    iframeEl.title = title;
+    iframeEl.src = src;
+
+    this.addElToBodyTop(iframeEl);
+
+    return iframeEl;
+  }
+
+  public static removeCss(styleEl: HTMLStyleElement) {
+    document.head.removeChild(styleEl);
+  }
+
+  public static addElToBodyTop(el: any) {
+    const body = document.body;
+
+    /* istanbul ignore else */
+    /* This can't be tested without clearing out all child elements of body which is not practical in a unit test */
+    if (body.firstChild) {
+      body.insertBefore(el, body.firstChild);
+    } else {
+      body.appendChild(el);
+    }
+  }
+
+}

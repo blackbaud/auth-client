@@ -31,7 +31,6 @@ function createSigninUrl(inactive?: boolean) {
 export class BBAuthNavigator {
   /* istanbul ignore next */
   public static navigate(url: string, replace?: boolean) {
-
     if (replace) {
       location.replace(url);
     } else {

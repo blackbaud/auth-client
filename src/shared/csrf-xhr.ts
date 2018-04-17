@@ -137,4 +137,33 @@ export class BBCsrfXhr {
         });
     });
   }
+
+  public static requestWithToken(
+    url: string,
+    token: string
+  ) {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === 4) {
+          switch (xhr.status) {
+            case 200:
+              resolve(JSON.parse(xhr.responseText));
+              break;
+            default:
+              reject();
+              break;
+          }
+        }
+      };
+
+      xhr.open('GET', url, true);
+
+      xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+      xhr.setRequestHeader('Accept', 'application/json');
+
+      xhr.send();
+    });
+  }
 }
