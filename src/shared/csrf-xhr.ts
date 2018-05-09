@@ -104,7 +104,8 @@ export class BBCsrfXhr {
     signinRedirectParams?: any,
     disableRedirect?: boolean,
     envId?: string,
-    permissionScope?: string
+    permissionScope?: string,
+    bypassCsrf?: boolean
   ) {
     if (permissionScope && !envId) {
       return Promise.reject({
@@ -115,7 +116,19 @@ export class BBCsrfXhr {
 
     return new Promise((resolve: any, reject: any) => {
       // First get the CSRF token
-      requestToken(CSRF_URL, 'token_needed')
+
+      new Promise((resolveCsrf: any, rejectCsrf: any) => {
+        if (bypassCsrf) {
+          resolveCsrf({
+            csrf_token: 'token_needed'
+          });
+        } else {
+          console.log('CSRF NEEDED FOR: ' + url);
+          requestToken(CSRF_URL, 'token_needed')
+            .then(resolveCsrf)
+            .catch(rejectCsrf);
+        }
+      })
         .then((csrfResponse: any) => {
           // Next get the access token, and then pass it to the callback.
           return requestToken(url, csrfResponse['csrf_token'], envId, permissionScope);
