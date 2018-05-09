@@ -123,7 +123,6 @@ export class BBCsrfXhr {
             csrf_token: 'token_needed'
           });
         } else {
-          console.log('CSRF NEEDED FOR: ' + url);
           requestToken(CSRF_URL, 'token_needed')
             .then(resolveCsrf)
             .catch(rejectCsrf);
