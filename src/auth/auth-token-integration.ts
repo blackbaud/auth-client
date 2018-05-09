@@ -13,7 +13,8 @@ export class BBAuthTokenIntegration {
       disableRedirect,
       envId,
       permissionScope,
-      leId
+      leId,
+      true
     );
   }
 }

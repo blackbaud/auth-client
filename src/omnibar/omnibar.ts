@@ -9,6 +9,8 @@ import { BBOmnibarUserActivity } from './omnibar-user-activity';
 
 import { BBAuthNavigator } from '../shared/navigator';
 
+import { BBAuthDomUtility } from '../shared/dom-utility';
+
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 
@@ -20,32 +22,19 @@ let omnibarConfig: BBOmnibarConfig;
 let currentLegacyKeepAliveUrl: string;
 let promiseResolve: () => void;
 
-function addElToBodyTop(el: any) {
-  const body = document.body;
-
-  /* istanbul ignore else */
-  /* This can't be tested without clearing out all child elements of body which is not practical in a unit test */
-  if (body.firstChild) {
-    body.insertBefore(el, body.firstChild);
-  } else {
-    body.appendChild(el);
-  }
-}
-
 function addIframeEl() {
-  iframeEl = document.createElement('iframe');
-  iframeEl.className = `sky-omnibar-iframe ${CLS_LOADING}`;
-  iframeEl.title = 'Navigation';
-  iframeEl.src = buildOmnibarUrl();
-
-  addElToBodyTop(iframeEl);
+  iframeEl = BBAuthDomUtility.addIframe(
+    buildOmnibarUrl(),
+    `sky-omnibar-iframe ${CLS_LOADING}`,
+    'Navigation'
+  );
 }
 
 function addEnvironmentEl() {
   envEl = document.createElement('div');
   envEl.className = 'sky-omnibar-environment';
 
-  addElToBodyTop(envEl);
+  BBAuthDomUtility.addElToBodyTop(envEl);
 }
 
 function collapseIframe() {
@@ -53,7 +42,7 @@ function collapseIframe() {
 }
 
 function addStyleEl() {
-  const css = `
+  styleEl = BBAuthDomUtility.addCss(`
 body {
   margin-top: 50px;
 }
@@ -110,13 +99,8 @@ body {
 .sky-omnibar-environment-visible .sky-omnibar-environment {
   height: 24px;
 }
-  `;
-
-  styleEl = document.createElement('style');
-
-  styleEl.appendChild(document.createTextNode(css));
-
-  document.head.appendChild(styleEl);
+`
+  );
 }
 
 function addPlaceholderEl() {
@@ -441,11 +425,11 @@ export class BBOmnibar {
   }
 
   public static destroy() {
-    document.head.removeChild(styleEl);
+    BBAuthDomUtility.removeCss(styleEl);
 
-    document.body.removeChild(placeholderEl);
-    document.body.removeChild(iframeEl);
-    document.body.removeChild(envEl);
+    BBAuthDomUtility.removeEl(placeholderEl);
+    BBAuthDomUtility.removeEl(iframeEl);
+    BBAuthDomUtility.removeEl(envEl);
 
     window.removeEventListener('message', messageHandler);
 

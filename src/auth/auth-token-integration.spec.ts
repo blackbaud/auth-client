@@ -20,7 +20,8 @@ describe('Auth token integration', () => {
       undefined,
       undefined,
       undefined,
-      undefined
+      undefined,
+      true
     );
   });
 
@@ -34,7 +35,8 @@ describe('Auth token integration', () => {
       true,
       'abc',
       '123',
-      undefined
+      undefined,
+      true
     );
 
   });
@@ -49,7 +51,8 @@ describe('Auth token integration', () => {
       true,
       'abc',
       '123',
-      'xyz'
+      'xyz',
+      true
     );
   });
 

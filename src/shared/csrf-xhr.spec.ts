@@ -137,6 +137,43 @@ describe('Auth token integration', () => {
     });
   });
 
+  it('should not call csrf endpoint if bypassCsrf is set', (done) => {
+    const tokenPromise = BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      true
+    );
+
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        tokenRequest.respondWith({
+          responseText: JSON.stringify({
+            access_token: 'xyz',
+            expires_in: 12345
+          }),
+          status: 200
+        });
+
+        tokenPromise.then((tokenResponse: any) => {
+          expect(tokenResponse).toEqual({
+            access_token: 'xyz',
+            expires_in: 12345
+          });
+
+          done();
+        });
+      }
+    });
+  });
+
   it('should not try to parse an empty response', () => {
     BBCsrfXhr.request('https://example.com/token');
     const request = jasmine.Ajax.requests.mostRecent();
@@ -259,6 +296,56 @@ describe('Auth token integration', () => {
       expect(reason.code).toBe(BBAuthTokenErrorCode.PermissionScopeNoEnvironment);
       expect(reason.message).toBe('You must also specify an environment when specifying a permission scope.');
       done();
+    });
+  });
+
+  it('should provide a method for making a request with a BBID token', (done) => {
+    BBCsrfXhr.requestWithToken(
+      'https://example.com/token',
+      'abc'
+    ).then((response) => {
+      expect(response).toEqual({
+        success: true
+      });
+
+      done();
+    });
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    expect(request.url).toBe('https://example.com/token');
+    expect(request.method).toBe('GET');
+
+    expect(request.requestHeaders).toEqual({
+      Accept: 'application/json',
+      Authorization: 'Bearer abc'
+    });
+
+    request.respondWith({
+      responseText: JSON.stringify({
+        success: true
+      }),
+      status: 200
+    });
+  });
+
+  it('should handle errors when making a request with a BBID token', (done) => {
+    BBCsrfXhr.requestWithToken(
+      'https://example.com/token',
+      'abc'
+    ).then(
+      () => {
+        /* do nothing */
+      },
+      () => {
+        done();
+      }
+    );
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      status: 401
     });
   });
 
