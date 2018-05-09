@@ -147,10 +147,12 @@ describe('Auth token integration', () => {
       true
     );
 
-    setInterval(() => {
+    const intervalId = setInterval(() => {
       const tokenRequest = jasmine.Ajax.requests.mostRecent();
 
       if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
         tokenRequest.respondWith({
           responseText: JSON.stringify({
             access_token: 'xyz',
