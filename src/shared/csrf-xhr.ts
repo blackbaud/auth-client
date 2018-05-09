@@ -1,5 +1,3 @@
-const CSRF_URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/csrf';
-
 import {
   BBAuthTokenError,
   BBAuthTokenErrorCode
