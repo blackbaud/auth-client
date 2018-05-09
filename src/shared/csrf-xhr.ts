@@ -114,12 +114,8 @@ export class BBCsrfXhr {
     }
 
     return new Promise((resolve: any, reject: any) => {
-      // First get the CSRF token
-      requestToken(CSRF_URL, 'token_needed')
-        .then((csrfResponse: any) => {
-          // Next get the access token, and then pass it to the callback.
-          return requestToken(url, csrfResponse['csrf_token'], envId, permissionScope);
-        })
+      // Get the access token, and then pass it to the callback.
+      requestToken(url, 'token_needed', envId, permissionScope)
         .then(resolve)
         .catch((reason: BBAuthTokenError) => {
           if (disableRedirect) {
