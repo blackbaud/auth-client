@@ -147,7 +147,7 @@ describe('Auth token integration', () => {
       true
     );
 
-    setTimeout(() => {
+    setInterval(() => {
       const tokenRequest = jasmine.Ajax.requests.mostRecent();
 
       if (tokenRequest.url === 'https://example.com/token') {
