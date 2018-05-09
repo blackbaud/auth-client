@@ -137,6 +137,42 @@ describe('Auth token integration', () => {
     });
   });
 
+  it('should not call csrf endpoint if bypassCsrf is set', (done) => {
+    const tokenPromise = BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      true
+    );
+
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        tokenRequest.respondWith({
+          responseText: JSON.stringify({
+            access_token: 'xyz',
+            expires_in: 12345
+          }),
+          status: 200
+        });
+
+        tokenPromise.then((tokenResponse: any) => {
+          expect(tokenResponse).toEqual({
+            access_token: 'xyz',
+            expires_in: 12345
+          });
+
+          done();
+        });
+      }
+    });
+  });
+
   it('should not try to parse an empty response', () => {
     BBCsrfXhr.request('https://example.com/token');
     const request = jasmine.Ajax.requests.mostRecent();

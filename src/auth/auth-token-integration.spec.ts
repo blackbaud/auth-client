@@ -15,7 +15,8 @@ describe('Auth token integration', () => {
       undefined,
       undefined,
       undefined,
-      undefined
+      undefined,
+      true
     );
 
     requestSpy.calls.reset();
@@ -27,7 +28,8 @@ describe('Auth token integration', () => {
       undefined,
       true,
       'abc',
-      '123'
+      '123',
+      true
     );
   });
 
