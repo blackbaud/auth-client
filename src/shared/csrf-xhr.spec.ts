@@ -101,40 +101,26 @@ describe('Auth token integration', () => {
 
   it('should return a token if the user is signed in', (done) => {
     const tokenPromise = BBCsrfXhr.request('https://example.com/token');
-    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+    const tokenRequest = jasmine.Ajax.requests.mostRecent();
 
-    csrfRequest.respondWith({
-      responseText: JSON.stringify({
-        csrf_token: 'abc'
-      }),
-      status: 200
-    });
+    if (tokenRequest.url === 'https://example.com/token') {
+      tokenRequest.respondWith({
+        responseText: JSON.stringify({
+          access_token: 'xyz',
+          expires_in: 12345
+        }),
+        status: 200
+      });
 
-    // Wait for the token request to kick off.
-    const intervalId = setInterval(() => {
-      const tokenRequest = jasmine.Ajax.requests.mostRecent();
-
-      if (tokenRequest.url === 'https://example.com/token') {
-        clearInterval(intervalId);
-
-        tokenRequest.respondWith({
-          responseText: JSON.stringify({
-            access_token: 'xyz',
-            expires_in: 12345
-          }),
-          status: 200
+      tokenPromise.then((tokenResponse: any) => {
+        expect(tokenResponse).toEqual({
+          access_token: 'xyz',
+          expires_in: 12345
         });
 
-        tokenPromise.then((tokenResponse: any) => {
-          expect(tokenResponse).toEqual({
-            access_token: 'xyz',
-            expires_in: 12345
-          });
-
-          done();
-        });
-      }
-    });
+        done();
+      });
+    }
   });
 
   it('should not try to parse an empty response', () => {
