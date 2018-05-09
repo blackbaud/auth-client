@@ -146,26 +146,29 @@ describe('Auth token integration', () => {
       undefined,
       true
     );
-    const tokenRequest = jasmine.Ajax.requests.mostRecent();
 
-    if (tokenRequest.url === 'https://example.com/token') {
-      tokenRequest.respondWith({
-        responseText: JSON.stringify({
-          access_token: 'xyz',
-          expires_in: 12345
-        }),
-        status: 200
-      });
+    setTimeout(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
 
-      tokenPromise.then((tokenResponse: any) => {
-        expect(tokenResponse).toEqual({
-          access_token: 'xyz',
-          expires_in: 12345
+      if (tokenRequest.url === 'https://example.com/token') {
+        tokenRequest.respondWith({
+          responseText: JSON.stringify({
+            access_token: 'xyz',
+            expires_in: 12345
+          }),
+          status: 200
         });
 
-        done();
-      });
-    }
+        tokenPromise.then((tokenResponse: any) => {
+          expect(tokenResponse).toEqual({
+            access_token: 'xyz',
+            expires_in: 12345
+          });
+
+          done();
+        });
+      }
+    });
   });
 
   it('should not try to parse an empty response', () => {
