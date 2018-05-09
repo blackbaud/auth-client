@@ -65,9 +65,10 @@ function post(
   }
 }
 
-function requestToken(url: string, csrfValue: string, envId?: string, permissionScope?: string) {
+function requestToken(url: string, csrfValue: string, envId?: string, permissionScope?: string, leId?: string) {
   let body: {
     environment_id?: string,
+    legal_entity_id?: string,
     permission_scope?: string
   };
 
@@ -79,6 +80,10 @@ function requestToken(url: string, csrfValue: string, envId?: string, permission
     if (permissionScope) {
       body.permission_scope = permissionScope;
     }
+  }
+
+  if (leId) {
+    body.legal_entity_id = leId;
   }
 
   return new Promise((resolve: any, reject: any) => {
@@ -104,7 +109,8 @@ export class BBCsrfXhr {
     signinRedirectParams?: any,
     disableRedirect?: boolean,
     envId?: string,
-    permissionScope?: string
+    permissionScope?: string,
+    leId?: string
   ) {
     if (permissionScope && !envId) {
       return Promise.reject({

@@ -4,9 +4,13 @@ import { BBAuthTokenIntegration } from './auth-token-integration';
 import 'jasmine-ajax';
 
 describe('Auth token integration', () => {
+  let requestSpy: jasmine.Spy;
 
-  it('should request a token', () => {
-    const requestSpy = spyOn(BBCsrfXhr, 'request');
+  beforeEach(() => {
+    requestSpy = spyOn(BBCsrfXhr, 'request');
+  });
+
+  it('should request a token without params', () => {
 
     BBAuthTokenIntegration.getToken();
 
@@ -15,10 +19,12 @@ describe('Auth token integration', () => {
       undefined,
       undefined,
       undefined,
+      undefined,
       undefined
     );
+  });
 
-    requestSpy.calls.reset();
+  it('should request a token with envId and permissionScope', () => {
 
     BBAuthTokenIntegration.getToken(true, 'abc', '123');
 
@@ -27,7 +33,23 @@ describe('Auth token integration', () => {
       undefined,
       true,
       'abc',
-      '123'
+      '123',
+      undefined
+    );
+
+  });
+
+  it('should request a token with envId, permissionScope, and leId', () => {
+
+    BBAuthTokenIntegration.getToken(true, 'abc', '123', 'xyz');
+
+    expect(requestSpy).toHaveBeenCalledWith(
+      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
+      undefined,
+      true,
+      'abc',
+      '123',
+      'xyz'
     );
   });
 

@@ -3,9 +3,14 @@ import { BBAuthTokenIntegration } from './auth-token-integration';
 import { BBAuthGetTokenArgs } from './auth-get-token-args';
 
 function buildCacheKey(args: BBAuthGetTokenArgs) {
-  const { envId, permissionScope } = args;
+  const { envId, permissionScope, leId } = args;
 
-  return 'token|' + (envId || '-') + '|' + (permissionScope || '-');
+  return 'token|'
+    + (leId || '-')
+    + '|'
+    + (envId || '-')
+    + '|'
+    + (permissionScope || '-');
 }
 
 export class BBAuth {
@@ -60,7 +65,8 @@ export class BBAuth {
       cachedItem.pendingLookupPromise = BBAuthTokenIntegration.getToken(
         disableRedirect,
         args.envId,
-        args.permissionScope
+        args.permissionScope,
+        args.leId
       )
         .then((tokenResponse: any) => {
           cachedItem.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;

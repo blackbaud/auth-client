@@ -434,6 +434,7 @@ describe('Omnibar', () => {
     it('should notify the omnibar when navigation is ready to be loaded', () => {
       const envId = 'abc';
       const svcId = 'xyz';
+      const leId = '123';
       const localNavItems: BBOmnibarNavigationItem[] = [
         {
           title: 'Test',
@@ -443,6 +444,7 @@ describe('Omnibar', () => {
 
       loadOmnibar({
         envId,
+        leId,
         nav: {
           localNavItems,
           services: [
@@ -480,6 +482,7 @@ describe('Omnibar', () => {
           localNavItems,
           enableHelp: undefined,
           envId,
+          leId,
           localNotifications: false,
           localSearch: true,
           messageType: 'nav-ready',
