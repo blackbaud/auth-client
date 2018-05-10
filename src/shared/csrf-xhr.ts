@@ -136,7 +136,7 @@ export class BBCsrfXhr {
       })
         .then((csrfResponse: any) => {
           // Next get the access token, and then pass it to the callback.
-          return requestToken(url, csrfResponse['csrf_token'], envId, permissionScope);
+          return requestToken(url, csrfResponse['csrf_token'], envId, permissionScope, leId);
         })
         .then(resolve)
         .catch((reason: BBAuthTokenError) => {
