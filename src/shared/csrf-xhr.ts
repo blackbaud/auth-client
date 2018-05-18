@@ -65,26 +65,22 @@ function post(
   }
 }
 
+function addToRequestBody(body: any, key: string, value: string, condition?: boolean): any {
+  if (condition || (condition === undefined && value)) {
+    body = body || {};
+
+    body[key] = value;
+  }
+
+  return body;
+}
+
 function requestToken(url: string, csrfValue: string, envId?: string, permissionScope?: string, leId?: string) {
-  let body: {
-    environment_id?: string,
-    legal_entity_id?: string,
-    permission_scope?: string
-  };
+  let body: any;
 
-  if (envId) {
-    body = {
-      environment_id: envId
-    };
-
-    if (permissionScope) {
-      body.permission_scope = permissionScope;
-    }
-  }
-
-  if (leId) {
-    body.legal_entity_id = leId;
-  }
+  body = addToRequestBody(body, 'environment_id', envId);
+  body = addToRequestBody(body, 'legal_entity_id', leId);
+  body = addToRequestBody(body, 'permission_scope', permissionScope, !!((envId || leId) && permissionScope));
 
   return new Promise((resolve: any, reject: any) => {
     post(
