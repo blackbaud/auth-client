@@ -144,6 +144,7 @@ describe('Auth token integration', () => {
       undefined,
       undefined,
       undefined,
+      undefined,
       true
     );
 
@@ -240,6 +241,43 @@ describe('Auth token integration', () => {
 
         expect(requestData).toEqual({
           environment_id: 'abc'
+        });
+
+        done();
+      }
+    });
+  });
+
+  it('should add the legal entity ID to the request body', (done) => {
+    BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      'abc',
+      undefined,
+      'def'
+    );
+
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc'
+      }),
+      status: 200
+    });
+
+    // Wait for the token request to kick off.
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        const requestData: any = tokenRequest.data();
+
+        expect(requestData).toEqual({
+          environment_id: 'abc',
+          legal_entity_id: 'def'
         });
 
         done();

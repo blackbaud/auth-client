@@ -40,7 +40,7 @@ describe('Auth', () => {
   it('should return the cached token if it has not expired', (done) => {
     const tokenCache = (BBAuth as any).tokenCache;
 
-    tokenCache['token|-|-'] = {
+    tokenCache['token|-|-|-'] = {
       expirationTime: new Date().valueOf() + 100000,
       lastToken: 'abc'
     };
@@ -54,7 +54,7 @@ describe('Auth', () => {
   it('should return a new token if requested even if there is a cached token', (done) => {
     const tokenCache = (BBAuth as any).tokenCache;
 
-    tokenCache['token|-|-'] = {
+    tokenCache['token|-|-|-'] = {
       expirationTime: new Date().valueOf() + 100000,
       lastToken: 'abc'
     };
@@ -77,7 +77,7 @@ describe('Auth', () => {
   it('should return a new token if the cached token is expired', (done) => {
     const tokenCache = (BBAuth as any).tokenCache;
 
-    tokenCache['token|-|-'] = {
+    tokenCache['token|-|-|-'] = {
       expirationTime: new Date().valueOf() - 100000,
       lastToken: 'abc'
     };
@@ -92,8 +92,22 @@ describe('Auth', () => {
     BBAuth.getToken().then(() => {
       const tokenCache = (BBAuth as any).tokenCache;
 
-      expect(tokenCache['token|-|-'].lastToken).toBe('xyz');
-      expect(tokenCache['token|-|-'].expirationTime).toBeGreaterThan(new Date().valueOf());
+      expect(tokenCache['token|-|-|-'].lastToken).toBe('xyz');
+      expect(tokenCache['token|-|-|-'].expirationTime).toBeGreaterThan(new Date().valueOf());
+      done();
+    });
+  });
+
+  it('should cache tokens based on the specified legal entity ID, environment ID, and permission scope', (done) => {
+    BBAuth.getToken({
+      envId: '123',
+      leId: 'foo',
+      permissionScope: 'abc'
+    }).then(() => {
+      const tokenCache = (BBAuth as any).tokenCache;
+
+      expect(tokenCache['token|foo|123|abc'].lastToken).toBe('xyz');
+      expect(tokenCache['token|foo|123|abc'].expirationTime).toBeGreaterThan(new Date().valueOf());
       done();
     });
   });
@@ -105,8 +119,8 @@ describe('Auth', () => {
     }).then(() => {
       const tokenCache = (BBAuth as any).tokenCache;
 
-      expect(tokenCache['token|123|abc'].lastToken).toBe('xyz');
-      expect(tokenCache['token|123|abc'].expirationTime).toBeGreaterThan(new Date().valueOf());
+      expect(tokenCache['token|-|123|abc'].lastToken).toBe('xyz');
+      expect(tokenCache['token|-|123|abc'].expirationTime).toBeGreaterThan(new Date().valueOf());
       done();
     });
   });
@@ -168,7 +182,7 @@ describe('Auth', () => {
     BBAuth.getToken({
       disableRedirect: true
     }).then(() => {
-      expect(getTokenSpy).toHaveBeenCalledWith(true, undefined, undefined);
+      expect(getTokenSpy).toHaveBeenCalledWith(true, undefined, undefined, undefined);
       done();
     });
   });
@@ -178,7 +192,27 @@ describe('Auth', () => {
       envId: 'abc',
       permissionScope: '123'
     }).then((token: string) => {
-      expect(getTokenSpy).toHaveBeenCalledWith(undefined, 'abc', '123');
+      expect(getTokenSpy).toHaveBeenCalledWith(undefined, 'abc', '123', undefined);
+      done();
+    });
+  });
+
+  it('should pass legal entity ID', (done) => {
+    BBAuth.getToken({
+      leId: 'bar'
+    }).then((token: string) => {
+      expect(getTokenSpy).toHaveBeenCalledWith(undefined, undefined, undefined, 'bar');
+      done();
+    });
+  });
+
+  it('should pass legal entity ID, environment ID, and permission scope', (done) => {
+    BBAuth.getToken({
+      envId: 'abc',
+      leId: 'baz',
+      permissionScope: '123'
+    }).then((token: string) => {
+      expect(getTokenSpy).toHaveBeenCalledWith(undefined, 'abc', '123', 'baz');
       done();
     });
   });
