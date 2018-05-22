@@ -1,15 +1,50 @@
-import { BBAuth } from '../auth';
-import { BBAuthInterop } from '../shared/interop';
-import { BBOmnibarConfig } from './omnibar-config';
-import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
-import { BBOmnibarNotificationItem } from './omnibar-notification-item';
-import { BBOmnibarSearchArgs } from './omnibar-search-args';
+//#region imports
 
-import { BBOmnibarUserActivity } from './omnibar-user-activity';
+import {
+  BBAuth
+} from '../auth';
 
-import { BBAuthNavigator } from '../shared/navigator';
+import {
+  BBAuthInterop
+} from '../shared/interop';
 
-import { BBAuthDomUtility } from '../shared/dom-utility';
+import {
+  BBOmnibarConfig
+} from './omnibar-config';
+
+import {
+  BBOmnibarNavigationItem
+} from './omnibar-navigation-item';
+
+import {
+  BBOmnibarNotificationItem
+} from './omnibar-notification-item';
+
+import {
+  BBOmnibarSearchArgs
+} from './omnibar-search-args';
+
+import {
+  BBOmnibarUserActivity
+} from './omnibar-user-activity';
+
+import {
+  BBOmnibarUpdateArgs
+} from './omnibar-update-args';
+
+import {
+  BBAuthNavigator
+} from '../shared/navigator';
+
+import {
+  BBAuthDomUtility
+} from '../shared/dom-utility';
+
+import {
+  BBOmnibarThemeAccent
+} from './theming';
+
+//#endregion
 
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
@@ -42,6 +77,23 @@ function collapseIframe() {
 }
 
 function addStyleEl() {
+  let accentColor = '#00b4f1';
+  let backgroundColor = '#4d5259';
+
+  const theme = omnibarConfig.theme;
+
+  if (theme) {
+    const accent = theme.accent;
+
+    backgroundColor = theme.backgroundColor || backgroundColor;
+
+    if (accent === false) {
+      accentColor = backgroundColor;
+    } else if (accent && (accent as BBOmnibarThemeAccent).color) {
+      accentColor = (accent as BBOmnibarThemeAccent).color;
+    }
+  }
+
   styleEl = BBAuthDomUtility.addCss(`
 body {
   margin-top: 50px;
@@ -64,8 +116,8 @@ body {
 }
 
 .sky-omnibar-placeholder {
-  background-color: #4d5259;
-  border-top: 5px solid #00b4f1;
+  background-color: ${backgroundColor};
+  border-top: 5px solid ${accentColor};
   display: none;
 }
 
@@ -331,7 +383,8 @@ function messageHandler(event: MessageEvent) {
           localSearch: !!omnibarConfig.onSearch,
           messageType: 'nav-ready',
           services: nav && nav.services,
-          svcId: omnibarConfig.svcId
+          svcId: omnibarConfig.svcId,
+          theme: omnibarConfig.theme
         }
       );
 
@@ -421,6 +474,16 @@ export class BBOmnibar {
 
       window.addEventListener('message', messageHandler);
     });
+  }
+
+  public static update(args: BBOmnibarUpdateArgs) {
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        messageType: 'update',
+        updateArgs: args
+      }
+    );
   }
 
   public static destroy() {

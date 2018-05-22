@@ -10,3 +10,6 @@ export * from './omnibar-search-results';
 export * from './omnibar-search-results-html-fields';
 export * from './omnibar-notifications';
 export * from './omnibar-notification-item';
+export * from './omnibar-update-args';
+export * from './theming';
+export * from './omnibar-navigation-item-display-style';
