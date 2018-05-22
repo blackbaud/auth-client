@@ -378,6 +378,7 @@ function messageHandler(event: MessageEvent) {
         {
           enableHelp: omnibarConfig.enableHelp,
           envId: omnibarConfig.envId,
+          leId: omnibarConfig.leId,
           localNavItems: nav && nav.localNavItems,
           localNotifications: !!omnibarConfig.notifications,
           localSearch: !!omnibarConfig.onSearch,

@@ -33,6 +33,8 @@ export interface BBOmnibarConfig {
 
   envId?: string;
 
+  leId?: string;
+
   nav?: BBOmnibarNavigation;
 
   legacy?: boolean;

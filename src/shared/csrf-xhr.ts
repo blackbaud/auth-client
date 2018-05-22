@@ -65,21 +65,22 @@ function post(
   }
 }
 
-function requestToken(url: string, csrfValue: string, envId?: string, permissionScope?: string) {
-  let body: {
-    environment_id?: string,
-    permission_scope?: string
-  };
+function addToRequestBody(body: any, key: string, value: string, condition?: boolean): any {
+  if (condition || (condition === undefined && value)) {
+    body = body || {};
 
-  if (envId) {
-    body = {
-      environment_id: envId
-    };
-
-    if (permissionScope) {
-      body.permission_scope = permissionScope;
-    }
+    body[key] = value;
   }
+
+  return body;
+}
+
+function requestToken(url: string, csrfValue: string, envId?: string, permissionScope?: string, leId?: string) {
+  let body: any;
+
+  body = addToRequestBody(body, 'environment_id', envId);
+  body = addToRequestBody(body, 'legal_entity_id', leId);
+  body = addToRequestBody(body, 'permission_scope', permissionScope, !!((envId || leId) && permissionScope));
 
   return new Promise((resolve: any, reject: any) => {
     post(
@@ -105,6 +106,7 @@ export class BBCsrfXhr {
     disableRedirect?: boolean,
     envId?: string,
     permissionScope?: string,
+    leId?: string,
     bypassCsrf?: boolean
   ) {
     if (permissionScope && !envId) {
@@ -130,7 +132,7 @@ export class BBCsrfXhr {
       })
         .then((csrfResponse: any) => {
           // Next get the access token, and then pass it to the callback.
-          return requestToken(url, csrfResponse['csrf_token'], envId, permissionScope);
+          return requestToken(url, csrfResponse['csrf_token'], envId, permissionScope, leId);
         })
         .then(resolve)
         .catch((reason: BBAuthTokenError) => {
