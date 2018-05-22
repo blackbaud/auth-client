@@ -1,3 +1,7 @@
+# 2.6.0 (2018-05-22)
+
+- Added support for passing legal entity ID when retrieving a token.
+
 # 2.5.0 (2018-05-09)
 
 - Optimized the `BBAuth.getToken()` method by bypassing the CSRF endpoint which is no longer required by BBID. (#63)
