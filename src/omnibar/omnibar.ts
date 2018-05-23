@@ -87,6 +87,8 @@ function addStyleEl() {
 
     backgroundColor = theme.backgroundColor || backgroundColor;
 
+    // Explicitly check for false here since undefined represents the default
+    // behavior of showing the accent with the default color.
     if (accent === false) {
       accentColor = backgroundColor;
     } else if (accent && (accent as BBOmnibarThemeAccent).color) {
