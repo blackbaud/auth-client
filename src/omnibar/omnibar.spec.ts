@@ -1,14 +1,50 @@
-import { BBOmnibar } from './omnibar';
-import { BBOmnibarConfig } from './omnibar-config';
-import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
-import { BBOmnibarSearchArgs } from './omnibar-search-args';
-import { BBOmnibarSearchResults } from './omnibar-search-results';
-import { BBOmnibarUserActivity } from './omnibar-user-activity';
+//#region imports
 
-import { BBAuthInterop } from '../shared/interop';
-import { BBAuthNavigator } from '../shared/navigator';
+import {
+  BBOmnibar
+} from './omnibar';
 
-import { BBAuth } from '../auth';
+import {
+  BBOmnibarConfig
+} from './omnibar-config';
+
+import {
+  BBOmnibarNavigationItem
+} from './omnibar-navigation-item';
+
+import {
+  BBOmnibarSearchArgs
+} from './omnibar-search-args';
+
+import {
+  BBOmnibarSearchResults
+} from './omnibar-search-results';
+
+import {
+  BBOmnibarUserActivity
+} from './omnibar-user-activity';
+
+import {
+  BBOmnibarTheme
+} from './theming';
+
+import {
+  BBAuthInterop
+} from '../shared/interop';
+
+import {
+  BBAuthNavigator
+} from '../shared/navigator';
+
+import {
+  BBAuth
+} from '../auth';
+
+import {
+  BBOmnibarUpdateArgs
+} from './omnibar-update-args';
+
+//#endregion
 
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
@@ -145,6 +181,50 @@ describe('Omnibar', () => {
 
     expect(getComputedStyle(placeholderEl).display).toBe('none');
     expect(getComputedStyle(iframeEl).visibility).toBe('visible');
+  });
+
+  it('should style the placeholder element based on the provided theme', () => {
+    loadOmnibar({
+      theme: {
+        backgroundColor: 'rgb(123, 0, 4)'
+      }
+    });
+
+    const placeholderEl = getPlaceholderEl();
+    const placeholderStyle = getComputedStyle(placeholderEl);
+
+    expect(placeholderStyle.backgroundColor).toBe('rgb(123, 0, 4)');
+    expect(placeholderStyle.borderTopColor).toBe('rgb(0, 180, 241)');
+  });
+
+  it('should style the placeholder element accent based on the provided theme', () => {
+    loadOmnibar({
+      theme: {
+        accent: {
+          color: 'rgb(3, 5, 6)'
+        }
+      }
+    });
+
+    const placeholderEl = getPlaceholderEl();
+    const placeholderStyle = getComputedStyle(placeholderEl);
+
+    expect(placeholderStyle.backgroundColor).toBe('rgb(77, 82, 89)');
+    expect(placeholderStyle.borderTopColor).toBe('rgb(3, 5, 6)');
+  });
+
+  it('should not show a placeholder accent when the provided theme removes it', () => {
+    loadOmnibar({
+      theme: {
+        accent: false
+      }
+    });
+
+    const placeholderEl = getPlaceholderEl();
+    const placeholderStyle = getComputedStyle(placeholderEl);
+
+    expect(placeholderStyle.backgroundColor).toBe('rgb(77, 82, 89)');
+    expect(placeholderStyle.borderTopColor).toBe('rgb(77, 82, 89)');
   });
 
   it('should disable redirect when the session ends and allow anonymous is true', (done) => {
@@ -442,6 +522,10 @@ describe('Omnibar', () => {
         }
       ];
 
+      const theme: BBOmnibarTheme = {
+        backgroundColor: 'green'
+      };
+
       loadOmnibar({
         envId,
         leId,
@@ -462,7 +546,8 @@ describe('Omnibar', () => {
         onSearch: (searchArgs) => {
           return undefined;
         },
-        svcId
+        svcId,
+        theme
       });
 
       fireMessageEvent({
@@ -497,7 +582,8 @@ describe('Omnibar', () => {
               title: 'Some service'
             }
           ],
-          svcId
+          svcId,
+          theme
         }
       ]);
     });
@@ -782,6 +868,38 @@ describe('Omnibar', () => {
       fireMessageEvent({
         messageType: 'get-token'
       });
+    });
+
+    it('should notify the omnibar when update() is called', (done) => {
+      const updateArgs: BBOmnibarUpdateArgs = {
+        compactNavOnly: true,
+        nav: {
+          services: [
+            {
+              title: 'Test Service'
+            }
+          ]
+        },
+        theme: {
+          backgroundColor: '#abc'
+        }
+      };
+
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'update',
+            updateArgs
+          }
+        );
+
+        done();
+      });
+
+      loadOmnibar();
+
+      BBOmnibar.update(updateArgs);
     });
 
   });
