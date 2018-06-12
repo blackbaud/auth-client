@@ -515,6 +515,8 @@ describe('Omnibar', () => {
       const envId = 'abc';
       const svcId = 'xyz';
       const leId = '123';
+      const compactNavOnly = true;
+
       const localNavItems: BBOmnibarNavigationItem[] = [
         {
           title: 'Test',
@@ -527,6 +529,7 @@ describe('Omnibar', () => {
       };
 
       loadOmnibar({
+        compactNavOnly,
         envId,
         leId,
         nav: {
@@ -564,10 +567,11 @@ describe('Omnibar', () => {
       expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
         getIframeEl(),
         {
-          localNavItems,
+          compactNavOnly,
           enableHelp: undefined,
           envId,
           leId,
+          localNavItems,
           localNotifications: false,
           localSearch: true,
           messageType: 'nav-ready',

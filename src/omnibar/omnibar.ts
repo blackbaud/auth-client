@@ -378,6 +378,7 @@ function messageHandler(event: MessageEvent) {
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
+          compactNavOnly: omnibarConfig.compactNavOnly,
           enableHelp: omnibarConfig.enableHelp,
           envId: omnibarConfig.envId,
           leId: omnibarConfig.leId,

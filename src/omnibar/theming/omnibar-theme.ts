@@ -1,4 +1,10 @@
-import { BBOmnibarThemeAccent } from './omnibar-theme-accent';
+//#region imports
+
+import {
+  BBOmnibarThemeAccent
+} from './omnibar-theme-accent';
+
+//#endregion
 
 export interface BBOmnibarTheme {
 
