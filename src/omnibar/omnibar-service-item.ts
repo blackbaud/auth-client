@@ -6,4 +6,6 @@ export interface BBOmnibarServiceItem {
   items?: BBOmnibarNavigationItem[];
 
   specialItems?: BBOmnibarNavigationItem[];
+
+  imageUrl?: string;
 }
