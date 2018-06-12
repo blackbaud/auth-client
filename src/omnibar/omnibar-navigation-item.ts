@@ -14,4 +14,6 @@ export interface BBOmnibarNavigationItem {
   data?: any;
 
   displayStyle?: BBOmnibarNavigationItemDisplayStyle;
+
+  imageUrl?: string;
 }
