@@ -1,8 +1,30 @@
-import { BBOmnibarNavigation } from './omnibar-navigation';
-import { BBOmnibarNotificationsConfig } from './omnibar-notifications-config';
-import { BBOmnibarSearchArgs } from './omnibar-search-args';
-import { BBOmnibarSearchResults } from './omnibar-search-results';
-import { BBOmnibarServiceItem } from './omnibar-service-item';
+//#region imports
+
+import {
+  BBOmnibarNavigation
+} from './omnibar-navigation';
+
+import {
+  BBOmnibarNotificationsConfig
+} from './omnibar-notifications-config';
+
+import {
+  BBOmnibarSearchArgs
+} from './omnibar-search-args';
+
+import {
+  BBOmnibarSearchResults
+} from './omnibar-search-results';
+
+import {
+  BBOmnibarServiceItem
+} from './omnibar-service-item';
+
+import {
+  BBOmnibarTheme
+} from './theming';
+
+//#endregion
 
 export interface BBOmnibarConfig {
   serviceName?: string;
@@ -30,4 +52,9 @@ export interface BBOmnibarConfig {
   legacyKeepAliveUrl?: string;
 
   allowAnonymous?: boolean;
+
+  theme?: BBOmnibarTheme;
+
+  compactNavOnly?: boolean;
+
 }
