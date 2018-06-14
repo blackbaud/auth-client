@@ -1,3 +1,7 @@
+# 2.7.0 (2018-06-14)
+
+- Added interfaces and methods for theming the omnibar. (#67)
+
 # 2.6.0 (2018-05-22)
 
 - Added support for passing legal entity ID when retrieving a token.
