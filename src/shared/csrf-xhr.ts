@@ -22,6 +22,12 @@ function post(
   xhr.onreadystatechange = () => {
     if (xhr.readyState === 4) {
       switch (xhr.status) {
+        case 0:
+          unuthCB({
+            code: BBAuthTokenErrorCode.Offline,
+            message: 'The user is offline.'
+          });
+          break;
         case 200:
           okCB(xhr.responseText);
           break;
@@ -39,7 +45,7 @@ function post(
           break;
         default:
           /* istanbul ignore else */
-          if (xhr.status === 0 || xhr.status >= 400) {
+          if (xhr.status >= 400) {
             unuthCB({
               code: BBAuthTokenErrorCode.Unspecified,
               message: 'An unknown error occurred.'
@@ -136,7 +142,7 @@ export class BBCsrfXhr {
         })
         .then(resolve)
         .catch((reason: BBAuthTokenError) => {
-          if (disableRedirect) {
+          if (disableRedirect || reason.code === BBAuthTokenErrorCode.Offline) {
             reject(reason);
           } else {
             switch (reason.code) {

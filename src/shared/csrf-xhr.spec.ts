@@ -58,6 +58,22 @@ describe('Auth token integration', () => {
     });
   });
 
+  it('should not redirect to the error page when the user is offline', (done) => {
+    BBCsrfXhr.request('https://example.com/token')
+      .catch((reason: BBAuthTokenError) => {
+        expect(reason.code).toBe(BBAuthTokenErrorCode.Offline);
+        expect(reason.message).toBe('The user is offline.');
+        done();
+      });
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      responseText: undefined,
+      status: 0
+    });
+  });
+
   it('should redirect when the user is not a member of the specified environment', (done) => {
     navigateSpy.and.callFake((url: string) => {
       expect(url).toBe(
