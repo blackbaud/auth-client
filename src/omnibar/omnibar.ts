@@ -490,6 +490,15 @@ export class BBOmnibar {
     );
   }
 
+  public static focusSearch() {
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        messageType: 'search-focus'
+      }
+    );
+  }
+
   public static destroy() {
     BBAuthDomUtility.removeCss(styleEl);
 
