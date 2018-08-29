@@ -1,20 +1,39 @@
+//#region imports
+
 import {
   BBAuth,
   BBAuthTokenErrorCode
 } from '../auth';
 
-import { BBAuthInterop } from '../shared/interop';
+import {
+  BBAuthInterop
+} from '../shared/interop';
 
-import { BBCsrfXhr } from '../shared/csrf-xhr';
-import { BBAuthDomUtility } from '../shared/dom-utility';
-import { BBAuthNavigator } from '../shared/navigator';
+import {
+  BBCsrfXhr
+} from '../shared/csrf-xhr';
 
-import { BBContextArgs } from './context-args';
-import { BBContextNavigation } from './context-navigation';
+import {
+  BBAuthDomUtility
+} from '../shared/dom-utility';
+
+import {
+  BBAuthNavigator
+} from '../shared/navigator';
+
+import {
+  BBContextArgs
+} from './context-args';
+
+import {
+  BBContextDestinations
+} from './context-destinations';
+
+//#endregion
 
 function showPicker(
   args: BBContextArgs,
-  navigation: BBContextNavigation,
+  destinations: BBContextDestinations,
   resolve: (args: BBContextArgs) => void,
   reject: (reason: { reason: string }) => void
 ) {
@@ -112,7 +131,7 @@ function showPicker(
         BBAuthInterop.postOmnibarMessage(
           iframeEl,
           {
-            contextNavigation: navigation,
+            contextDestinations: destinations,
             messageType: 'context-provide'
           }
         );
@@ -161,9 +180,9 @@ export class BBContextProvider {
   public static url = 'https://host.nxt.blackbaud.com/omnibar/welcome';
 
   public static ensureContext(args: BBContextArgs): Promise<BBContextArgs> {
-    const { envId, envIdRequired, svcId } = args;
+    const { envId, envIdRequired, leId, leIdRequired, svcId } = args;
 
-    if (envId || !envIdRequired) {
+    if ((envId || !envIdRequired) && (leId || !leIdRequired)) {
       return Promise.resolve(args);
     }
 
@@ -171,25 +190,29 @@ export class BBContextProvider {
       if (svcId) {
         BBAuth.getToken()
           .then((token) => {
-            const url = 'https://s21anavnavaf00blkbapp01.sky.blackbaud.com/user/services?svcid=' +
+            let url = 'https://s21anavnavaf00blkbapp01.sky.blackbaud.com/user/destinations?svcid=' +
               encodeURIComponent(svcId);
+
+            if (args.url) {
+              url += '&referringurl=' + encodeURIComponent(args.url);
+            }
 
             BBCsrfXhr.requestWithToken(
               url,
               token
-            ).then((navigation: BBContextNavigation) => {
-              const environments = navigation.environments;
-              const environmentCount = (environments && environments.length) || 0;
+            ).then((destinations: BBContextDestinations) => {
+              const items = destinations && destinations.items;
+              const itemCount = items && items.length;
 
-              if (environmentCount === 1) {
-                // Default to the only environment.
-                args.envId = environments[0].id;
+              if (itemCount === 1) {
+                // Default to the only possible context.
+                args.url = items[0].url;
                 resolve(args);
-              } else if (environmentCount > 1) {
-                // Let the user pick an environment.
-                showPicker(args, navigation, resolve, reject);
+              } else if (itemCount > 1) {
+                // Let the user pick a context.
+                showPicker(args, destinations, resolve, reject);
               } else {
-                // The user is not in an environment.  Redirect to the error page.
+                // The user does not have a valid context.  Redirect to the error page.
                 redirectToError();
               }
             });
