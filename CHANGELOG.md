@@ -1,3 +1,7 @@
+# 2.8.0 (2018-08-29)
+
+- Added the ability to enforce legal entity context with `BBContextProvider`. (#71)
+
 # 2.7.1 (2018-06-21)
 
 - Fixed issue where user could be redirected to an error page if a pending request was interrupted. (#69)
