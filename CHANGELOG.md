@@ -1,3 +1,7 @@
+# 2.9.0 (2018-08-30)
+
+- Updated user activity session renewal logic to reflect new max session age value from BBID. (#73)
+
 # 2.8.0 (2018-08-29)
 
 - Added the ability to enforce legal entity context with `BBContextProvider`. (#71)
