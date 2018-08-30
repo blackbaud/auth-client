@@ -115,17 +115,16 @@ export class BBOmnibarUserActivity {
   // after the previous session renewal.
   public static MIN_RENEWAL_RETRY = 1 * 60 * 1000;
 
-  // The tim in millseconds that the expiration prompt will show before the session actually expires.  When the
-  // prompt shows will be determined by subtracting this value from the MAX_SESSION_AGE; for instance, if the
-  // prompt duration is 2 minutes and the max session age is 15 minutes, the inactivity prompt will be displayed
-  // 13 minutes after the last user activity.
+  // The time in millseconds that the expiration prompt will show before the session actually expires.
   public static INACTIVITY_PROMPT_DURATION = 2 * 60 * 1000;
 
   // The minimum age in milliseconds of the session before it will be renewed in response to user activity.
   public static MIN_RENEWAL_AGE = 5 * 60 * 1000;
 
-  // The time in millseconds that a session is allowed without activity.
-  public static MAX_SESSION_AGE = 15 * 60 * 1000;
+  // The time in millseconds that a session is allowed without activity.  While the actual length of the current
+  // session is determined by calls to auth's TTL endpoint, this value is used to determine when to start renewing
+  // the session by calculating the difference between the max session age and the min renewal age.
+  public static MAX_SESSION_AGE = 90 * 60 * 1000;
 
   public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
