@@ -1,5 +1,7 @@
 export interface BBOmnibarThemeAccent {
 
-  color: string;
+  color?: string;
+
+  topAccent?: boolean;
 
 }
