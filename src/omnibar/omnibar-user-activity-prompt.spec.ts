@@ -1,20 +1,12 @@
 //#region imports
 
 import {
-  BBAuthDomUtility
-} from '../shared/dom-utility';
-
-import {
   BBAuthInterop
 } from '../shared/interop';
 
 import {
   BBOmnibarUserActivityPrompt
 } from './omnibar-user-activity-prompt';
-
-import {
-  BBOmnibarUserActivityPromptShowArgs
-} from './omnibar-user-activity-prompt-show-args';
 
 //#endregion
 
@@ -75,7 +67,7 @@ describe('User activity prompt', () => {
     const iframeStyle = getComputedStyle(iframeEl);
 
     expect(iframeStyle.backgroundColor).toEqual(jasmine.stringMatching(/^transparent|rgba\(0, 0, 0, 0\)$/gi));
-    expect(iframeStyle.borderStyle).toBe('none');
+    expect(iframeStyle.borderStyle).toEqual(jasmine.stringMatching(/^|none$/gi));
     expect(iframeStyle.height).toBe(document.documentElement.clientHeight + 'px');
     expect(iframeStyle.left).toBe('0px');
     expect(iframeStyle.position).toBe('fixed');
