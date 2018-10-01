@@ -1,3 +1,7 @@
+# 2.10.0 (2018-10-01)
+
+- Updated inactivity prompt to be shown with a higher z-index to avoid being covered up by a page's contents in more cases. (#75)
+
 # 2.9.0 (2018-08-30)
 
 - Updated user activity session renewal logic to reflect new max session age value from BBID. (#73)
