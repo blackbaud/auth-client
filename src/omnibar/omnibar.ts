@@ -29,6 +29,10 @@ import {
 } from './omnibar-user-activity';
 
 import {
+  BBOmnibarUserActivityPrompt
+} from './omnibar-user-activity-prompt';
+
+import {
   BBOmnibarUpdateArgs
 } from './omnibar-update-args';
 
@@ -216,21 +220,15 @@ function refreshUserCallback() {
 }
 
 function showInactivityCallback() {
-  BBAuthInterop.postOmnibarMessage(
-    iframeEl,
-    {
-      messageType: 'inactivity-show'
+  BBOmnibarUserActivityPrompt.show({
+    sessionRenewCallback: () => {
+      BBOmnibarUserActivity.userRenewedSession();
     }
-  );
+  });
 }
 
 function hideInactivityCallback() {
-  BBAuthInterop.postOmnibarMessage(
-    iframeEl,
-    {
-      messageType: 'inactivity-hide'
-    }
-  );
+  BBOmnibarUserActivityPrompt.hide();
 }
 
 function startActivityTracking() {
