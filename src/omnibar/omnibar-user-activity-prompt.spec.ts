@@ -74,7 +74,7 @@ describe('User activity prompt', () => {
 
     const iframeStyle = getComputedStyle(iframeEl);
 
-    expect(iframeStyle.backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    expect(iframeStyle.backgroundColor).toEqual(jasmine.stringMatching(/^transparent|rgba\(0, 0, 0, 0\)$/gi));
     expect(iframeStyle.borderStyle).toBe('none');
     expect(iframeStyle.height).toBe(document.documentElement.clientHeight + 'px');
     expect(iframeStyle.left).toBe('0px');
