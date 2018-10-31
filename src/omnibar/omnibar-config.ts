@@ -57,4 +57,6 @@ export interface BBOmnibarConfig {
 
   compactNavOnly?: boolean;
 
+  navVersion?: string;
+
 }

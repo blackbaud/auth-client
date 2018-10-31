@@ -384,6 +384,7 @@ function messageHandler(event: MessageEvent) {
           localNotifications: !!omnibarConfig.notifications,
           localSearch: !!omnibarConfig.onSearch,
           messageType: 'nav-ready',
+          navVersion: omnibarConfig.navVersion,
           services: nav && nav.services,
           svcId: omnibarConfig.svcId,
           theme: omnibarConfig.theme
