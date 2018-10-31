@@ -1,3 +1,7 @@
+# 2.11.0 (2018-10-31)
+
+- Added `navVersion` config property. (#78)
+
 # 2.10.0 (2018-10-01)
 
 - Updated inactivity prompt to be shown with a higher z-index to avoid being covered up by a page's contents in more cases. (#75)

@@ -596,6 +596,7 @@ describe('Omnibar', () => {
       const svcId = 'xyz';
       const leId = '123';
       const compactNavOnly = true;
+      const navVersion = 'test';
 
       const localNavItems: BBOmnibarNavigationItem[] = [
         {
@@ -626,6 +627,7 @@ describe('Omnibar', () => {
             }
           ]
         },
+        navVersion,
         onSearch: (searchArgs) => {
           return undefined;
         },
@@ -655,6 +657,7 @@ describe('Omnibar', () => {
           localNotifications: false,
           localSearch: true,
           messageType: 'nav-ready',
+          navVersion,
           services: [
             {
               items: [
