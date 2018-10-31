@@ -68,7 +68,7 @@ BBAuthClient.BBOmnibar.load({
 });
 ```
 
-If you're using no module loader at all, then you can load the `dist/bundles/auth-client.umd.js` file onto your page and via a `<script>` element or concatenated with the rest of your page's JavaScript and access it via the global `BBAuthClient` variable:
+If you're using no module loader at all, then you can load the `dist/bundles/auth-client.umd.js` file onto your page via a `<script>` element or concatenated with the rest of your page's JavaScript and access it via the global `BBAuthClient` variable:
 
 ```
 // BBAuthClient is global here.
