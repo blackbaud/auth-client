@@ -1,3 +1,7 @@
+# 2.12.0 (2018-11-08)
+
+- Updated token requests to allow legal entity ID to be specified with a permission scope; previously permission scope could only be specified if environment ID were specified. (#79)
+
 # 2.11.0 (2018-10-31)
 
 - Added `navVersion` config property. (#78)
