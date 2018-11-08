@@ -117,7 +117,7 @@ export class BBCsrfXhr {
   ) {
     if (permissionScope && !envId && !leId) {
       return Promise.reject({
-        code: BBAuthTokenErrorCode.PermissionScopeNoContext,
+        code: BBAuthTokenErrorCode.PermissionScopeNoEnvironment,
         message: 'You must also specify an environment or legal entity when specifying a permission scope.'
       });
     }

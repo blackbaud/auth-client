@@ -346,7 +346,7 @@ describe('Auth token integration', () => {
       undefined,
       '123'
     ).catch((reason: BBAuthTokenError) => {
-      expect(reason.code).toBe(BBAuthTokenErrorCode.PermissionScopeNoContext);
+      expect(reason.code).toBe(BBAuthTokenErrorCode.PermissionScopeNoEnvironment);
       expect(reason.message)
         .toBe('You must also specify an environment or legal entity when specifying a permission scope.');
       done();

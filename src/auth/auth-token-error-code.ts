@@ -2,6 +2,6 @@ export enum BBAuthTokenErrorCode {
   Unspecified = 0,
   NotLoggedIn,
   InvalidEnvironment,
-  PermissionScopeNoContext,
+  PermissionScopeNoEnvironment,
   Offline
 }
