@@ -338,7 +338,7 @@ describe('Auth token integration', () => {
     });
   });
 
-  it('should require environment ID when permission scope is specified', (done) => {
+  it('should require environment ID or legal entity ID when permission scope is specified', (done) => {
     BBCsrfXhr.request(
       'https://example.com/token',
       undefined,
@@ -347,7 +347,8 @@ describe('Auth token integration', () => {
       '123'
     ).catch((reason: BBAuthTokenError) => {
       expect(reason.code).toBe(BBAuthTokenErrorCode.PermissionScopeNoEnvironment);
-      expect(reason.message).toBe('You must also specify an environment when specifying a permission scope.');
+      expect(reason.message)
+        .toBe('You must also specify an environment or legal entity when specifying a permission scope.');
       done();
     });
   });
