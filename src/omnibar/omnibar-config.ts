@@ -59,4 +59,6 @@ export interface BBOmnibarConfig {
 
   navVersion?: string;
 
+  hideResourceLinks?: boolean;
+
 }

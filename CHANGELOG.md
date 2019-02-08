@@ -1,3 +1,7 @@
+# 2.13.0 (2019-02-08)
+
+- Added `hideResourceLinks` config property which hides the menu items above the "Sign out" menu item in the user menu. (#81)
+
 # 2.12.0 (2018-11-08)
 
 - Updated token requests to allow legal entity ID to be specified with a permission scope; previously permission scope could only be specified if environment ID were specified. (#79)

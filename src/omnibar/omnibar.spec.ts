@@ -597,6 +597,7 @@ describe('Omnibar', () => {
       const leId = '123';
       const compactNavOnly = true;
       const navVersion = 'test';
+      const hideResourceLinks = true;
 
       const localNavItems: BBOmnibarNavigationItem[] = [
         {
@@ -612,6 +613,7 @@ describe('Omnibar', () => {
       loadOmnibar({
         compactNavOnly,
         envId,
+        hideResourceLinks,
         leId,
         nav: {
           localNavItems,
@@ -652,6 +654,7 @@ describe('Omnibar', () => {
           compactNavOnly,
           enableHelp: undefined,
           envId,
+          hideResourceLinks,
           leId,
           localNavItems,
           localNotifications: false,
