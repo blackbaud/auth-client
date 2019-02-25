@@ -9,6 +9,20 @@ function bindEvent(element: any, eventName: string, eventHandler: any) {
   }
 }
 
+function IFrameMock(frame: HTMLIFrameElement) {
+  bindEvent(frame.contentWindow, 'message', (msg: any) => {
+    if (msg.data['methodName'] === 'ready') {
+      window.postMessage({methodName: 'ready'}, '*');
+    } else if (msg.data['methodName'] === 'getToken') {
+      getTokenCalls += 1;
+      window.postMessage({
+        methodName: 'getToken',
+        value: 'accessToken!'
+      }, '*');
+    }
+  });
+}
+
 let getTokenCalls: number;
 
 describe('Auth Cross Domain Iframe', () => {
@@ -35,7 +49,7 @@ describe('Auth Cross Domain Iframe', () => {
     expect(requestSpy).not.toHaveBeenCalled();
   });
 
-  it('communicates with the iframe via "ready" and "getToken" and kics off "ready"', (done) => {
+  it('communicates with the iframe via "ready" and "getToken" and kicks off "ready"', (done) => {
     fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
     IFrameMock(fakeIframe);
 
@@ -63,14 +77,3 @@ describe('Auth Cross Domain Iframe', () => {
   });
 
 });
-
-function IFrameMock(frame: HTMLIFrameElement) {
-  bindEvent(frame.contentWindow, 'message', (msg: any) => {
-    if (msg.data['methodName'] === 'ready') {
-      window.postMessage('ready', '*');
-    } else if (msg.data['methodName'] === 'getToken') {
-      getTokenCalls += 1;
-      window.postMessage('accessToken!', '*');
-    }
-  });
-}

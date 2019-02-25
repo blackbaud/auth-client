@@ -42,11 +42,11 @@ export class BBAuthCrossDomainIframe {
   public static getTokenFromIFrame(iframeEl: HTMLIFrameElement): Promise<TokenResponse> {
     return new Promise<TokenResponse>((resolve) => {
       bindEvent(window, 'message', function handleMessageFromIFrame(msg: any) {
-        if (msg.data === 'ready') {
+        if (msg.data['methodName'] === 'ready') {
           iframeEl.contentWindow.postMessage({methodName: 'getToken'}, '*'); // set this * to something else
-        } else {
+        } else if (msg.data['methodName'] === 'getToken') {
           const tokenResponse: TokenResponse = {
-            access_token: msg.data,
+            access_token: msg.data['value'],
             expires_in: 0
           };
           // this is required to prevent subsequent calls of getTOkenFromIFrame to not make extra calls to the IFrame
@@ -56,6 +56,5 @@ export class BBAuthCrossDomainIframe {
       });
       iframeEl.contentWindow.postMessage({methodName: 'ready'}, '*');
     });
-
   }
 }
