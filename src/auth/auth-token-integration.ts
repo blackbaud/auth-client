@@ -1,4 +1,5 @@
 import { BBCsrfXhr } from '../shared/csrf-xhr';
+import { BBAuthCrossDomainIframe } from './auth-cross-domain-iframe';
 
 export class BBAuthTokenIntegration {
   public static getToken(
@@ -7,6 +8,9 @@ export class BBAuthTokenIntegration {
     permissionScope?: string,
     leId?: string
   ) {
+    if (!this.getLocationHostname().endsWith('blackbaud.com')) {
+      return BBAuthCrossDomainIframe.GetToken();
+    }
     return BBCsrfXhr.request(
       'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
       undefined,
@@ -16,5 +20,10 @@ export class BBAuthTokenIntegration {
       leId,
       true
     );
+  }
+
+  // wrapper for window.location.hostName so it can be tested.
+  public static getLocationHostname() {
+    return window.location.hostname;
   }
 }
