@@ -8,7 +8,7 @@ export class BBAuthTokenIntegration {
     permissionScope?: string,
     leId?: string
   ) {
-    if (!this.getLocationHostname().endsWith('blackbaud.com')) {
+    if (!this.hostNameEndsWith('blackbaud.com')) {
       return BBAuthCrossDomainIframe.GetToken();
     }
     return BBCsrfXhr.request(
@@ -22,6 +22,9 @@ export class BBAuthTokenIntegration {
     );
   }
 
+  public static hostNameEndsWith(domain: string) {
+    return this.getLocationHostname().substr(-domain.length) === domain;
+  }
   // wrapper for window.location.hostName so it can be tested.
   public static getLocationHostname() {
     return window.location.hostname;
