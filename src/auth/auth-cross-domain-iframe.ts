@@ -3,33 +3,24 @@
 import {
   BBAuthDomUtility
 } from '../shared/dom-utility';
-import { TokenResponse } from './token-response';
+
+import { BBAuthTokenResponse } from './bbauth-token-response';
 
 //#endregion
-
-function bindEvent(element: any, eventName: string, eventHandler: any) {
-  if (element.addEventListener) {
-      element.addEventListener(eventName, eventHandler, false);
-  } else if (element.attachEvent) {
-      element.attachEvent('on' + eventName, eventHandler);
-  }
-}
-
-// URL to get iframe
-const URL = '';
+const URL = ''; // URL to get IFrame
 
 export class BBAuthCrossDomainIframe {
 
-  public static GetToken(): Promise<TokenResponse> {
+  public static getToken(): Promise<BBAuthTokenResponse> {
     let iframeEl: HTMLIFrameElement;
     iframeEl = this.getOrMakeIframe();
-    return this.getTokenFromIFrame(iframeEl);
+    return this.getTokenFromIframe(iframeEl);
   }
 
   public static getOrMakeIframe(): HTMLIFrameElement {
     let iframeEl = document.getElementById('auth-cross-domain-iframe') as HTMLIFrameElement;
     // if iframe doesn't exist, make it
-    if (iframeEl === undefined || iframeEl === null) {
+    if (!iframeEl) {
       iframeEl = BBAuthDomUtility.addIframe(
         URL,
         'auth-cross-domain-iframe',
@@ -39,13 +30,13 @@ export class BBAuthCrossDomainIframe {
     return iframeEl;
   }
 
-  public static getTokenFromIFrame(iframeEl: HTMLIFrameElement): Promise<TokenResponse> {
-    return new Promise<TokenResponse>((resolve) => {
-      bindEvent(window, 'message', function handleMessageFromIFrame(msg: any) {
-        if (msg.data['methodName'] === 'ready') {
+  public static getTokenFromIframe(iframeEl: HTMLIFrameElement): Promise<BBAuthTokenResponse> {
+    return new Promise<BBAuthTokenResponse>((resolve) => {
+      window.addEventListener('message', function handleMessageFromIFrame(msg: any) {
+        if (msg.data.methodName === 'ready') {
           iframeEl.contentWindow.postMessage({methodName: 'getToken'}, '*'); // set this * to something else
-        } else if (msg.data['methodName'] === 'getToken') {
-          const tokenResponse: TokenResponse = {
+        } else if (msg.data.methodName === 'getToken') {
+          const tokenResponse: BBAuthTokenResponse = {
             access_token: msg.data['value'],
             expires_in: 0
           };

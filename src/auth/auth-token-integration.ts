@@ -9,8 +9,9 @@ export class BBAuthTokenIntegration {
     leId?: string
   ) {
     if (!this.hostNameEndsWith('blackbaud.com')) {
-      return BBAuthCrossDomainIframe.GetToken();
+      return BBAuthCrossDomainIframe.getToken();
     }
+
     return BBCsrfXhr.request(
       'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
       undefined,
@@ -25,6 +26,7 @@ export class BBAuthTokenIntegration {
   public static hostNameEndsWith(domain: string) {
     return this.getLocationHostname().substr(-domain.length) === domain;
   }
+
   // wrapper for window.location.hostName so it can be tested.
   public static getLocationHostname() {
     return window.location.hostname;
