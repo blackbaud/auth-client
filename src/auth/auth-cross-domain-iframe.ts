@@ -12,9 +12,7 @@ const URL = ''; // URL to get IFrame
 export class BBAuthCrossDomainIframe {
 
   public static getToken(): Promise<BBAuthTokenResponse> {
-    let iframeEl: HTMLIFrameElement;
-    iframeEl = this.getOrMakeIframe();
-    return this.getTokenFromIframe(iframeEl);
+    return this.getTokenFromIframe(this.getOrMakeIframe());
   }
 
   public static getOrMakeIframe(): HTMLIFrameElement {

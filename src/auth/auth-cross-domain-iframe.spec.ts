@@ -28,8 +28,7 @@ describe('Auth Cross Domain Iframe', () => {
   describe('getToken', () => {
     it('gets or creates an iframe then returns the token promise', () => {
       const getOrMakeFrameSpy = spyOn(BBAuthCrossDomainIframe, 'getOrMakeIframe').and.returnValue(fakeIframe);
-      const getTokenFromIframeSpy = spyOn(BBAuthCrossDomainIframe, 'getTokenFromIframe')
-        .and.returnValue(new Promise(() => { return; }));
+      const getTokenFromIframeSpy = spyOn(BBAuthCrossDomainIframe, 'getTokenFromIframe');
 
       BBAuthCrossDomainIframe.getToken();
 
