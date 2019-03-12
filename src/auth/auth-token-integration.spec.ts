@@ -73,4 +73,10 @@ describe('Auth token integration', () => {
     });
 
   });
+
+  describe('getLocationHostname', () => {
+    it('should return window location hostname', () => {
+      expect(BBAuthTokenIntegration.getLocationHostname()).toEqual(window.location.hostname);
+    });
+  });
 });
