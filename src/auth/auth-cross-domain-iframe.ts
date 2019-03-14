@@ -8,6 +8,8 @@ import { BBAuthTokenResponse } from './bbauth-token-response';
 
 //#endregion
 const URL = ''; // URL to get IFrame
+const HOST = 'security-token-svc';
+const SOURCE = 'auth-client';
 
 export class BBAuthCrossDomainIframe {
 
@@ -31,9 +33,13 @@ export class BBAuthCrossDomainIframe {
   public static getTokenFromIframe(iframeEl: HTMLIFrameElement): Promise<BBAuthTokenResponse> {
     return new Promise<BBAuthTokenResponse>((resolve) => {
       window.addEventListener('message', function handleMessageFromIframe(msg: any) {
-        if (msg.data.methodName === 'ready') {
-          iframeEl.contentWindow.postMessage({methodName: 'getToken'}, '*'); // set this * to something else
-        } else if (msg.data.methodName === 'getToken') {
+        if (msg.data.source !== HOST) { return; }
+        if (msg.data.messageType === 'ready') {
+          iframeEl.contentWindow.postMessage({
+            messageType: 'getToken',
+            source: SOURCE
+          }, '*'); // set this * to something else
+        } else if (msg.data.messageType === 'getToken') {
           const tokenResponse: BBAuthTokenResponse = {
             access_token: msg.data['value'],
             expires_in: 0
@@ -43,7 +49,7 @@ export class BBAuthCrossDomainIframe {
           resolve(tokenResponse);
         }
       });
-      iframeEl.contentWindow.postMessage({methodName: 'ready'}, '*');
+      iframeEl.contentWindow.postMessage({messageType: 'ready', source: SOURCE}, '*');
     });
   }
 }

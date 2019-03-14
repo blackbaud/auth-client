@@ -2,13 +2,17 @@ import { BBAuthDomUtility } from '../shared/dom-utility';
 import { BBAuthCrossDomainIframe } from './auth-cross-domain-iframe';
 
 function IFrameMock(frame: HTMLIFrameElement) {
+  const SOURCE = 'security-token-svc';
+  const HOST = 'auth-client';
   frame.contentWindow.addEventListener('message', (msg: any) => {
-    if (msg.data.methodName === 'ready') {
-      window.postMessage({methodName: 'ready'}, '*');
-    } else if (msg.data.methodName === 'getToken') {
+    if (msg.data.source !== HOST) { return; }
+    if (msg.data.messageType === 'ready') {
+      window.postMessage({messageType: 'ready', source: SOURCE}, '*');
+    } else if (msg.data.messageType === 'getToken') {
       getTokenCalls += 1;
       window.postMessage({
-        methodName: 'getToken',
+        messageType: 'getToken',
+        source: SOURCE,
         value: 'accessToken!'
       }, '*');
     }
