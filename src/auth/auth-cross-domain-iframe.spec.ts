@@ -2,6 +2,7 @@ import { BBAuthDomUtility } from '../shared/dom-utility';
 import { BBAuthCrossDomainIframe } from './auth-cross-domain-iframe';
 
 function IFrameMock(frame: HTMLIFrameElement) {
+  // This mock should match the code at the URL
   const SOURCE = 'security-token-svc';
   const HOST = 'auth-client';
   frame.contentWindow.addEventListener('message', (msg: any) => {

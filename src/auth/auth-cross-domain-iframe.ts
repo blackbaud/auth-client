@@ -7,7 +7,7 @@ import {
 import { BBAuthTokenResponse } from './bbauth-token-response';
 
 //#endregion
-const URL = ''; // URL to get IFrame
+const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
 const HOST = 'security-token-svc';
 const SOURCE = 'auth-client';
 
