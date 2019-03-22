@@ -5,7 +5,7 @@ import { BBAuthTokenError } from './auth-token-error';
 import { BBAuthTokenErrorCode } from './auth-token-error-code';
 
 const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
-function IFrameMock(frame: HTMLIFrameElement, error: boolean = false) {
+function IFrameMock(frame: HTMLIFrameElement, error?: boolean) {
   // This mock should match the code at the URL
   const SOURCE = 'security-token-svc';
   const HOST = 'auth-client';
