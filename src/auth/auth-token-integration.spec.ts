@@ -69,7 +69,12 @@ describe('Auth token integration', () => {
 
     it('should create an iframe and then call getToken', () => {
       BBAuthTokenIntegration.getToken();
-      expect(requestSpy).toHaveBeenCalled();
+      expect(requestSpy).toHaveBeenCalledWith({
+        disableRedirect: true,
+        envId: undefined,
+        leId: undefined,
+        permissionScope: undefined
+      });
     });
 
   });

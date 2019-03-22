@@ -1,6 +1,7 @@
 import { BBAuthDomUtility } from '../shared/dom-utility';
 import { BBAuthCrossDomainIframe } from './auth-cross-domain-iframe';
 
+const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
 function IFrameMock(frame: HTMLIFrameElement) {
   // This mock should match the code at the URL
   const SOURCE = 'security-token-svc';
@@ -10,6 +11,7 @@ function IFrameMock(frame: HTMLIFrameElement) {
     if (msg.data.messageType === 'ready') {
       window.postMessage({messageType: 'ready', source: SOURCE}, '*');
     } else if (msg.data.messageType === 'getToken') {
+      expect(msg.data.value.disableRedirect).toBe(true);
       getTokenCalls += 1;
       window.postMessage({
         messageType: 'getToken',
@@ -35,10 +37,10 @@ describe('Auth Cross Domain Iframe', () => {
       const getOrMakeFrameSpy = spyOn(BBAuthCrossDomainIframe, 'getOrMakeIframe').and.returnValue(fakeIframe);
       const getTokenFromIframeSpy = spyOn(BBAuthCrossDomainIframe, 'getTokenFromIframe');
 
-      BBAuthCrossDomainIframe.getToken();
+      BBAuthCrossDomainIframe.getToken({disableRedirect: true});
 
       expect(getOrMakeFrameSpy).toHaveBeenCalled();
-      expect(getTokenFromIframeSpy).toHaveBeenCalledWith(fakeIframe);
+      expect(getTokenFromIframeSpy).toHaveBeenCalledWith(fakeIframe, {disableRedirect: true});
     });
   });
 
@@ -50,7 +52,7 @@ describe('Auth Cross Domain Iframe', () => {
       BBAuthCrossDomainIframe.getOrMakeIframe();
 
       expect(getElementSpy).toHaveBeenCalledWith('auth-cross-domain-iframe');
-      expect(requestSpy).toHaveBeenCalledWith('', 'auth-cross-domain-iframe', '');
+      expect(requestSpy).toHaveBeenCalledWith(URL, 'auth-cross-domain-iframe', '');
     });
 
     it('uses an existing frame if one exists', () => {
@@ -69,7 +71,7 @@ describe('Auth Cross Domain Iframe', () => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
       IFrameMock(fakeIframe);
 
-      BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe)
+      BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})
         .then((tokenResonse) => {
           expect(tokenResonse.access_token).toEqual('accessToken!');
           expect(tokenResonse.expires_in).toEqual(0);
@@ -81,14 +83,13 @@ describe('Auth Cross Domain Iframe', () => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
       IFrameMock(fakeIframe);
 
-      BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe)
+      BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})
         .then((tokenResonse) => {
-          BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe)
+          BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})
             .then((tr) => {
               expect(getTokenCalls).toEqual(2);
               done();
             });
-
         });
     });
   });
