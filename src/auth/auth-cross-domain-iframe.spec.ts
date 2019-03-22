@@ -14,6 +14,8 @@ function IFrameMock(frame: HTMLIFrameElement, error?: boolean) {
     if (msg.data.messageType === 'ready') {
       window.postMessage({messageType: 'ready', source: SOURCE}, '*');
     } else if (msg.data.messageType === 'getToken') {
+      console.log('error value:');
+      console.log(error);
       if (error) {
         window.postMessage({
           messageType: 'error',
