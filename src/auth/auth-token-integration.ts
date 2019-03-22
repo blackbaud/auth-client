@@ -1,4 +1,5 @@
 import { BBCsrfXhr } from '../shared/csrf-xhr';
+
 import { BBAuthCrossDomainIframe } from './auth-cross-domain-iframe';
 
 export class BBAuthTokenIntegration {

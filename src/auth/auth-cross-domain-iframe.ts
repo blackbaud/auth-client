@@ -5,9 +5,13 @@ import {
 } from '../shared/dom-utility';
 
 import { BBAuthNavigator } from '../shared/navigator';
+
 import { BBAuthGetTokenArgs } from './auth-get-token-args';
+
 import { BBAuthTokenError } from './auth-token-error';
+
 import { BBAuthTokenErrorCode } from './auth-token-error-code';
+
 import { BBAuthTokenResponse } from './bbauth-token-response';
 
 //#endregion
