@@ -8,8 +8,8 @@ const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDoma
 function IFrameMock(frame: HTMLIFrameElement) {
   // This mock should match the code at the URL
   const SOURCE = 'security-token-svc';
-  const HOST = 'auth-client';
   frame.contentWindow.addEventListener('message', (msg: any) => {
+    const HOST = 'auth-client';
     if (msg.data.source !== HOST) { return; }
     if (msg.data.messageType === 'ready') {
       window.postMessage({messageType: 'ready', source: SOURCE}, '*');
@@ -28,8 +28,8 @@ function IFrameMock(frame: HTMLIFrameElement) {
 function IFrameMockWithError(frame: HTMLIFrameElement) {
   // This mock should match the code at the URL
   const SOURCE = 'security-token-svc';
-  const HOST = 'auth-client';
   frame.contentWindow.addEventListener('message', (msg: any) => {
+    const HOST = 'auth-client';
     if (msg.data.source !== HOST) { return; }
     if (msg.data.messageType === 'ready') {
       window.postMessage({messageType: 'ready', source: SOURCE}, '*');
@@ -108,10 +108,6 @@ describe('Auth Cross Domain Iframe', () => {
       IFrameMockWithError(fakeIframe);
 
       BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})
-        .then((res) => {
-          console.log('how did I get here?');
-          console.log(res);
-        })
         .catch((response) => {
           expect(errorSpy).toHaveBeenCalled();
           done();
