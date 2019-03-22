@@ -4,10 +4,10 @@ import {
   BBAuthDomUtility
 } from '../shared/dom-utility';
 
-import { BBAuthTokenErrorCode } from './auth-token-error-code';
 import { BBAuthNavigator } from '../shared/navigator';
 import { BBAuthGetTokenArgs } from './auth-get-token-args';
 import { BBAuthTokenError } from './auth-token-error';
+import { BBAuthTokenErrorCode } from './auth-token-error-code';
 import { BBAuthTokenResponse } from './bbauth-token-response';
 
 //#endregion
@@ -33,6 +33,8 @@ export class BBAuthCrossDomainIframe {
         'auth-cross-domain-iframe',
         ''
       );
+      iframeEl.id = 'auth-cross-domain-iframe';
+      iframeEl.hidden = true;
     }
     return iframeEl;
   }
@@ -49,42 +51,33 @@ export class BBAuthCrossDomainIframe {
             messageType: 'getToken',
             source: SOURCE,
             value: args
-          }, '*'); // set this * to something else
+          }, '*');
         } else if (msg.data.messageType === 'error') {
-          const reason: BBAuthTokenError = msg.data.value;
-          if (reason.code === BBAuthTokenErrorCode.Offline) {
-            reject(reason);
-          } else if (reason.code === BBAuthTokenErrorCode.NotLoggedIn) {
-            BBAuthNavigator.redirectToSignin(undefined);
-          } else {
-            BBAuthNavigator.redirectToError(reason.code);
-          }
+          BBAuthCrossDomainIframe.handleErrorMessage(msg.data.value, reject);
+          window.removeEventListener('message', handleMessageFromIframe);
+          reject();
         } else if (msg.data.messageType === 'getToken') {
           const tokenResponse: BBAuthTokenResponse = {
             access_token: msg.data['value'],
             expires_in: 0
           };
-          // this is required to prevent subsequent calls of getTOkenFromIFrame to not make extra calls to the IFrame
+          // this is required to prevent subsequent calls of getTokenFromIFrame to not make extra calls to the IFrame
           window.removeEventListener('message', handleMessageFromIframe);
           resolve(tokenResponse);
         }
       });
-      this.sendInitialMessage(iframeEl);
+      iframeEl.onload = (() => iframeEl.contentWindow.postMessage({messageType: 'ready', source: SOURCE}, '*'));
+      iframeEl.contentWindow.postMessage({messageType: 'ready', source: SOURCE}, '*');
     });
   }
 
-  private static sendInitialMessage(iframeEl: HTMLIFrameElement) {
-    let readyMessageSent = false;
-    iframeEl.onload = (() => {
-      if (!readyMessageSent) {
-        iframeEl.contentWindow.postMessage({messageType: 'ready', source: SOURCE}, '*');
-        readyMessageSent = true;
-      }
-    });
-    if (!readyMessageSent) {
-      iframeEl.contentWindow.postMessage({messageType: 'ready', source: SOURCE}, '*');
-      readyMessageSent = true;
+  public static handleErrorMessage(reason: BBAuthTokenError, reject: any) {
+    if (reason.code === BBAuthTokenErrorCode.Offline) {
+      reject(reason);
+    } else if (reason.code === BBAuthTokenErrorCode.NotLoggedIn) {
+      BBAuthNavigator.redirectToSignin(undefined);
+    } else {
+      BBAuthNavigator.redirectToError(reason.code);
     }
-
   }
 }
