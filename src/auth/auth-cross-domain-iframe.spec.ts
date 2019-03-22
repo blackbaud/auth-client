@@ -5,7 +5,7 @@ import { BBAuthTokenError } from './auth-token-error';
 import { BBAuthTokenErrorCode } from './auth-token-error-code';
 
 const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
-function IFrameMock(frame: HTMLIFrameElement, error?: boolean) {
+function IFrameMock(frame: HTMLIFrameElement) {
   // This mock should match the code at the URL
   const SOURCE = 'security-token-svc';
   const HOST = 'auth-client';
@@ -14,23 +14,31 @@ function IFrameMock(frame: HTMLIFrameElement, error?: boolean) {
     if (msg.data.messageType === 'ready') {
       window.postMessage({messageType: 'ready', source: SOURCE}, '*');
     } else if (msg.data.messageType === 'getToken') {
-      console.log('error value:');
-      console.log(error);
-      if (error) {
-        window.postMessage({
-          messageType: 'error',
-          source: SOURCE,
-          value: {code: 0, message: 'it broke'}
-        }, '*');
-      } else {
-        expect(msg.data.value.disableRedirect).toBe(true);
-        getTokenCalls += 1;
-        window.postMessage({
-          messageType: 'getToken',
-          source: SOURCE,
-          value: 'accessToken!'
-        }, '*');
-      }
+      expect(msg.data.value.disableRedirect).toBe(true);
+      getTokenCalls += 1;
+      window.postMessage({
+        messageType: 'getToken',
+        source: SOURCE,
+        value: 'accessToken!'
+      }, '*');
+    }
+  });
+}
+
+function IFrameMockWithError(frame: HTMLIFrameElement) {
+  // This mock should match the code at the URL
+  const SOURCE = 'security-token-svc';
+  const HOST = 'auth-client';
+  frame.contentWindow.addEventListener('message', (msg: any) => {
+    if (msg.data.source !== HOST) { return; }
+    if (msg.data.messageType === 'ready') {
+      window.postMessage({messageType: 'ready', source: SOURCE}, '*');
+    } else if (msg.data.messageType === 'getToken') {
+      window.postMessage({
+        messageType: 'error',
+        source: SOURCE,
+        value: {code: 0, message: 'it broke'}
+      }, '*');
     }
   });
 }
@@ -97,7 +105,7 @@ describe('Auth Cross Domain Iframe', () => {
     it('handles errors', (done) => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
       const errorSpy = spyOn(BBAuthCrossDomainIframe, 'handleErrorMessage');
-      IFrameMock(fakeIframe, true);
+      IFrameMockWithError(fakeIframe);
 
       BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})
         .then((res) => {
