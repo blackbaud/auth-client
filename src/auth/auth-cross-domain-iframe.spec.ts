@@ -18,7 +18,7 @@ function IFrameMock(frame: HTMLIFrameElement, error: boolean = false) {
         window.postMessage({
           messageType: 'error',
           source: SOURCE,
-          value: {code: 4, message: 'it broke'}
+          value: {code: 0, message: 'it broke'}
         }, '*');
       } else {
         expect(msg.data.value.disableRedirect).toBe(true);
@@ -98,6 +98,10 @@ describe('Auth Cross Domain Iframe', () => {
       IFrameMock(fakeIframe, true);
 
       BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})
+        .then((res) => {
+          console.log('how did I get here?');
+          console.log(res);
+        })
         .catch((response) => {
           expect(errorSpy).toHaveBeenCalled();
           done();
@@ -114,7 +118,7 @@ describe('Auth Cross Domain Iframe', () => {
             .then((tr) => {
               expect(getTokenCalls).toEqual(2);
               done();
-            }); // .catch((err) => { console.log(err); });
+            });
         });
     });
   });
