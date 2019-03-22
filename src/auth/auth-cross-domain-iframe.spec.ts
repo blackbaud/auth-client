@@ -37,7 +37,7 @@ function IFrameMockWithError(frame: HTMLIFrameElement) {
       window.postMessage({
         messageType: 'error',
         source: SOURCE,
-        value: {code: 0, message: 'it broke'}
+        value: {code: 4, message: 'it broke'}
       }, '*');
     }
   });
@@ -104,7 +104,7 @@ describe('Auth Cross Domain Iframe', () => {
 
     it('handles errors', (done) => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
-      const errorSpy = spyOn(BBAuthCrossDomainIframe, 'handleErrorMessage').and.callFake(() => { return; });
+      const errorSpy = spyOn(BBAuthCrossDomainIframe, 'handleErrorMessage');
       IFrameMockWithError(fakeIframe);
 
       BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})

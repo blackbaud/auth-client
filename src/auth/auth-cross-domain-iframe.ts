@@ -70,7 +70,9 @@ export class BBAuthCrossDomainIframe {
           resolve(tokenResponse);
         }
       });
+      // when the iframe has been loaded, start the request
       iframeEl.onload = (() => iframeEl.contentWindow.postMessage({messageType: 'ready', source: SOURCE}, '*'));
+      // makes sure if we load the iframe before this is setup, it will call ready
       iframeEl.contentWindow.postMessage({messageType: 'ready', source: SOURCE}, '*');
     });
   }
