@@ -104,11 +104,10 @@ describe('Auth Cross Domain Iframe', () => {
 
     it('handles errors', (done) => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
-      const errorSpy = spyOn(BBAuthCrossDomainIframe, 'handleErrorMessage');
+      const errorSpy = spyOn(BBAuthCrossDomainIframe, 'handleErrorMessage').and.callFake(() => { return; });
       IFrameMockWithError(fakeIframe);
 
       BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})
-        .then((res) => { return; })
         .catch((response) => {
           expect(errorSpy).toHaveBeenCalled();
           done();
