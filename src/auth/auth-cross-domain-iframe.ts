@@ -4,7 +4,7 @@ import {
   BBAuthDomUtility
 } from '../shared/dom-utility';
 
-import { BBAuthTokenErrorCode } from '../../dist';
+import { BBAuthTokenErrorCode } from './auth-token-error-code';
 import { BBAuthNavigator } from '../shared/navigator';
 import { BBAuthGetTokenArgs } from './auth-get-token-args';
 import { BBAuthTokenError } from './auth-token-error';
