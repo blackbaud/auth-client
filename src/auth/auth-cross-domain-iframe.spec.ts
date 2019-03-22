@@ -10,6 +10,7 @@ function IFrameMock(frame: HTMLIFrameElement) {
   const SOURCE = 'security-token-svc';
   const HOST = 'auth-client';
   frame.contentWindow.addEventListener('message', (msg: any) => {
+    console.log(1);
     if (msg.data.source !== HOST) { return; }
     if (msg.data.messageType === 'ready') {
       window.postMessage({messageType: 'ready', source: SOURCE}, '*');
@@ -30,6 +31,7 @@ function IFrameMockWithError(frame: HTMLIFrameElement) {
   const SOURCE = 'security-token-svc';
   const HOST = 'auth-client';
   frame.contentWindow.addEventListener('message', (msg: any) => {
+    console.log(2);
     if (msg.data.source !== HOST) { return; }
     if (msg.data.messageType === 'ready') {
       window.postMessage({messageType: 'ready', source: SOURCE}, '*');
