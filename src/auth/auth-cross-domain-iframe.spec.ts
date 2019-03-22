@@ -108,6 +108,7 @@ describe('Auth Cross Domain Iframe', () => {
       IFrameMockWithError(fakeIframe);
 
       BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {disableRedirect: true})
+        .then((res) => { return; })
         .catch((response) => {
           expect(errorSpy).toHaveBeenCalled();
           done();
