@@ -59,7 +59,6 @@ export class BBAuthCrossDomainIframe {
         } else if (msg.data.messageType === 'error') {
           BBAuthCrossDomainIframe.handleErrorMessage(msg.data.value, reject);
           window.removeEventListener('message', handleMessageFromIframe);
-          reject();
         } else if (msg.data.messageType === 'getToken') {
           const tokenResponse: BBAuthTokenResponse = {
             access_token: msg.data['value'],
