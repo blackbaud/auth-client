@@ -1,8 +1,16 @@
-import { BBAuthTokenIntegration } from './auth-token-integration';
+//#region imports
+import {
+BBAuthTokenIntegration
+} from './auth-token-integration';
 
-import { BBAuthGetTokenArgs } from './auth-get-token-args';
+import {
+BBAuthGetTokenArgs
+} from './auth-get-token-args';
 
-import { BBAuthTokenResponse } from './bbauth-token-response';
+import {
+BBAuthTokenResponse
+} from './bbauth-token-response';
+//#endregion
 
 function buildCacheKey(args: BBAuthGetTokenArgs) {
   const { envId, permissionScope, leId } = args;

@@ -1,8 +1,18 @@
-import { BBCsrfXhr } from '../shared/csrf-xhr';
-import { BBAuthTokenIntegration } from './auth-token-integration';
+//#region imports
+import {
+BBCsrfXhr
+} from '../shared/csrf-xhr';
+
+import {
+BBAuthTokenIntegration
+} from './auth-token-integration';
+
+import {
+BBAuthCrossDomainIframe
+} from './auth-cross-domain-iframe';
 
 import 'jasmine-ajax';
-import { BBAuthCrossDomainIframe } from './auth-cross-domain-iframe';
+//#endregion
 
 describe('Auth token integration', () => {
   let requestSpy: jasmine.Spy;

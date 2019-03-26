@@ -4,15 +4,25 @@ import {
   BBAuthDomUtility
 } from '../shared/dom-utility';
 
-import { BBAuthNavigator } from '../shared/navigator';
+import {
+BBAuthNavigator
+} from '../shared/navigator';
 
-import { BBAuthGetTokenArgs } from './auth-get-token-args';
+import {
+BBAuthGetTokenArgs
+} from './auth-get-token-args';
 
-import { BBAuthTokenError } from './auth-token-error';
+import {
+BBAuthTokenError
+} from './auth-token-error';
 
-import { BBAuthTokenErrorCode } from './auth-token-error-code';
+import {
+BBAuthTokenErrorCode
+} from './auth-token-error-code';
 
-import { BBAuthTokenResponse } from './bbauth-token-response';
+import {
+BBAuthTokenResponse
+} from './bbauth-token-response';
 
 //#endregion
 const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
@@ -64,11 +74,13 @@ export class BBAuthCrossDomainIframe {
             access_token: msg.data['value'],
             expires_in: 0
           };
+
           // this is required to prevent subsequent calls of getTokenFromIFrame to not make extra calls to the IFrame
           window.removeEventListener('message', handleMessageFromIframe);
           resolve(tokenResponse);
         }
       });
+
       // when the iframe has been loaded, start the request
       iframeEl.onload = (() => iframeEl.contentWindow.postMessage({messageType: 'ready', source: SOURCE}, '*'));
       // makes sure if we load the iframe before this is setup, it will call ready
