@@ -1,17 +1,19 @@
 //#region imports
+
 import {
-BBCsrfXhr
+  BBCsrfXhr
 } from '../shared/csrf-xhr';
 
 import {
-BBAuthTokenIntegration
+  BBAuthTokenIntegration
 } from './auth-token-integration';
 
 import {
-BBAuthCrossDomainIframe
+  BBAuthCrossDomainIframe
 } from './auth-cross-domain-iframe';
 
 import 'jasmine-ajax';
+
 //#endregion
 
 describe('Auth token integration', () => {
@@ -39,7 +41,6 @@ describe('Auth token integration', () => {
     });
 
     it('should request a token with envId and permissionScope', () => {
-
       BBAuthTokenIntegration.getToken(true, 'abc', '123');
 
       expect(requestSpy).toHaveBeenCalledWith(
@@ -55,7 +56,6 @@ describe('Auth token integration', () => {
     });
 
     it('should request a token with envId, permissionScope, and leId', () => {
-
       BBAuthTokenIntegration.getToken(true, 'abc', '123', 'xyz');
 
       expect(requestSpy).toHaveBeenCalledWith(
@@ -74,11 +74,13 @@ describe('Auth token integration', () => {
   describe('when the host name location is not blackbaud.com', () => {
     beforeEach(() => {
       requestSpy = spyOn(BBAuthCrossDomainIframe, 'getToken');
+
       spyOn(BBAuthTokenIntegration, 'getLocationHostname').and.returnValue('forgoodfund.com');
     });
 
     it('should create an iframe and then call getToken', () => {
       BBAuthTokenIntegration.getToken();
+
       expect(requestSpy).toHaveBeenCalledWith({
         disableRedirect: true,
         envId: undefined,

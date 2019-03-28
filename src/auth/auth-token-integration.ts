@@ -1,11 +1,13 @@
 //#region imports
+
 import {
-BBCsrfXhr
+  BBCsrfXhr
 } from '../shared/csrf-xhr';
 
 import {
-BBAuthCrossDomainIframe
+  BBAuthCrossDomainIframe
 } from './auth-cross-domain-iframe';
+
 //#endregion
 
 export class BBAuthTokenIntegration {
