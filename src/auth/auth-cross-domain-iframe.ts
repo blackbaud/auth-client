@@ -32,104 +32,127 @@ const SOURCE = 'auth-client';
 
 export class BBAuthCrossDomainIframe {
 
-  public static getToken(args: BBAuthGetTokenArgs): Promise<BBAuthTokenResponse> {
-    return this.getTokenFromIframe(
-      this.getOrMakeIframe(),
-      args
-    );
+//#region static features
+
+  public static iframeEl: HTMLIFrameElement;
+  public static listenerSetup = false;
+  public static iframeReadyResolve: any;
+  public static iframeReadyPromise = new Promise<boolean>((resolve) =>
+    BBAuthCrossDomainIframe.iframeReadyResolve = resolve
+  );
+  public static tokenRequests: any = {};
+
+  private static TARGETORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
+
+  public static TARGET_ORIGIN() {
+    return this.TARGETORIGIN;
   }
 
   public static getOrMakeIframe(): HTMLIFrameElement {
-    let iframeEl = document.getElementById('auth-cross-domain-iframe') as HTMLIFrameElement;
+    BBAuthCrossDomainIframe.iframeEl = document.getElementById('auth-cross-domain-iframe') as HTMLIFrameElement;
 
     // if iframe doesn't exist, make it
-    if (!iframeEl) {
-      iframeEl = BBAuthDomUtility.addIframe(
+    if (!BBAuthCrossDomainIframe.iframeEl) {
+      BBAuthCrossDomainIframe.iframeEl = BBAuthDomUtility.addIframe(
         URL,
         'auth-cross-domain-iframe',
         ''
       );
 
-      iframeEl.id = 'auth-cross-domain-iframe';
-      iframeEl.hidden = true;
+      BBAuthCrossDomainIframe.iframeEl.id = 'auth-cross-domain-iframe';
+      BBAuthCrossDomainIframe.iframeEl.hidden = true;
     }
 
-    return iframeEl;
+    return BBAuthCrossDomainIframe.iframeEl;
   }
 
-  public static getTokenFromIframe(
+//#endregion static features
+
+//#region instance features
+
+  public getToken(args: BBAuthGetTokenArgs): Promise<BBAuthTokenResponse> {
+    this.setupListenersForIframe();
+
+    return this.getTokenFromIframe(
+      BBAuthCrossDomainIframe.getOrMakeIframe(),
+      args
+    );
+  }
+
+  public setupListenersForIframe() {
+    if (BBAuthCrossDomainIframe.listenerSetup) {
+      return;
+    }
+
+    window.addEventListener('message', (event: MessageEvent) => {
+      const message = event.data;
+      const tokenRequestId = message.requestId;
+      const tokenRequest = BBAuthCrossDomainIframe.tokenRequests[tokenRequestId];
+
+      if (message.source !== HOST && message.origin !== BBAuthCrossDomainIframe.TARGET_ORIGIN) {
+        return;
+      }
+
+      switch (message.messageType) {
+        case 'ready':
+          BBAuthCrossDomainIframe.iframeReadyResolve(true);
+
+          break;
+        case 'error':
+          this.handleErrorMessage(message.value, tokenRequest.reject);
+
+          break;
+        case 'getToken':
+          const tokenResponse: BBAuthTokenResponse = {
+            access_token: message.value,
+            expires_in: 0
+          };
+
+          tokenRequest.resolve(tokenResponse);
+
+          break;
+        }
+    });
+  }
+
+  public getTokenFromIframe(
     iframeEl: HTMLIFrameElement,
     args: BBAuthGetTokenArgs
   ): Promise<BBAuthTokenResponse> {
     return new Promise<BBAuthTokenResponse>((resolve, reject) => {
-      function handleMessageFromIframe(event: MessageEvent) {
-        const message = event.data;
+      const tokenRequestId = Date.now();
+      BBAuthCrossDomainIframe.tokenRequests[tokenRequestId] = {
+        resolve,
+        reject
+      };
 
-        if (message.source !== HOST) {
-          return;
-        }
-
-        switch (message.messageType) {
-          case 'ready':
-            iframeEl.contentWindow.postMessage(
-              {
-                messageType: 'getToken',
-                source: SOURCE,
-                value: args
-              },
-              '*'
-            );
-
-            break;
-          case 'error':
-            BBAuthCrossDomainIframe.handleErrorMessage(message.value, reject);
-            window.removeEventListener('message', handleMessageFromIframe);
-
-            break;
-          case 'getToken':
-            const tokenResponse: BBAuthTokenResponse = {
-              access_token: message.value,
-              expires_in: 0
-            };
-
-            // this is required to prevent subsequent calls of getTokenFromIFrame to not make extra calls to the IFrame
-            window.removeEventListener('message', handleMessageFromIframe);
-            resolve(tokenResponse);
-
-            break;
-        }
-      }
-
-      function postReadyMessage() {
-        iframeEl.contentWindow.postMessage(
-          {
-            messageType: 'ready',
-            source: SOURCE
-          },
-          '*'
-        );
-      }
-
-      window.addEventListener('message', handleMessageFromIframe);
-
-      // when the iframe has been loaded, start the request
-      iframeEl.onload = postReadyMessage;
-
-      // makes sure if we load the iframe before this is setup, it will call ready
-      postReadyMessage();
+      BBAuthCrossDomainIframe.iframeReadyPromise.then(() => {
+        iframeEl.contentWindow.postMessage({
+          messageType: 'getToken',
+          requestId: tokenRequestId,
+          source: SOURCE,
+          value: args
+        },
+        BBAuthCrossDomainIframe.TARGET_ORIGIN());
+      });
     });
   }
 
-  public static handleErrorMessage(reason: BBAuthTokenError, reject: any) {
+  public handleErrorMessage(reason: BBAuthTokenError, reject: any) {
     switch (reason.code) {
       case BBAuthTokenErrorCode.Offline:
         reject(reason);
+
         break;
       case BBAuthTokenErrorCode.NotLoggedIn:
         BBAuthNavigator.redirectToSignin(undefined);
+
         break;
       default:
         BBAuthNavigator.redirectToError(reason.code);
     }
   }
+
+//#endregion instance features
+
 }

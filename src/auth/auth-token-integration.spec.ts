@@ -73,7 +73,7 @@ describe('Auth token integration', () => {
 
   describe('when the host name location is not blackbaud.com', () => {
     beforeEach(() => {
-      requestSpy = spyOn(BBAuthCrossDomainIframe, 'getToken');
+      requestSpy = spyOn(BBAuthCrossDomainIframe.prototype, 'getToken');
 
       spyOn(BBAuthTokenIntegration, 'getLocationHostname').and.returnValue('forgoodfund.com');
     });

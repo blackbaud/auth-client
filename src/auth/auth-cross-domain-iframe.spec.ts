@@ -30,6 +30,8 @@ describe('Auth Cross Domain Iframe', () => {
 
   let getTokenCalls: number;
 
+  let crossDomainIframe: BBAuthCrossDomainIframe;
+
   function iframeMock(frame: HTMLIFrameElement, error = false) {
     // This mock should match the code at the URL
     const SOURCE = 'security-token-svc';
@@ -44,24 +46,15 @@ describe('Auth Cross Domain Iframe', () => {
       }
 
       switch (message.messageType) {
-        case 'ready':
-          window.postMessage(
-            {
-              messageType: 'ready',
-              source: SOURCE
-            },
-            '*'
-          );
-
-          break;
         case 'getToken':
           if (error) {
             window.postMessage(
               {
                 messageType: 'error',
+                requestId: message.requestId,
                 source: SOURCE,
                 value: {
-                  code: 4,
+                  code: BBAuthTokenErrorCode.Offline,
                   message: 'it broke'
                 }
               },
@@ -75,6 +68,7 @@ describe('Auth Cross Domain Iframe', () => {
             window.postMessage(
               {
                 messageType: 'getToken',
+                requestId: message.requestId,
                 source: SOURCE,
                 value: 'accessToken!'
               },
@@ -85,19 +79,27 @@ describe('Auth Cross Domain Iframe', () => {
           break;
       }
     });
+    window.postMessage(
+      {
+        messageType: 'ready',
+        source: SOURCE
+      },
+      '*'
+    );
   }
 
   beforeEach(() => {
     fakeIframe = document.createElement('iframe');
     getTokenCalls = 0;
+    crossDomainIframe = new BBAuthCrossDomainIframe();
   });
 
   describe('getToken', () => {
     it('gets or creates an iframe then returns the token promise', () => {
       const getOrMakeFrameSpy = spyOn(BBAuthCrossDomainIframe, 'getOrMakeIframe').and.returnValue(fakeIframe);
-      const getTokenFromIframeSpy = spyOn(BBAuthCrossDomainIframe, 'getTokenFromIframe');
+      const getTokenFromIframeSpy = spyOn(crossDomainIframe, 'getTokenFromIframe');
 
-      BBAuthCrossDomainIframe.getToken({disableRedirect: true});
+      crossDomainIframe.getToken({disableRedirect: true});
 
       expect(getOrMakeFrameSpy).toHaveBeenCalled();
 
@@ -135,12 +137,17 @@ describe('Auth Cross Domain Iframe', () => {
   });
 
   describe('getTokenFromIframe', () => {
+
+    beforeEach(() => {
+      spyOn(BBAuthCrossDomainIframe, 'TARGET_ORIGIN').and.returnValue('*');
+    });
+
     it('communicates with the iframe via "ready" and "getToken" and kicks off "ready"', (done) => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
 
       iframeMock(fakeIframe);
 
-      BBAuthCrossDomainIframe.getTokenFromIframe(
+      crossDomainIframe.getTokenFromIframe(
         fakeIframe,
         {
           disableRedirect: true
@@ -155,20 +162,16 @@ describe('Auth Cross Domain Iframe', () => {
 
     it('handles errors', (done) => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
-      const errorSpy = spyOn(BBAuthCrossDomainIframe, 'handleErrorMessage').and.callThrough();
 
       iframeMock(fakeIframe, true);
 
-      BBAuthCrossDomainIframe.getTokenFromIframe(
+      crossDomainIframe.getTokenFromIframe(
         fakeIframe,
         {
           disableRedirect: true
         }
       )
-        .catch(() => {
-          expect(errorSpy).toHaveBeenCalled();
-          done();
-        });
+        .catch(done); // if this is caught, it must have thrown the reject
     });
 
     it('only calls the iframe once if the getToken is called', (done) => {
@@ -176,14 +179,14 @@ describe('Auth Cross Domain Iframe', () => {
 
       iframeMock(fakeIframe);
 
-      BBAuthCrossDomainIframe.getTokenFromIframe(
+      crossDomainIframe.getTokenFromIframe(
         fakeIframe,
         {
           disableRedirect: true
         }
       )
         .then(() => {
-          BBAuthCrossDomainIframe.getTokenFromIframe(
+          crossDomainIframe.getTokenFromIframe(
             fakeIframe,
             {
               disableRedirect: true
@@ -216,7 +219,7 @@ describe('Auth Cross Domain Iframe', () => {
         rej
       };
 
-      BBAuthCrossDomainIframe.handleErrorMessage(reason, obj.rej);
+      crossDomainIframe.handleErrorMessage(reason, obj.rej);
 
       expect(rej).toHaveBeenCalledWith(reason);
     });
@@ -225,7 +228,7 @@ describe('Auth Cross Domain Iframe', () => {
       const navSpy = spyOn(BBAuthNavigator, 'redirectToSignin');
       reason.code = BBAuthTokenErrorCode.NotLoggedIn;
 
-      BBAuthCrossDomainIframe.handleErrorMessage(reason, rej);
+      crossDomainIframe.handleErrorMessage(reason, rej);
 
       expect(navSpy).toHaveBeenCalledWith(undefined);
     });
@@ -234,7 +237,7 @@ describe('Auth Cross Domain Iframe', () => {
       const navSpy = spyOn(BBAuthNavigator, 'redirectToError');
       reason.code = BBAuthTokenErrorCode.InvalidEnvironment;
 
-      BBAuthCrossDomainIframe.handleErrorMessage(reason, rej);
+      crossDomainIframe.handleErrorMessage(reason, rej);
 
       expect(navSpy).toHaveBeenCalledWith(reason.code);
     });

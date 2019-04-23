@@ -18,7 +18,8 @@ export class BBAuthTokenIntegration {
     leId?: string
   ): Promise<any> {
     if (!this.hostNameEndsWith('blackbaud.com')) {
-      return BBAuthCrossDomainIframe.getToken({
+      const crossDomainIframe = new BBAuthCrossDomainIframe();
+      return crossDomainIframe.getToken({
         envId,
         permissionScope,
         leId,
