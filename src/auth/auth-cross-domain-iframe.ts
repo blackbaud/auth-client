@@ -70,7 +70,7 @@ export class BBAuthCrossDomainIframe {
 
 //#region instance features
 
-  public getToken(args: BBAuthGetTokenArgs): Promise<BBAuthTokenResponse> {
+  public static getToken(args: BBAuthGetTokenArgs): Promise<BBAuthTokenResponse> {
     this.setupListenersForIframe();
 
     return this.getTokenFromIframe(
@@ -79,7 +79,7 @@ export class BBAuthCrossDomainIframe {
     );
   }
 
-  public setupListenersForIframe() {
+  public static setupListenersForIframe() {
     if (BBAuthCrossDomainIframe.listenerSetup) {
       return;
     }
@@ -115,7 +115,7 @@ export class BBAuthCrossDomainIframe {
     });
   }
 
-  public getTokenFromIframe(
+  public static getTokenFromIframe(
     iframeEl: HTMLIFrameElement,
     args: BBAuthGetTokenArgs
   ): Promise<BBAuthTokenResponse> {
@@ -138,7 +138,7 @@ export class BBAuthCrossDomainIframe {
     });
   }
 
-  public handleErrorMessage(reason: BBAuthTokenError, reject: any) {
+  public static handleErrorMessage(reason: BBAuthTokenError, reject: any) {
     switch (reason.code) {
       case BBAuthTokenErrorCode.Offline:
         reject(reason);
