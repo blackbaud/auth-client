@@ -32,8 +32,6 @@ const SOURCE = 'auth-client';
 
 export class BBAuthCrossDomainIframe {
 
-//#region static features
-
   public static iframeEl: HTMLIFrameElement;
   public static listenerSetup = false;
   public static iframeReadyResolve: any;
@@ -41,6 +39,7 @@ export class BBAuthCrossDomainIframe {
     BBAuthCrossDomainIframe.iframeReadyResolve = resolve
   );
   public static tokenRequests: any = {};
+  public static requestCounter = 0;
 
   private static TARGETORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
@@ -66,36 +65,32 @@ export class BBAuthCrossDomainIframe {
     return BBAuthCrossDomainIframe.iframeEl;
   }
 
-//#endregion static features
-
-//#region instance features
-
   public static getToken(args: BBAuthGetTokenArgs): Promise<BBAuthTokenResponse> {
     this.setupListenersForIframe();
 
     return this.getTokenFromIframe(
-      BBAuthCrossDomainIframe.getOrMakeIframe(),
+      this.getOrMakeIframe(),
       args
     );
   }
 
   public static setupListenersForIframe() {
-    if (BBAuthCrossDomainIframe.listenerSetup) {
+    if (this.listenerSetup) {
       return;
     }
 
     window.addEventListener('message', (event: MessageEvent) => {
       const message = event.data;
       const tokenRequestId = message.requestId;
-      const tokenRequest = BBAuthCrossDomainIframe.tokenRequests[tokenRequestId];
+      const tokenRequest = this.tokenRequests[tokenRequestId];
 
-      if (message.source !== HOST && message.origin !== BBAuthCrossDomainIframe.TARGET_ORIGIN) {
+      if (message.source !== HOST && message.origin !== this.TARGET_ORIGIN()) {
         return;
       }
 
       switch (message.messageType) {
         case 'ready':
-          BBAuthCrossDomainIframe.iframeReadyResolve(true);
+          this.iframeReadyResolve(true);
 
           break;
         case 'error':
@@ -120,7 +115,7 @@ export class BBAuthCrossDomainIframe {
     args: BBAuthGetTokenArgs
   ): Promise<BBAuthTokenResponse> {
     return new Promise<BBAuthTokenResponse>((resolve, reject) => {
-      const tokenRequestId = Date.now();
+      const tokenRequestId = (this.requestCounter++);
       BBAuthCrossDomainIframe.tokenRequests[tokenRequestId] = {
         resolve,
         reject
@@ -152,7 +147,5 @@ export class BBAuthCrossDomainIframe {
         BBAuthNavigator.redirectToError(reason.code);
     }
   }
-
-//#endregion instance features
 
 }
