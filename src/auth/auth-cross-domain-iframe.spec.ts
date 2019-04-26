@@ -44,24 +44,15 @@ describe('Auth Cross Domain Iframe', () => {
       }
 
       switch (message.messageType) {
-        case 'ready':
-          window.postMessage(
-            {
-              messageType: 'ready',
-              source: SOURCE
-            },
-            '*'
-          );
-
-          break;
         case 'getToken':
           if (error) {
             window.postMessage(
               {
                 messageType: 'error',
+                requestId: message.requestId,
                 source: SOURCE,
                 value: {
-                  code: 4,
+                  code: BBAuthTokenErrorCode.Offline,
                   message: 'it broke'
                 }
               },
@@ -75,6 +66,7 @@ describe('Auth Cross Domain Iframe', () => {
             window.postMessage(
               {
                 messageType: 'getToken',
+                requestId: message.requestId,
                 source: SOURCE,
                 value: 'accessToken!'
               },
@@ -85,6 +77,13 @@ describe('Auth Cross Domain Iframe', () => {
           break;
       }
     });
+    window.postMessage(
+      {
+        messageType: 'ready',
+        source: SOURCE
+      },
+      '*'
+    );
   }
 
   beforeEach(() => {
@@ -135,6 +134,11 @@ describe('Auth Cross Domain Iframe', () => {
   });
 
   describe('getTokenFromIframe', () => {
+
+    beforeEach(() => {
+      spyOn(BBAuthCrossDomainIframe, 'TARGET_ORIGIN').and.returnValue('*');
+    });
+
     it('communicates with the iframe via "ready" and "getToken" and kicks off "ready"', (done) => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
 
@@ -155,7 +159,6 @@ describe('Auth Cross Domain Iframe', () => {
 
     it('handles errors', (done) => {
       fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
-      const errorSpy = spyOn(BBAuthCrossDomainIframe, 'handleErrorMessage').and.callThrough();
 
       iframeMock(fakeIframe, true);
 
@@ -165,10 +168,7 @@ describe('Auth Cross Domain Iframe', () => {
           disableRedirect: true
         }
       )
-        .catch(() => {
-          expect(errorSpy).toHaveBeenCalled();
-          done();
-        });
+        .catch(done); // if this is caught, it must have thrown the reject
     });
 
     it('only calls the iframe once if the getToken is called', (done) => {
