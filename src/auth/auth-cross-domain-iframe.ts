@@ -108,6 +108,8 @@ export class BBAuthCrossDomainIframe {
           break;
         }
     });
+
+    this.listenerSetup = true;
   }
 
   public static getTokenFromIframe(

@@ -107,6 +107,27 @@ describe('Auth Cross Domain Iframe', () => {
         }
       );
     });
+
+    it('should only add a message event listener to window on the first getToken() call', () => {
+      let messageListenerCalls = 0;
+
+      const getOrMakeFrameSpy = spyOn(BBAuthCrossDomainIframe, 'getOrMakeIframe').and.returnValue(fakeIframe);
+      const windowAddListenerSpy = spyOn(window, 'addEventListener').and.callFake((eventType: string) => {
+        if (eventType === 'message') {
+          messageListenerCalls++;
+        }
+      });
+
+      spyOn(BBAuthCrossDomainIframe, 'getTokenFromIframe');
+
+      BBAuthCrossDomainIframe.getToken({disableRedirect: true});
+
+      expect(messageListenerCalls).toBe(1);
+
+      BBAuthCrossDomainIframe.getToken({disableRedirect: true});
+
+      expect(messageListenerCalls).toBe(1);
+    });
   });
 
   describe('getOrMakeIframe', () => {
