@@ -86,12 +86,7 @@ describe('Auth Cross Domain Iframe', () => {
     );
   }
 
-  function resetTest() {
-    BBAuthCrossDomainIframe.listenerSetup = false;
-  }
-
   beforeEach(() => {
-    resetTest();
     fakeIframe = document.createElement('iframe');
     getTokenCalls = 0;
   });
