@@ -43,6 +43,15 @@ export class BBAuthCrossDomainIframe {
 
   private static TARGETORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
+  public static reset() {
+    this.requestCounter = 0;
+    this.tokenRequests = {};
+    this.iframeReadyPromise = new Promise<boolean>((resolve) =>
+      this.iframeReadyResolve = resolve
+    );
+    this.listenerSetup = false;
+  }
+
   public static TARGET_ORIGIN() {
     return this.TARGETORIGIN;
   }
