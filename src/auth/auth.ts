@@ -1,6 +1,18 @@
-import { BBAuthTokenIntegration } from './auth-token-integration';
+//#region imports
 
-import { BBAuthGetTokenArgs } from './auth-get-token-args';
+import {
+  BBAuthTokenIntegration
+} from './auth-token-integration';
+
+import {
+  BBAuthGetTokenArgs
+} from './auth-get-token-args';
+
+import {
+  BBAuthTokenResponse
+} from './auth-token-response';
+
+//#endregion
 
 function buildCacheKey(args: BBAuthGetTokenArgs) {
   const { envId, permissionScope, leId } = args;
@@ -68,9 +80,9 @@ export class BBAuth {
         args.permissionScope,
         args.leId
       )
-        .then((tokenResponse: any) => {
-          cachedItem.expirationTime = new Date().valueOf() + tokenResponse['expires_in'] * 1000;
-          cachedItem.lastToken = tokenResponse['access_token'];
+        .then((tokenResponse: BBAuthTokenResponse) => {
+          cachedItem.expirationTime = new Date().valueOf() + tokenResponse.expires_in * 1000;
+          cachedItem.lastToken = tokenResponse.access_token;
           cachedItem.pendingLookupPromise = null;
 
           return cachedItem.lastToken;

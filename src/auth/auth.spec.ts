@@ -1,5 +1,14 @@
-import { BBAuth } from './auth';
-import { BBAuthTokenIntegration } from './auth-token-integration';
+//#region imports
+
+import {
+  BBAuth
+} from './auth';
+
+import {
+  BBAuthTokenIntegration
+} from './auth-token-integration';
+
+//#endregion
 
 describe('Auth', () => {
   let authIntegrationGetTokenFake: any;
