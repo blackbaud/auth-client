@@ -1,3 +1,7 @@
+# 2.14.0 (2019-05-01)
+
+- Improved browser support for cross-domain auth token requests. (#88)
+
 # 2.13.0 (2019-02-08)
 
 - Added `hideResourceLinks` config property which hides the menu items above the "Sign out" menu item in the user menu. (#81)
