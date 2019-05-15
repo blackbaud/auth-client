@@ -1,6 +1,6 @@
 {
   "name": "@blackbaud/auth-client",
-  "version": "2.14.0",
+  "version": "2.15.0-alpha.0",
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
   "main": "dist/bundles/auth-client.umd.js",
   "module": "index.ts",
@@ -16,6 +16,9 @@
     "build": "rimraf dist && tsc && webpack --config config/webpack/webpack.prod.config.js && npm run compress",
     "watch": "npm run test:unit -- --auto-watch --no-single-run",
     "lint": "tslint 'src/**/*.ts'"
+  },
+  "pipelineSettings": {
+    "publishToCDN": true
   },
   "repository": {
     "type": "git",
