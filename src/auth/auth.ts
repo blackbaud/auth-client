@@ -14,6 +14,8 @@ import {
 
 //#endregion
 
+const URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?\/(.*)/;
+
 function buildCacheKey(args: BBAuthGetTokenArgs) {
   const { envId, permissionScope, leId } = args;
 
@@ -36,6 +38,22 @@ export class BBAuth {
     }
   } = {};
 
+  public static getUrl(
+    url: string,
+    zone: string
+  ): Promise<string> {
+    // Returning a promise so eventually this could be enhanced to use a service discovery solution instead of using a convention.
+    const match = URL_REGEX.exec(url);
+    if (match) {
+      if (match[3]) {
+        zone = match[3].substring(1);
+      }
+      // https://eng-pusa01.app.blackbaud.net/hub00/version
+      url = `https://${match[1]}-${zone}.app.blackbaud.net/${match[2]}/${match[4]}`;
+    }
+    return Promise.resolve(url);
+  }
+
   public static getToken(
     args?: BBAuthGetTokenArgs
   ): Promise<string> {
@@ -44,6 +62,10 @@ export class BBAuth {
 
   public static clearTokenCache() {
     BBAuth.tokenCache = {};
+  }
+
+  private static build1BBUrl(scs: string, service: string, zone: string, pathAndQuery: string) {
+    return `https://${scs}-${zone}.app.blackbaud.net/${service}/${pathAndQuery}`;
   }
 
   private static getTokenInternal(args: BBAuthGetTokenArgs): Promise<string> {
