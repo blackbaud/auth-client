@@ -81,7 +81,7 @@ function collapseIframe() {
 }
 
 function addStyleEl() {
-  let accentColor = '#00b4f1';
+  let accentCss = 'background: linear-gradient(to right, #71bf44 0, #31b986 50%, #00b2ec 100%);';
   let backgroundColor = '#4d5259';
 
   const theme = omnibarConfig.theme;
@@ -94,9 +94,9 @@ function addStyleEl() {
     // Explicitly check for false here since undefined represents the default
     // behavior of showing the accent with the default color.
     if (accent === false) {
-      accentColor = backgroundColor;
+      accentCss = 'display: none;';
     } else if (accent && (accent as BBOmnibarThemeAccent).color) {
-      accentColor = (accent as BBOmnibarThemeAccent).color;
+      accentCss = `background-color: ${(accent as BBOmnibarThemeAccent).color};`;
     }
   }
 
@@ -123,8 +123,12 @@ body {
 
 .sky-omnibar-placeholder {
   background-color: ${backgroundColor};
-  border-top: 5px solid ${accentColor};
   display: none;
+}
+
+.sky-omnibar-placeholder-accent {
+  height: 5px;
+  ${accentCss}
 }
 
 .sky-omnibar-placeholder.sky-omnibar-loading {
@@ -164,6 +168,7 @@ body {
 function addPlaceholderEl() {
   placeholderEl = document.createElement('div');
   placeholderEl.className = `sky-omnibar-placeholder ${CLS_LOADING}`;
+  placeholderEl.innerHTML = `<div class="sky-omnibar-placeholder-accent"></div>`;
 
   document.body.appendChild(placeholderEl);
 }

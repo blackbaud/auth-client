@@ -72,6 +72,12 @@ describe('Omnibar', () => {
     return document.querySelector('.sky-omnibar-placeholder') as HTMLDivElement;
   }
 
+  function getPlaceholderAccentEl(): HTMLDivElement {
+    return document.querySelector(
+      '.sky-omnibar-placeholder .sky-omnibar-placeholder-accent'
+    ) as HTMLDivElement;
+  }
+
   function fireMessageEvent(data: any, includeSource = true) {
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
@@ -201,8 +207,15 @@ describe('Omnibar', () => {
     const placeholderEl = getPlaceholderEl();
     const placeholderStyle = getComputedStyle(placeholderEl);
 
+    const placeholderAccentEl = getPlaceholderAccentEl();
+    const placeholderAccentStyle = getComputedStyle(placeholderAccentEl);
+
     expect(placeholderStyle.backgroundColor).toBe('rgb(123, 0, 4)');
-    expect(placeholderStyle.borderTopColor).toBe('rgb(0, 180, 241)');
+
+    expect(placeholderAccentStyle.display).toBe('block');
+    expect(placeholderAccentStyle.backgroundImage).toBe(
+      'linear-gradient(to right, rgb(113, 191, 68) 0px, rgb(49, 185, 134) 50%, rgb(0, 178, 236) 100%)'
+    );
   });
 
   it('should style the placeholder element accent based on the provided theme', () => {
@@ -217,8 +230,13 @@ describe('Omnibar', () => {
     const placeholderEl = getPlaceholderEl();
     const placeholderStyle = getComputedStyle(placeholderEl);
 
+    const placeholderAccentEl = getPlaceholderAccentEl();
+    const placeholderAccentStyle = getComputedStyle(placeholderAccentEl);
+
     expect(placeholderStyle.backgroundColor).toBe('rgb(77, 82, 89)');
-    expect(placeholderStyle.borderTopColor).toBe('rgb(3, 5, 6)');
+
+    expect(placeholderAccentStyle.display).toBe('block');
+    expect(placeholderAccentStyle.backgroundColor).toBe('rgb(3, 5, 6)');
   });
 
   it('should not show a placeholder accent when the provided theme removes it', () => {
@@ -231,8 +249,12 @@ describe('Omnibar', () => {
     const placeholderEl = getPlaceholderEl();
     const placeholderStyle = getComputedStyle(placeholderEl);
 
+    const placeholderAccentEl = getPlaceholderAccentEl();
+    const placeholderAccentStyle = getComputedStyle(placeholderAccentEl);
+
     expect(placeholderStyle.backgroundColor).toBe('rgb(77, 82, 89)');
-    expect(placeholderStyle.borderTopColor).toBe('rgb(77, 82, 89)');
+
+    expect(placeholderAccentStyle.display).toBe('none');
   });
 
   it('should disable redirect when the session ends and allow anonymous is true', (done) => {
