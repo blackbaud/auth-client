@@ -1,3 +1,7 @@
+# 2.15.0 (2019-06-06)
+
+- Updated omnibar placeholder accent to match the new omnibar gradient accent. (#92)
+
 # 2.14.0 (2019-05-01)
 
 - Improved browser support for cross-domain auth token requests. (#88)
