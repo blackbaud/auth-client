@@ -162,11 +162,11 @@ export class BBAuthCrossDomainIframe {
 
         break;
       case BBAuthTokenErrorCode.NotLoggedIn:
-        disableRedirect ? reject(reason) : BBAuthNavigator.redirectToSignin(undefined);
+        BBAuthNavigator.redirectToSignin(undefined);
 
         break;
       default:
-        disableRedirect ? reject(reason) : BBAuthNavigator.redirectToError(reason.code);
+        BBAuthNavigator.redirectToError(reason.code);
     }
   }
 
