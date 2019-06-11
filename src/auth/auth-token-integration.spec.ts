@@ -82,7 +82,7 @@ describe('Auth token integration', () => {
       BBAuthTokenIntegration.getToken();
 
       expect(requestSpy).toHaveBeenCalledWith({
-        disableRedirect: true,
+        disableRedirect: undefined,
         envId: undefined,
         leId: undefined,
         permissionScope: undefined
