@@ -241,7 +241,7 @@ describe('Auth Cross Domain Iframe', () => {
         rej
       };
 
-      BBAuthCrossDomainIframe.handleErrorMessage(reason, obj.rej);
+      BBAuthCrossDomainIframe.handleErrorMessage(reason, obj.rej, false);
 
       expect(rej).toHaveBeenCalledWith(reason);
     });
@@ -250,7 +250,7 @@ describe('Auth Cross Domain Iframe', () => {
       const navSpy = spyOn(BBAuthNavigator, 'redirectToSignin');
       reason.code = BBAuthTokenErrorCode.NotLoggedIn;
 
-      BBAuthCrossDomainIframe.handleErrorMessage(reason, rej);
+      BBAuthCrossDomainIframe.handleErrorMessage(reason, rej, false);
 
       expect(navSpy).toHaveBeenCalledWith(undefined);
     });
@@ -259,9 +259,29 @@ describe('Auth Cross Domain Iframe', () => {
       const navSpy = spyOn(BBAuthNavigator, 'redirectToError');
       reason.code = BBAuthTokenErrorCode.InvalidEnvironment;
 
-      BBAuthCrossDomainIframe.handleErrorMessage(reason, rej);
+      BBAuthCrossDomainIframe.handleErrorMessage(reason, rej, false);
 
       expect(navSpy).toHaveBeenCalledWith(reason.code);
+    });
+
+    it('rejects if redirect is disabled', () => {
+      const obj = {
+        rej
+      };
+      reason.code = BBAuthTokenErrorCode.NotLoggedIn;
+
+      BBAuthCrossDomainIframe.handleErrorMessage(reason, obj.rej, true);
+
+      expect(rej).toHaveBeenCalledWith(reason);
+    });
+
+    it('redirects if redirect is undefined', () => {
+      const navSpy = spyOn(BBAuthNavigator, 'redirectToSignin');
+      reason.code = BBAuthTokenErrorCode.NotLoggedIn;
+
+      BBAuthCrossDomainIframe.handleErrorMessage(reason, rej, undefined);
+
+      expect(navSpy).toHaveBeenCalledWith(undefined);
     });
   });
 

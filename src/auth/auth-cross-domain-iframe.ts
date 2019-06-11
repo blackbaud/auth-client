@@ -103,7 +103,7 @@ export class BBAuthCrossDomainIframe {
 
           break;
         case 'error':
-          this.handleErrorMessage(message.value, tokenRequest.reject);
+          this.handleErrorMessage(message.value, tokenRequest.reject, tokenRequest.args.disableRedirect);
 
           break;
         case 'getToken':
@@ -129,33 +129,44 @@ export class BBAuthCrossDomainIframe {
       const tokenRequestId = (this.requestCounter++);
       BBAuthCrossDomainIframe.tokenRequests[tokenRequestId] = {
         resolve,
-        reject
+        reject,
+        args
       };
+
+      // disable redirect must always be passed,
+      // so original args will need to be preserved for error handling
+      const iframeArgs = args;
+      iframeArgs.disableRedirect = true;
 
       BBAuthCrossDomainIframe.iframeReadyPromise.then(() => {
         iframeEl.contentWindow.postMessage({
           messageType: 'getToken',
           requestId: tokenRequestId,
           source: SOURCE,
-          value: args
+          value: iframeArgs
         },
         BBAuthCrossDomainIframe.TARGET_ORIGIN());
       });
     });
   }
 
-  public static handleErrorMessage(reason: BBAuthTokenError, reject: any) {
+  public static handleErrorMessage(reason: BBAuthTokenError, reject: any, disableRedirect: boolean) {
+    if (disableRedirect) {
+      reject(reason);
+      return;
+    }
+
     switch (reason.code) {
       case BBAuthTokenErrorCode.Offline:
         reject(reason);
 
         break;
       case BBAuthTokenErrorCode.NotLoggedIn:
-        BBAuthNavigator.redirectToSignin(undefined);
+        disableRedirect ? reject(reason) : BBAuthNavigator.redirectToSignin(undefined);
 
         break;
       default:
-        BBAuthNavigator.redirectToError(reason.code);
+        disableRedirect ? reject(reason) : BBAuthNavigator.redirectToError(reason.code);
     }
   }
 
