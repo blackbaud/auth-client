@@ -1,3 +1,7 @@
+# 2.15.1 (2019-06-13)
+
+- Fixed `disableRedirect` logic for sites not hosted on a `blackbaud.com` domain. [#94](https://github.com/blackbaud/auth-client/pull/94) [#95](https://github.com/blackbaud/auth-client/pull/95)
+
 # 2.15.0 (2019-06-06)
 
 - Updated the omnibar placeholder accent to match the new omnibar gradient accent. [#92](https://github.com/blackbaud/auth-client/pull/92)
