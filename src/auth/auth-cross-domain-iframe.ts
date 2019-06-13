@@ -133,17 +133,12 @@ export class BBAuthCrossDomainIframe {
         args
       };
 
-      // disable redirect must always be passed,
-      // so original args will need to be preserved for error handling
-      const iframeArgs = args;
-      iframeArgs.disableRedirect = true;
-
       BBAuthCrossDomainIframe.iframeReadyPromise.then(() => {
         iframeEl.contentWindow.postMessage({
           messageType: 'getToken',
           requestId: tokenRequestId,
           source: SOURCE,
-          value: iframeArgs
+          value: args
         },
         BBAuthCrossDomainIframe.TARGET_ORIGIN());
       });
