@@ -4,6 +4,9 @@
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
   "main": "dist/bundles/auth-client.umd.js",
   "module": "index.ts",
+  "pipelineSettings": {
+    "publishToCDN": true
+  },
   "scripts": {
     "ci": "npm run test:ci && npm run build",
     "test": "npm run lint && npm run test:unit",
