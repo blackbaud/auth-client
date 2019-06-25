@@ -128,9 +128,9 @@ export class BBAuthCrossDomainIframe {
     return new Promise<BBAuthTokenResponse>((resolve, reject) => {
       const tokenRequestId = (this.requestCounter++);
       BBAuthCrossDomainIframe.tokenRequests[tokenRequestId] = {
-        resolve,
+        args,
         reject,
-        args
+        resolve
       };
 
       BBAuthCrossDomainIframe.iframeReadyPromise.then(() => {

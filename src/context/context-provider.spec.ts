@@ -60,7 +60,7 @@ describe('Context provider', () => {
     getTokenFake = () => Promise.resolve('some_token');
 
     spyOn(BBCsrfXhr, 'requestWithToken').and.callFake(
-      (url: string, token: string) : Promise<BBContextDestinations> => {
+      (url: string, token: string): Promise<BBContextDestinations> => {
         let expectedUrl = 'https://s21anavnavaf00blkbapp01.sky.blackbaud.com/user/destinations?svcid=' +
           encodeURIComponent(svcId);
 

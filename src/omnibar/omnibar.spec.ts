@@ -758,13 +758,13 @@ describe('Omnibar', () => {
       const config = {
         onSearch: (searchArgs: BBOmnibarSearchArgs) => {
           return Promise.resolve({
-            searchArgs,
             items: [
               {
                 title: 'test',
                 url: 'https://example.com/'
               }
-            ]
+            ],
+            searchArgs
           });
         }
       };
