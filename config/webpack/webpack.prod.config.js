@@ -32,11 +32,11 @@ function createConfig(libraryTarget, mode, target, name) {
 
 module.exports = [
   createConfig('umd', 'none', 'es5'),
-  createConfig('umd', 'none', 'es2015', 'umd-2015'),
+  createConfig('umd', 'none', 'es2015', 'umd-es2015'),
   createConfig('umd', 'production', 'es5', 'umd.min'),
-  createConfig('umd', 'production', 'es2015', 'umd-2015.min'),
+  createConfig('umd', 'production', 'es2015', 'umd-es2015.min'),
   createConfig('window', 'none', 'es5', 'global'),
-  createConfig('window', 'none', 'es2015', 'global-2015'),
+  createConfig('window', 'none', 'es2015', 'global-es2015'),
   createConfig('window', 'production', 'es5', 'global.min'),
-  createConfig('window', 'production', 'es2015', 'global-2015.min')
+  createConfig('window', 'production', 'es2015', 'global-es2015.min')
 ]
