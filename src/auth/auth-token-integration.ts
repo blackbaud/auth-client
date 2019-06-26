@@ -19,10 +19,10 @@ export class BBAuthTokenIntegration {
   ): Promise<any> {
     if (!this.hostNameEndsWith('blackbaud.com')) {
       return BBAuthCrossDomainIframe.getToken({
+        disableRedirect,
         envId,
-        permissionScope,
         leId,
-        disableRedirect
+        permissionScope
       });
     }
 

@@ -15,7 +15,6 @@ describe('User activity prompt', () => {
   const PROMPT_URL = 'about:blank';
 
   let postOmnibarMessageSpy: jasmine.Spy;
-  let messageIsFromOmnibarSpy: jasmine.Spy;
 
   let messageIsFromOmnibarReturnValue = true;
 
@@ -38,7 +37,7 @@ describe('User activity prompt', () => {
   beforeAll(() => {
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
 
-    messageIsFromOmnibarSpy = spyOn(
+    spyOn(
       BBAuthInterop,
       'messageIsFromOmnibar'
     ).and.callFake(() => {
