@@ -1,3 +1,7 @@
+# 2.16.0 (2019-06-27)
+
+- Added a new "global" bundle that can be used to explicitly add `BBAuthClient` to the browser's global `window` object even when RequireJS or another runtime module loader is present. Also added ES2015 bundles that can be used in browsers that natively support ES2015. [#98](https://github.com/blackbaud/auth-client/pull/98)
+
 # 2.15.1 (2019-06-13)
 
 - Fixed `disableRedirect` logic for sites not hosted on a `blackbaud.com` domain. [#94](https://github.com/blackbaud/auth-client/pull/94) [#95](https://github.com/blackbaud/auth-client/pull/95)
