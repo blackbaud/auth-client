@@ -1,6 +1,6 @@
 var path = require('path');
 
-function createConfig(libraryTarget, mode, name) {
+function createConfig(libraryTarget, mode, target, name) {
   return {
     mode,
     entry: './index.ts',
@@ -20,7 +20,8 @@ function createConfig(libraryTarget, mode, name) {
           loader: 'ts-loader',
           options: {
             compilerOptions: {
-              declaration: false
+              declaration: false,
+              target
             }
           }
         }
@@ -30,8 +31,12 @@ function createConfig(libraryTarget, mode, name) {
 }
 
 module.exports = [
-  createConfig('umd', 'none'),
-  createConfig('umd', 'production', 'umd.min'),
-  createConfig('window', 'none', 'global'),
-  createConfig('window', 'production', 'global.min')
+  createConfig('umd', 'none', 'es5'),
+  createConfig('umd', 'none', 'es2015', 'umd-2015'),
+  createConfig('umd', 'production', 'es5', 'umd.min'),
+  createConfig('umd', 'production', 'es2015', 'umd-2015.min'),
+  createConfig('window', 'none', 'es5', 'global'),
+  createConfig('window', 'none', 'es2015', 'global-2015'),
+  createConfig('window', 'production', 'es5', 'global.min'),
+  createConfig('window', 'production', 'es2015', 'global-2015.min')
 ]
