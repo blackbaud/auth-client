@@ -1,3 +1,7 @@
+# 2.17.0 (2019-07-11)
+
+- Added a `getUrl()` method to `BBAuth` that translates a 1BB tokenized URL and zone to a zoned URL. For example, a tokenized URL of `1bb://eng-hub00/version` and a zone of `eng-pusa01` translates to `https://eng-pusa01.app.blackbaud.net/hub00/version`. [#90](https://github.com/blackbaud/auth-client/pull/90)
+
 # 2.16.0 (2019-06-27)
 
 - Added a new "global" bundle that can be used to explicitly add `BBAuthClient` to the browser's global `window` object even when RequireJS or another runtime module loader is present. Also added ES2015 bundles that can be used in browsers that natively support ES2015. [#98](https://github.com/blackbaud/auth-client/pull/98)
