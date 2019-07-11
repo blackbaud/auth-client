@@ -9,13 +9,16 @@ import {
 } from './auth-get-token-args';
 
 import {
+  BBAuthGetUrlArgs
+} from './auth-get-url-args';
+
+import {
   BBAuthTokenResponse
 } from './auth-token-response';
-import { BBAuthGetUriArgs } from './auth-get-uri-args';
 
 //#endregion
 
-const TOKENIZED_URI_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?\/(.*)/;
+const TOKENIZED_URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?\/(.*)/;
 
 function buildCacheKey(args: BBAuthGetTokenArgs) {
   const { envId, permissionScope, leId } = args;
@@ -39,14 +42,14 @@ export class BBAuth {
     }
   } = {};
 
-  public static getUri(
-    tokenizedUri: string,
-    args?: BBAuthGetUriArgs
+  public static getUrl(
+    tokenizedUrl: string,
+    args?: BBAuthGetUrlArgs
   ): Promise<string> {
     // Returning a promise so eventually this could be enhanced
     // to use a service discovery solution instead of using a convention.
-    const match = TOKENIZED_URI_REGEX.exec(tokenizedUri);
-    let result = tokenizedUri;
+    const match = TOKENIZED_URL_REGEX.exec(tokenizedUrl);
+    let result = tokenizedUrl;
     let zone = args ? args.zone : undefined;
 
     if (match) {
