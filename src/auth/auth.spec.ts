@@ -225,4 +225,25 @@ describe('Auth', () => {
       done();
     });
   });
+
+  it('should convert tokenized urls and honor the hard-coded zone.', (done) => {
+    BBAuth.getUrl(
+      '1bb://eng-hub00-pusa01/version'
+    ).then((url: string) => {
+      expect(url).toBe('https://eng-pusa01.app.blackbaud.net/hub00/version');
+      done();
+    });
+  });
+
+  it('should convert tokenized urls and get zone from the token.', (done) => {
+    BBAuth.getUrl(
+      '1bb://eng-hub00/version',
+      {
+        zone: 'p-can01'
+      }
+    ).then((url: string) => {
+      expect(url).toBe('https://eng-pcan01.app.blackbaud.net/hub00/version');
+      done();
+    });
+  });
 });
