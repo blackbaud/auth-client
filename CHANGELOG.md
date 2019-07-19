@@ -1,6 +1,6 @@
 # 2.17.1 (2019-07-19)
 
-- Added logic to correctly format the zone when added to a tokenized URL. [#102](https://github.com/blackbaud/auth-client/pull/102)
+- Added logic to correctly format the zone when it is added to a tokenized URL. [#102](https://github.com/blackbaud/auth-client/pull/102) (Thanks @Blackbaud-JonathanBell!)
 
 # 2.17.0 (2019-07-11)
 
