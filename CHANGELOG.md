@@ -1,3 +1,7 @@
+# 2.17.1 (2019-07-19)
+
+- Added logic to correctly format the zone when added to a tokenized URL. [#102](https://github.com/blackbaud/auth-client/pull/102)
+
 # 2.17.0 (2019-07-11)
 
 - Added a `getUrl()` method to `BBAuth` that translates a 1BB tokenized URL and zone to a zoned URL. For example, a tokenized URL of `1bb://eng-hub00/version` and a zone of `eng-pusa01` translates to `https://eng-pusa01.app.blackbaud.net/hub00/version`. [#90](https://github.com/blackbaud/auth-client/pull/90)
