@@ -52,6 +52,10 @@ export class BBAuth {
     let result = tokenizedUrl;
     let zone = args ? args.zone : undefined;
 
+    if (zone) {
+      zone = zone.replace('-', '');
+    }
+
     if (match) {
       if (match[3]) {
         zone = match[3].substring(1);
