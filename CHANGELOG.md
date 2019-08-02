@@ -1,3 +1,7 @@
+# 2.17.2 (2019-08-02)
+
+- Added `selected` property to `BBOmnibarServiceItem`. [#84](https://github.com/blackbaud/auth-client/pull/84)
+
 # 2.17.1 (2019-07-19)
 
 - Added logic to correctly format the zone when it is added to a tokenized URL. [#102](https://github.com/blackbaud/auth-client/pull/102) (Thanks @Blackbaud-JonathanBell!)
