@@ -9,6 +9,14 @@ import {
 } from '../shared/interop';
 
 import {
+  BBAuthNavigator
+} from '../shared/navigator';
+
+import {
+  BBAuthDomUtility
+} from '../shared/dom-utility';
+
+import {
   BBOmnibarConfig
 } from './omnibar-config';
 
@@ -37,12 +45,8 @@ import {
 } from './omnibar-update-args';
 
 import {
-  BBAuthNavigator
-} from '../shared/navigator';
-
-import {
-  BBAuthDomUtility
-} from '../shared/dom-utility';
+  BBOmnibarPushNotifications
+} from './omnibar-push-notifications';
 
 import {
   BBOmnibarThemeAccent
@@ -354,6 +358,46 @@ function setupNotifications() {
   }
 }
 
+function setupPushNotifications() {
+  BBOmnibarPushNotifications.init((notification) => {
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        messageType: 'notifications-update',
+        notifications: {
+          items: [
+            {
+              date: new Date(),
+              id: Date.now(),
+              message: notification.shortMessage,
+              title: 'Some Title'
+            }
+          ]
+        }
+      }
+    );
+
+    const toastContainerEl = document.createElement('div');
+    toastContainerEl.className = 'toast-container';
+    toastContainerEl.style.position = 'fixed';
+    toastContainerEl.style.bottom = '20px';
+    toastContainerEl.style.right = '20px';
+    toastContainerEl.style.width = '300px';
+
+    document.body.appendChild(toastContainerEl);
+
+    const toastEl = document.createElement('sky-el-toast') as any;
+    toastEl.toastType = 'info';
+    toastEl.innerHTML = notification.shortMessage;
+
+    toastEl.addEventListener('closed', () => {
+      document.querySelector('.toast-container').removeChild(toastEl);
+    });
+
+    document.querySelector('.toast-container').appendChild(toastEl);
+  });
+}
+
 function messageHandler(event: MessageEvent) {
   if (!BBAuthInterop.messageIsFromOmnibar(event)) {
     return;
@@ -398,6 +442,7 @@ function messageHandler(event: MessageEvent) {
       );
 
       setupNotifications();
+      setupPushNotifications();
 
       handleStateChange();
 
