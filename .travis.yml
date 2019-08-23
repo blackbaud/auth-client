@@ -3,6 +3,9 @@ language: node_js
 addons:
   firefox: "52.0.2"
 
+services:
+  - xvfb
+
 branches:
   only:
     - master
@@ -11,7 +14,6 @@ branches:
 
 before_script:
   - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
 
 script: npm run ci
