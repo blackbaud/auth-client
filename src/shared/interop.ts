@@ -1,4 +1,4 @@
-const HOST_ORIGIN = 'https://host.nxt.blackbaud.com';
+const HOST_ORIGIN = 'https://app.blackbaud.com';
 
 export class BBAuthInterop {
   /* istanbul ignore next */

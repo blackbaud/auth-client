@@ -18,10 +18,10 @@ describe('Interop', () => {
     validate('skyux-spa-omnibar', 'https://example.com', false);
 
     // Invalid source, valid origin
-    validate('skyux-spa-foo', 'https://host.nxt.blackbaud.com', false);
+    validate('skyux-spa-foo', 'https://app.blackbaud.com', false);
 
     // Valid source, valid origin
-    validate('skyux-spa-omnibar', 'https://host.nxt.blackbaud.com', true);
+    validate('skyux-spa-omnibar', 'https://app.blackbaud.com', true);
   });
 
 });

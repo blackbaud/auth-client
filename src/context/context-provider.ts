@@ -177,7 +177,7 @@ function redirectToError() {
 
 export class BBContextProvider {
 
-  public static url = 'https://host.nxt.blackbaud.com/omnibar/welcome';
+  public static url = 'https://app.blackbaud.com/omnibar/welcome';
 
   public static ensureContext(args: BBContextArgs): Promise<BBContextArgs> {
     const { envId, envIdRequired, leId, leIdRequired, svcId } = args;
