@@ -16,8 +16,6 @@ let registerPromise: Promise<any>;
 
 export class BBOmnibarPushNotifications {
 
-  // public static readonly NOTIFICATIONS_CLIENT_URL = 'https://localhost:8080/lib/notifications-client.global.js';
-
   public static readonly NOTIFICATIONS_CLIENT_URL =
     'https://sky.blackbaudcdn.net/static/notifications-client/1/notifications-client.global.min.js';
 

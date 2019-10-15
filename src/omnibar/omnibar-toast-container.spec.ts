@@ -1,3 +1,5 @@
+//#region imports
+
 import {
   BBOmnibarToastContainer
 } from './omnibar-toast-container';
@@ -5,6 +7,8 @@ import {
 import {
   BBAuthInterop
 } from '../shared/interop';
+
+//#endregion
 
 describe('Omnibar toast container', () => {
 
