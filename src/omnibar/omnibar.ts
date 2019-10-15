@@ -49,6 +49,10 @@ import {
 } from './omnibar-push-notifications';
 
 import {
+  BBOmnibarToastContainer
+} from './omnibar-toast-container';
+
+import {
   BBOmnibarThemeAccent
 } from './theming';
 
@@ -64,6 +68,7 @@ let iframeEl: HTMLIFrameElement;
 let omnibarConfig: BBOmnibarConfig;
 let currentLegacyKeepAliveUrl: string;
 let promiseResolve: () => void;
+let pushNotificationsConnected: boolean;
 
 function addIframeEl() {
   iframeEl = BBAuthDomUtility.addIframe(
@@ -135,15 +140,15 @@ body {
   ${accentCss}
 }
 
-.sky-omnibar-placeholder.sky-omnibar-loading {
+.sky-omnibar-placeholder.${CLS_LOADING} {
   display: block;
 }
 
-.sky-omnibar-iframe.sky-omnibar-loading {
+.sky-omnibar-iframe.${CLS_LOADING} {
   visibility: hidden;
 }
 
-.sky-omnibar-iframe-expanded {
+.${CLS_EXPANDED} {
   height: 100%;
 }
 
@@ -207,6 +212,38 @@ function handleSearch(searchArgs: BBOmnibarSearchArgs) {
   }
 }
 
+function connectPushNotifications() {
+  if (omnibarConfig.previewPushNotifications && !pushNotificationsConnected) {
+    BBOmnibarToastContainer.init()
+      .then(() => {
+        BBOmnibarPushNotifications.connect(
+          omnibarConfig.leId,
+          omnibarConfig.envId,
+          (notifications) => {
+            BBAuthInterop.postOmnibarMessage(
+              iframeEl,
+              {
+                messageType: 'push-notifications-update',
+                pushNotifications: notifications
+              }
+            );
+
+            BBOmnibarToastContainer.showNewNotifications(notifications);
+          });
+        }
+      );
+
+    pushNotificationsConnected = true;
+  }
+}
+
+function disconnectPushNotifications() {
+  if (pushNotificationsConnected) {
+    BBOmnibarToastContainer.destroy();
+    BBOmnibarPushNotifications.disconnect();
+  }
+}
+
 function refreshUserCallback() {
   function refreshUser(token: string) {
     BBAuthInterop.postOmnibarMessage(
@@ -216,6 +253,12 @@ function refreshUserCallback() {
         token
       }
     );
+
+    if (token) {
+      connectPushNotifications();
+    } else {
+      disconnectPushNotifications();
+    }
   }
 
   BBAuth.clearTokenCache();
@@ -301,6 +344,10 @@ function handleNotificationRead(notification: BBOmnibarNotificationItem) {
   }
 }
 
+function handlePushNotificationsChange(notifications: any) {
+  BBOmnibarPushNotifications.updateNotifications(notifications);
+}
+
 function handleEnvironmentUpdate(name: string) {
   const bodyCls = 'sky-omnibar-environment-visible';
   const bodyClassList = document.body.classList;
@@ -340,7 +387,7 @@ function monkeyPatchState() {
   history.replaceState = newReplaceState;
 }
 
-function setupNotifications() {
+function initLocalNotifications() {
   const notificationsConfig = omnibarConfig.notifications;
 
   if (notificationsConfig) {
@@ -356,46 +403,6 @@ function setupNotifications() {
       }
     });
   }
-}
-
-function setupPushNotifications() {
-  BBOmnibarPushNotifications.init((notification) => {
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        messageType: 'notifications-update',
-        notifications: {
-          items: [
-            {
-              date: new Date(),
-              id: Date.now(),
-              message: notification.shortMessage,
-              title: 'Some Title'
-            }
-          ]
-        }
-      }
-    );
-
-    const toastContainerEl = document.createElement('div');
-    toastContainerEl.className = 'toast-container';
-    toastContainerEl.style.position = 'fixed';
-    toastContainerEl.style.bottom = '20px';
-    toastContainerEl.style.right = '20px';
-    toastContainerEl.style.width = '300px';
-
-    document.body.appendChild(toastContainerEl);
-
-    const toastEl = document.createElement('sky-el-toast') as any;
-    toastEl.toastType = 'info';
-    toastEl.innerHTML = notification.shortMessage;
-
-    toastEl.addEventListener('closed', () => {
-      document.querySelector('.toast-container').removeChild(toastEl);
-    });
-
-    document.querySelector('.toast-container').appendChild(toastEl);
-  });
 }
 
 function messageHandler(event: MessageEvent) {
@@ -427,6 +434,7 @@ function messageHandler(event: MessageEvent) {
         {
           compactNavOnly: omnibarConfig.compactNavOnly,
           enableHelp: omnibarConfig.enableHelp,
+          enablePushNotifications: omnibarConfig.previewPushNotifications,
           envId: omnibarConfig.envId,
           hideResourceLinks: omnibarConfig.hideResourceLinks,
           leId: omnibarConfig.leId,
@@ -441,8 +449,8 @@ function messageHandler(event: MessageEvent) {
         }
       );
 
-      setupNotifications();
-      setupPushNotifications();
+      initLocalNotifications();
+      connectPushNotifications();
 
       handleStateChange();
 
@@ -485,6 +493,9 @@ function messageHandler(event: MessageEvent) {
       handleNotificationRead(
         message.notification
       );
+      break;
+    case 'push-notifications-change':
+      handlePushNotificationsChange(message.notifications);
       break;
     case 'session-renew':
       BBOmnibarUserActivity.userRenewedSession();
@@ -541,11 +552,14 @@ export class BBOmnibar {
   }
 
   public static destroy() {
-    BBAuthDomUtility.removeCss(styleEl);
+    BBOmnibarToastContainer.destroy();
+    BBOmnibarPushNotifications.disconnect();
 
     BBAuthDomUtility.removeEl(placeholderEl);
     BBAuthDomUtility.removeEl(iframeEl);
     BBAuthDomUtility.removeEl(envEl);
+
+    BBAuthDomUtility.removeCss(styleEl);
 
     window.removeEventListener('message', messageHandler);
 
@@ -555,6 +569,7 @@ export class BBOmnibar {
       iframeEl =
       envEl =
       promiseResolve =
+      pushNotificationsConnected =
       undefined;
   }
 }
