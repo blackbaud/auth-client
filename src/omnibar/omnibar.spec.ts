@@ -1122,6 +1122,34 @@ describe('Omnibar', () => {
       });
     });
 
+    it('should notify the omnibar to open the push notifications menu', (done) => {
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+      });
+
+      toastContainerInitSpy.and.callFake((openPushNotificationsCallback: () => void) => {
+        openPushNotificationsCallback();
+
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'push-notifications-open'
+          }
+        );
+
+        done();
+      });
+
+      loadOmnibar({
+        previewPushNotifications: true
+      });
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
+
   });
 
 });

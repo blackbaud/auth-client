@@ -212,9 +212,18 @@ function handleSearch(searchArgs: BBOmnibarSearchArgs) {
   }
 }
 
+function openPushNotificationsMenu() {
+  BBAuthInterop.postOmnibarMessage(
+    iframeEl,
+    {
+      messageType: 'push-notifications-open'
+    }
+  );
+}
+
 function connectPushNotifications() {
   if (omnibarConfig.previewPushNotifications && !pushNotificationsConnected) {
-    BBOmnibarToastContainer.init()
+    BBOmnibarToastContainer.init(openPushNotificationsMenu)
       .then(() => {
         BBOmnibarPushNotifications.connect(
           omnibarConfig.leId,

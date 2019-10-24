@@ -14,8 +14,9 @@ describe('Omnibar toast container', () => {
 
   const CONTAINER_URL = 'about:blank';
 
-  let postOmnibarMessageSpy: jasmine.Spy;
   let messageIsFromOmnibarReturnValue: boolean;
+  let openMenuCallbackSpy: jasmine.Spy;
+  let postOmnibarMessageSpy: jasmine.Spy;
   let previousContainerUrl: string;
 
   function fireMessageEvent(data: any, includeSource = true): void {
@@ -31,7 +32,7 @@ describe('Omnibar toast container', () => {
   }
 
   function loadToastContainer(): Promise<any> {
-    const initPromise = BBOmnibarToastContainer.init();
+    const initPromise = BBOmnibarToastContainer.init(openMenuCallbackSpy);
 
     fireMessageEvent({
       messageType: 'toast-ready'
@@ -66,6 +67,7 @@ describe('Omnibar toast container', () => {
     messageIsFromOmnibarReturnValue = true;
 
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
+    openMenuCallbackSpy = jasmine.createSpy('openMenuCallback');
 
     spyOn(
       BBAuthInterop,
@@ -179,6 +181,22 @@ describe('Omnibar toast container', () => {
     iframeEl = getIframeEl();
 
     expect(getIframeEl()).toBeNull();
+  });
+
+  it('should call the specified open menu callback when the push notifications menu should open', () => {
+    loadToastContainer();
+
+    fireMessageEvent({
+      messageType: 'toast-ready'
+    });
+
+    expect(openMenuCallbackSpy).not.toHaveBeenCalled();
+
+    fireMessageEvent({
+      messageType: 'push-notifications-open'
+    });
+
+    expect(openMenuCallbackSpy).toHaveBeenCalled();
   });
 
 });

@@ -18,6 +18,7 @@ let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
 let initPromise: Promise<void>;
 let initResolve: () => void;
+let currentOpenMenuCallback: () => void;
 
 function getContainerEl(): HTMLDivElement {
   /* istanbul ignore else */
@@ -86,6 +87,9 @@ function messageHandler(event: MessageEvent): void {
       }
 
       break;
+    case 'push-notifications-open':
+      currentOpenMenuCallback();
+      break;
   }
 }
 
@@ -93,7 +97,9 @@ export class BBOmnibarToastContainer {
 
   public static readonly CONTAINER_URL = 'https://host.nxt.blackbaud.com/omnibar/toast';
 
-  public static init(): Promise<void> {
+  public static init(openMenuCallback: () => void): Promise<void> {
+    currentOpenMenuCallback = openMenuCallback;
+
     if (!initPromise) {
       initPromise = new Promise((resolve) => {
         initResolve = resolve;
@@ -123,8 +129,10 @@ export class BBOmnibarToastContainer {
       BBAuthDomUtility.removeEl(iframeEl);
     }
 
-    iframeEl =
+    currentOpenMenuCallback =
+      iframeEl =
       initPromise =
+      initResolve =
       styleEl =
       undefined;
 
