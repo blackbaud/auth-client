@@ -45,7 +45,7 @@ describe('Omnibar toast container', () => {
     return document.querySelector('.sky-omnibar-toast-container');
   }
 
-  function validateIframeVisible(visible: boolean, height?: string) {
+  function validateIframeVisible(visible: boolean, height?: string): void {
     const iframeEl = getIframeEl();
 
     expect(getComputedStyle(iframeEl).visibility).toBe(visible ? 'visible' : 'hidden');

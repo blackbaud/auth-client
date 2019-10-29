@@ -70,7 +70,7 @@ let currentLegacyKeepAliveUrl: string;
 let promiseResolve: () => void;
 let pushNotificationsConnected: boolean;
 
-function addIframeEl() {
+function addIframeEl(): void {
   iframeEl = BBAuthDomUtility.addIframe(
     buildOmnibarUrl(),
     `sky-omnibar-iframe ${CLS_LOADING}`,
@@ -78,18 +78,18 @@ function addIframeEl() {
   );
 }
 
-function addEnvironmentEl() {
+function addEnvironmentEl(): void {
   envEl = document.createElement('div');
   envEl.className = 'sky-omnibar-environment';
 
   BBAuthDomUtility.addElToBodyTop(envEl);
 }
 
-function collapseIframe() {
+function collapseIframe(): void {
   iframeEl.classList.remove(CLS_EXPANDED);
 }
 
-function addStyleEl() {
+function addStyleEl(): void {
   let accentCss = 'background: linear-gradient(to right, #71bf44 0, #31b986 50%, #00b2ec 100%);';
   let backgroundColor = '#4d5259';
 
@@ -174,7 +174,7 @@ body {
   );
 }
 
-function addPlaceholderEl() {
+function addPlaceholderEl(): void {
   placeholderEl = document.createElement('div');
   placeholderEl.className = `sky-omnibar-placeholder ${CLS_LOADING}`;
   placeholderEl.innerHTML = `<div class="sky-omnibar-placeholder-accent"></div>`;
@@ -182,11 +182,11 @@ function addPlaceholderEl() {
   document.body.appendChild(placeholderEl);
 }
 
-function expandIframe() {
+function expandIframe(): void {
   iframeEl.classList.add(CLS_EXPANDED);
 }
 
-function handleStateChange() {
+function handleStateChange(): void {
   BBAuthInterop.postOmnibarMessage(
     iframeEl,
     {
@@ -196,7 +196,7 @@ function handleStateChange() {
   );
 }
 
-function handleSearch(searchArgs: BBOmnibarSearchArgs) {
+function handleSearch(searchArgs: BBOmnibarSearchArgs): void {
   if (omnibarConfig.onSearch) {
     omnibarConfig
       .onSearch(searchArgs)
@@ -212,7 +212,7 @@ function handleSearch(searchArgs: BBOmnibarSearchArgs) {
   }
 }
 
-function openPushNotificationsMenu() {
+function openPushNotificationsMenu(): void {
   BBAuthInterop.postOmnibarMessage(
     iframeEl,
     {
@@ -221,7 +221,7 @@ function openPushNotificationsMenu() {
   );
 }
 
-function connectPushNotifications() {
+function connectPushNotifications(): void {
   if (omnibarConfig.previewPushNotifications && !pushNotificationsConnected) {
     BBOmnibarToastContainer.init(openPushNotificationsMenu)
       .then(() => {
@@ -246,14 +246,14 @@ function connectPushNotifications() {
   }
 }
 
-function disconnectPushNotifications() {
+function disconnectPushNotifications(): void {
   if (pushNotificationsConnected) {
     BBOmnibarToastContainer.destroy();
     BBOmnibarPushNotifications.disconnect();
   }
 }
 
-function refreshUserCallback() {
+function refreshUserCallback(): void {
   function refreshUser(token: string) {
     BBAuthInterop.postOmnibarMessage(
       iframeEl,
@@ -280,7 +280,7 @@ function refreshUserCallback() {
     .catch(() => refreshUser(undefined));
 }
 
-function showInactivityCallback() {
+function showInactivityCallback(): void {
   BBOmnibarUserActivityPrompt.show({
     sessionRenewCallback: () => {
       BBOmnibarUserActivity.userRenewedSession();
@@ -288,11 +288,11 @@ function showInactivityCallback() {
   });
 }
 
-function hideInactivityCallback() {
+function hideInactivityCallback(): void {
   BBOmnibarUserActivityPrompt.hide();
 }
 
-function startActivityTracking() {
+function startActivityTracking(): void {
   BBOmnibarUserActivity.startTracking(
     refreshUserCallback,
     showInactivityCallback,
@@ -305,7 +305,7 @@ function startActivityTracking() {
 function handleGetToken(
   tokenRequestId: any,
   disableRedirect: boolean
-) {
+): void {
   BBAuth.getToken({
     disableRedirect
   })
@@ -337,7 +337,7 @@ function handleGetToken(
     );
 }
 
-function handleHelp() {
+function handleHelp(): void {
   const BBHELP = (window as any).BBHELP;
 
   if (BBHELP) {
@@ -345,7 +345,7 @@ function handleHelp() {
   }
 }
 
-function handleNotificationRead(notification: BBOmnibarNotificationItem) {
+function handleNotificationRead(notification: BBOmnibarNotificationItem): void {
   const notificationsConfig = omnibarConfig.notifications;
 
   if (notificationsConfig && notificationsConfig.onNotificationRead) {
@@ -353,7 +353,7 @@ function handleNotificationRead(notification: BBOmnibarNotificationItem) {
   }
 }
 
-function handlePushNotificationsChange(notifications: any) {
+function handlePushNotificationsChange(notifications: any[]): void {
   BBOmnibarPushNotifications.updateNotifications(notifications);
 }
 
@@ -372,7 +372,7 @@ function handleEnvironmentUpdate(name: string) {
   }
 }
 
-function monkeyPatchState() {
+function monkeyPatchState(): void {
   const oldPushState = history.pushState;
   const oldReplaceState = history.replaceState;
 
@@ -396,7 +396,7 @@ function monkeyPatchState() {
   history.replaceState = newReplaceState;
 }
 
-function initLocalNotifications() {
+function initLocalNotifications(): void {
   const notificationsConfig = omnibarConfig.notifications;
 
   if (notificationsConfig) {
@@ -414,7 +414,7 @@ function initLocalNotifications() {
   }
 }
 
-function messageHandler(event: MessageEvent) {
+function messageHandler(event: MessageEvent): void {
   if (!BBAuthInterop.messageIsFromOmnibar(event)) {
     return;
   }
@@ -519,7 +519,7 @@ function messageHandler(event: MessageEvent) {
   }
 }
 
-function buildOmnibarUrl() {
+function buildOmnibarUrl(): string {
   const omnibarUrl = omnibarConfig.url ||
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/';
@@ -550,7 +550,7 @@ export class BBOmnibar {
     });
   }
 
-  public static update(args: BBOmnibarUpdateArgs) {
+  public static update(args: BBOmnibarUpdateArgs): void {
     BBAuthInterop.postOmnibarMessage(
       iframeEl,
       {
@@ -560,7 +560,7 @@ export class BBOmnibar {
     );
   }
 
-  public static destroy() {
+  public static destroy(): void {
     BBOmnibarToastContainer.destroy();
     BBOmnibarPushNotifications.disconnect();
 

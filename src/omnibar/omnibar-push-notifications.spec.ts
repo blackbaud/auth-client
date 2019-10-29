@@ -23,7 +23,7 @@ describe('Omnibar push notifications', () => {
   let registerScriptSpy: jasmine.Spy;
   let updateNotificationsSpy: jasmine.Spy;
 
-  function createNotificationsClient() {
+  function createNotificationsClient(): any {
     return (window as any).BBNotificationsClient = {
       BBNotifications: {
         addListener: addListenerSpy,

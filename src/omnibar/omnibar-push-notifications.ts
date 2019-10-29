@@ -54,7 +54,7 @@ export class BBOmnibarPushNotifications {
     return Promise.resolve();
   }
 
-  public static updateNotifications(notifications: any): void {
+  public static updateNotifications(notifications: any[]): void {
     BBNotificationsClient.BBNotifications.updateNotifications(notifications);
   }
 

@@ -65,7 +65,7 @@ import {
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
 
-  function loadOmnibar(config?: BBOmnibarConfig) {
+  function loadOmnibar(config?: BBOmnibarConfig): void {
     config = config || {};
     config.url = BASE_URL;
 
@@ -86,7 +86,7 @@ describe('Omnibar', () => {
     ) as HTMLDivElement;
   }
 
-  function fireMessageEvent(data: any, includeSource = true) {
+  function fireMessageEvent(data: any, includeSource = true): void {
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
     }
@@ -98,11 +98,11 @@ describe('Omnibar', () => {
     );
   }
 
-  function validateExpanded(expanded: boolean) {
+  function validateExpanded(expanded: boolean): void {
     expect(getIframeEl().classList.contains('sky-omnibar-iframe-expanded')).toBe(expanded);
   }
 
-  function destroyOmnibar() {
+  function destroyOmnibar(): void {
     BBOmnibar.destroy();
   }
 
