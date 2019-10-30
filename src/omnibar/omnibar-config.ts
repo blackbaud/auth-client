@@ -61,4 +61,5 @@ export interface BBOmnibarConfig {
 
   hideResourceLinks?: boolean;
 
+  previewPushNotifications?: boolean;
 }
