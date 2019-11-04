@@ -245,7 +245,7 @@ function connectPushNotifications(): void {
       envId: omnibarConfig.envId,
       leId: omnibarConfig.leId,
       permissionScope: 'Notifications'
-    }).then((token: any) => {
+    }).then((token: string) => {
       if (hasNotificationsEntitlement(token)) {
         BBOmnibarToastContainer.init(openPushNotificationsMenu)
           .then(() => {
