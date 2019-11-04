@@ -248,23 +248,22 @@ function connectPushNotifications(): void {
     }).then((token: any) => {
       if (hasNotificationsEntitlement(token)) {
         BBOmnibarToastContainer.init(openPushNotificationsMenu)
-        .then(() => {
-          BBOmnibarPushNotifications.connect(
-            omnibarConfig.leId,
-            omnibarConfig.envId,
-            (notifications) => {
-              BBAuthInterop.postOmnibarMessage(
-                iframeEl,
-                {
-                  messageType: 'push-notifications-update',
-                  pushNotifications: notifications
-                }
-              );
+          .then(() => {
+            BBOmnibarPushNotifications.connect(
+              omnibarConfig.leId,
+              omnibarConfig.envId,
+              (notifications) => {
+                BBAuthInterop.postOmnibarMessage(
+                  iframeEl,
+                  {
+                    messageType: 'push-notifications-update',
+                    pushNotifications: notifications
+                  }
+                );
 
-              BBOmnibarToastContainer.showNewNotifications(notifications);
+                BBOmnibarToastContainer.showNewNotifications(notifications);
+              });
             });
-          }
-        );
       } else {
         pushNotificationsConnected = false;
       }
