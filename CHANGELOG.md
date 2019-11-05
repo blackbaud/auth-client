@@ -1,4 +1,4 @@
-# 2.18.0 (2019-10-05)
+# 2.18.0 (2019-11-05)
 
 - Added omnibar notifications for users in environments or legal entities with the required entitlement. [#108](https://github.com/blackbaud/auth-client/pull/108)
 
