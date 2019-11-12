@@ -1,6 +1,5 @@
 //#region imports
 
-/*tslint:disable-next-line:no-var-requires*/
 import * as jwtDecode from 'jwt-decode';
 
 import {
