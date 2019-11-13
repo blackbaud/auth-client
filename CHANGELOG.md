@@ -1,3 +1,7 @@
+# 2.19.0 (2019-11-13)
+
+- Moved notification toasts to the top of the page. [#111](https://github.com/blackbaud/auth-client/pull/111)
+
 # 2.18.0 (2019-11-05)
 
 - Added omnibar notifications for users in environments or legal entities with the required entitlement. [#108](https://github.com/blackbaud/auth-client/pull/108)
