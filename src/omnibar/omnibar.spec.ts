@@ -583,6 +583,18 @@ describe('Omnibar', () => {
       );
     });
 
+    it('should set the document title with the service name', () => {
+      const serviceName = 'test service';
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      expect(document.title).toBe(serviceName);
+    });
+
     it('should show the inactivity prompt', (done) => {
       const showSpy = spyOn(BBOmnibarUserActivityPrompt, 'show');
 
@@ -1024,15 +1036,33 @@ describe('Omnibar', () => {
       BBOmnibar.update(updateArgs);
     });
 
+    it('should update the document title when setTitle() is called', () => {
+      const serviceName = 'Test Service';
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      expect(document.title).toBe(serviceName);
+
+      BBOmnibar.setTitle({titleParts: ['Dropdown', 'Components']});
+
+      expect(document.title).toBe('Dropdown - Components - Test Service');
+    });
+
     it('should notify the omnibar and the toast container when new push notifications arrive', (done) => {
       let notificationsUpdatePosted: boolean;
 
-      const testNotifications = [
-        {
-          notificationId: '1',
-          shortMessage: 'Hello world'
-        }
-      ];
+      const testNotifications = {
+        notifications: [
+          {
+            notificationId: '1',
+            shortMessage: 'Hello world'
+          }
+        ]
+      };
 
       postOmnibarMessageSpy.and.callFake(
         (iframeEl: HTMLIFrameElement, data: any) => {

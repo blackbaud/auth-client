@@ -36,6 +36,10 @@ import {
 } from './omnibar-search-args';
 
 import {
+  BBOmnibarSetTitleArgs
+} from './omnibar-set-title-args';
+
+import {
   BBOmnibarUserActivity
 } from './omnibar-user-activity';
 
@@ -72,6 +76,9 @@ let omnibarConfig: BBOmnibarConfig;
 let currentLegacyKeepAliveUrl: string;
 let promiseResolve: () => void;
 let pushNotificationsConnected: boolean;
+let unreadNotificationCount: number;
+let currentTitleParts: string[] = [];
+let serviceName: string;
 
 function addIframeEl(): void {
   iframeEl = BBAuthDomUtility.addIframe(
@@ -261,7 +268,14 @@ function connectPushNotifications(): void {
                   }
                 );
 
+                console.log('notifications and stuff');
+                console.log(notifications);
+
                 BBOmnibarToastContainer.showNewNotifications(notifications);
+                unreadNotificationCount = notifications &&
+                  notifications.notifications &&
+                  notifications.notifications.filter((notification: any) => !notification.isRead).length;
+                updateTitle();
               });
             });
       } else {
@@ -544,6 +558,10 @@ function messageHandler(event: MessageEvent): void {
       currentLegacyKeepAliveUrl = message.url;
       startActivityTracking();
       break;
+
+    case 'selected-service-update':
+      serviceName = message.serviceName;
+      updateTitle();
   }
 }
 
@@ -553,6 +571,23 @@ function buildOmnibarUrl(): string {
     'https://host.nxt.blackbaud.com/omnibar/';
 
   return omnibarUrl;
+}
+
+function updateTitle(): void {
+  console.log('yoooo');
+  console.log(unreadNotificationCount);
+  let title = '';
+  let titleParts: string[] = [];
+  if (unreadNotificationCount && unreadNotificationCount !== 0) {
+    titleParts.push(`(${unreadNotificationCount})`);
+  }
+
+  titleParts = titleParts.concat(currentTitleParts);
+  titleParts.push(serviceName);
+
+  title = titleParts.join(' - ');
+
+  document.title = title;
 }
 
 export class BBOmnibar {
@@ -586,6 +621,11 @@ export class BBOmnibar {
         updateArgs: args
       }
     );
+  }
+
+  public static setTitle(args: BBOmnibarSetTitleArgs): void {
+    currentTitleParts = args.titleParts;
+    updateTitle();
   }
 
   public static destroy(): void {
