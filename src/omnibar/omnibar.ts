@@ -76,8 +76,9 @@ let currentLegacyKeepAliveUrl: string;
 let promiseResolve: () => void;
 let pushNotificationsConnected: boolean;
 let unreadNotificationCount: number;
-let currentTitleParts: string[] = [];
 let serviceName: string;
+let currentTitleParts: string[] = [];
+let titleSet: boolean = false;
 
 function addIframeEl(): void {
   iframeEl = BBAuthDomUtility.addIframe(
@@ -266,9 +267,6 @@ function connectPushNotifications(): void {
                     pushNotifications: notifications
                   }
                 );
-
-                console.log('notifications and stuff');
-                console.log(notifications);
 
                 BBOmnibarToastContainer.showNewNotifications(notifications);
                 unreadNotificationCount = notifications &&
@@ -573,20 +571,23 @@ function buildOmnibarUrl(): string {
 }
 
 function updateTitle(): void {
-  console.log('yoooo');
-  console.log(unreadNotificationCount);
   let title = '';
   let titleParts: string[] = [];
   if (unreadNotificationCount && unreadNotificationCount !== 0) {
     titleParts.push(`(${unreadNotificationCount})`);
   }
 
-  titleParts = titleParts.concat(currentTitleParts);
+  if (currentTitleParts && currentTitleParts.length !== 0) {
+    titleParts = titleParts.concat(currentTitleParts);
+  }
+
   titleParts.push(serviceName);
 
   title = titleParts.join(' - ');
 
-  document.title = title;
+  if (titleSet) {
+    document.title = title;
+  }
 }
 
 export class BBOmnibar {
@@ -624,6 +625,7 @@ export class BBOmnibar {
 
   public static setTitle(args: BBOmnibarSetTitleArgs): void {
     currentTitleParts = args.titleParts;
+    titleSet = true;
     updateTitle();
   }
 
@@ -646,6 +648,10 @@ export class BBOmnibar {
       envEl =
       promiseResolve =
       pushNotificationsConnected =
+      unreadNotificationCount =
+      currentTitleParts =
+      serviceName =
+      titleSet =
       undefined;
   }
 }

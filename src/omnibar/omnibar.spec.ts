@@ -329,10 +329,13 @@ describe('Omnibar', () => {
   });
 
   describe('interop with host page', () => {
+
+    beforeEach(() => {
+      loadOmnibar();
+    });
+
     it('should ignore messages that do not originate from omnibar', () => {
       messageIsFromOmnibarReturnValue = false;
-
-      loadOmnibar();
 
       fireMessageEvent(
         {
@@ -345,8 +348,6 @@ describe('Omnibar', () => {
     });
 
     it('should expand and collapse', () => {
-      loadOmnibar();
-
       fireMessageEvent({
         messageType: 'expand'
       });
@@ -361,8 +362,6 @@ describe('Omnibar', () => {
     });
 
     it('should navigate by URL', () => {
-      loadOmnibar();
-
       fireMessageEvent({
         messageType: 'navigate-url',
         url: 'https://example.com/'
@@ -372,8 +371,6 @@ describe('Omnibar', () => {
     });
 
     it('should navigate by nav item', () => {
-      loadOmnibar();
-
       fireMessageEvent({
         messageType: 'navigate',
         navItem: {
@@ -427,8 +424,6 @@ describe('Omnibar', () => {
     });
 
     it('should not attempt to call the config\'s onSearch() callback when it is not defined', () => {
-      loadOmnibar();
-
       fireMessageEvent({
         messageType: 'search',
         searchArgs: {
@@ -497,8 +492,6 @@ describe('Omnibar', () => {
     });
 
     it('should open the help widget if the help widget is present on the page', () => {
-      loadOmnibar();
-
       const openSpy = jasmine.createSpy('open');
 
       (window as any).BBHELP = {
@@ -515,8 +508,6 @@ describe('Omnibar', () => {
     });
 
     it('should not attempt to open the help widget if the help widget is not present on the page', () => {
-      loadOmnibar();
-
       fireMessageEvent({
         messageType: 'help-open'
       });
@@ -525,8 +516,6 @@ describe('Omnibar', () => {
     });
 
     it('should provide a way to renew the user session', () => {
-      loadOmnibar();
-
       const userRenewedSessionSpy = spyOn(BBOmnibarUserActivity, 'userRenewedSession');
 
       fireMessageEvent({
@@ -537,8 +526,6 @@ describe('Omnibar', () => {
     });
 
     it('should display the current environment when specified by the omnibar', () => {
-      loadOmnibar();
-
       const environmentEl = document.querySelector('.sky-omnibar-environment') as any;
 
       const validateVisible = (visible: boolean) => {
@@ -565,8 +552,6 @@ describe('Omnibar', () => {
     });
 
     it('should restart activity tracking when the legacy session keep-alive URL changes', () => {
-      loadOmnibar();
-
       startTrackingSpy.calls.reset();
 
       fireMessageEvent({
@@ -583,9 +568,10 @@ describe('Omnibar', () => {
       );
     });
 
-    it('should set the document title with the service name', () => {
+    it('should set the document title with the service name if setTitle has been called', () => {
       const serviceName = 'test service';
-      loadOmnibar();
+
+      BBOmnibar.setTitle({});
 
       fireMessageEvent({
         messageType: 'selected-service-update',
@@ -593,6 +579,17 @@ describe('Omnibar', () => {
       });
 
       expect(document.title).toBe(serviceName);
+    });
+
+    it('should not set the document title with the service name if setTitle has not been called', () => {
+      const serviceName = 'test service 2';
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      expect(document.title).not.toBe(serviceName);
     });
 
     it('should show the inactivity prompt', (done) => {
@@ -608,8 +605,6 @@ describe('Omnibar', () => {
 
         done();
       });
-
-      loadOmnibar();
 
       // Getting a token starts the activity tracking.
       fireMessageEvent({
@@ -635,8 +630,6 @@ describe('Omnibar', () => {
         done();
       });
 
-      loadOmnibar();
-
       // Getting a token starts the activity tracking.
       fireMessageEvent({
         messageType: 'get-token'
@@ -658,8 +651,6 @@ describe('Omnibar', () => {
         done();
       });
 
-      loadOmnibar();
-
       // Getting a token starts the activity tracking.
       fireMessageEvent({
         messageType: 'get-token'
@@ -675,8 +666,6 @@ describe('Omnibar', () => {
       ];
 
       const updateNotificationsSpy = spyOn(BBOmnibarPushNotifications, 'updateNotifications');
-
-      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'push-notifications-change',
@@ -1044,8 +1033,6 @@ describe('Omnibar', () => {
         messageType: 'selected-service-update',
         serviceName
       });
-
-      expect(document.title).toBe(serviceName);
 
       BBOmnibar.setTitle({titleParts: ['Dropdown', 'Components']});
 
