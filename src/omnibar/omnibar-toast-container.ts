@@ -33,7 +33,8 @@ function getContainerEl(): HTMLDivElement {
   right: 0px;
   height: 0px;
   width: 300px;
-  z-index: 10000;
+  /* z-index is 1 less than omnibar so menus will display over top the toast container */
+  z-index: 999;
 }
 
 .${CLS_TOAST_CONTAINER_READY} {
