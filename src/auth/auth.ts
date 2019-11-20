@@ -18,11 +18,12 @@ import {
 
 //#endregion
 
-const TOKENIZED_URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?\/(.*)/;
+const TOKENIZED_URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?(:[0-9]+)?\/(.*)/;
 const SCS_INDEX = 1;
 const SERVICE_INDEX = 2;
 const ZONE_INDEX = 3;
-const ENDPOINT_INDEX = 4;
+// const PORT_INDEX = 4;
+const ENDPOINT_INDEX = 5;
 
 function buildCacheKey(args: BBAuthGetTokenArgs) {
   const { envId, permissionScope, leId } = args;

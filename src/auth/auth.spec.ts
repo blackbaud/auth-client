@@ -246,4 +246,25 @@ describe('Auth', () => {
       done();
     });
   });
+
+  it('should tokenized urls honoring the hard-coded zone, while ignoring any port protocol information', (done) => {
+    BBAuth.getUrl(
+      '1bb://eng-hub00-pusa01:8080/version'
+    ).then((url: string) => {
+      expect(url).toBe('https://eng-pusa01.app.blackbaud.net/hub00/version');
+      done();
+    });
+  });
+
+  it('should tokenized urls getting the zone from the token, while ignoring any port protocol information', (done) => {
+    BBAuth.getUrl(
+      '1bb://eng-hub00:8080/version',
+      {
+        zone: 'p-can01'
+      }
+    ).then((url: string) => {
+      expect(url).toBe('https://eng-pcan01.app.blackbaud.net/hub00/version');
+      done();
+    });
+  });
 });
