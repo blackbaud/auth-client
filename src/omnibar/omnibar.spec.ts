@@ -989,7 +989,7 @@ describe('Omnibar', () => {
         messageType: 'ready'
       });
 
-      expect(postOmnibarMessageSpy.calls.argsFor(2)).toEqual([
+      expect(postOmnibarMessageSpy.calls.argsFor(3)).toEqual([
         getIframeEl(),
         {
           messageType: 'notifications-update',

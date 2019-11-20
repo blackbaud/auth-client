@@ -252,9 +252,6 @@ function connectPushNotifications(): void {
       if (hasNotificationsEntitlement(token)) {
         BBOmnibarToastContainer.init(openPushNotificationsMenu)
           .then(() => {
-            // Make sure the toast container is updated with the current URL.
-            handleStateChange();
-
             BBOmnibarPushNotifications.connect(
               omnibarConfig.leId,
               omnibarConfig.envId,
@@ -492,10 +489,10 @@ function messageHandler(event: MessageEvent): void {
         }
       );
 
+      handleStateChange();
+
       initLocalNotifications();
       connectPushNotifications();
-
-      handleStateChange();
 
       promiseResolve();
       break;
