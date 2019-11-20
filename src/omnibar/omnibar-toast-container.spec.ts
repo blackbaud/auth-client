@@ -257,4 +257,36 @@ describe('Omnibar toast container', () => {
     expect(openMenuCallbackSpy).toHaveBeenCalled();
   });
 
+  it('should post a message with the current URL', () => {
+    BBOmnibarToastContainer.updateUrl('https://example.com/1');
+
+    loadToastContainer();
+
+    fireMessageEvent({
+      messageType: 'toast-ready'
+    });
+
+    const iframeEl = getIframeEl();
+
+    // Validate the initial URL is posted after receiving the `toast-ready` message.
+    expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+      iframeEl,
+      {
+        href: 'https://example.com/1',
+        messageType: 'location-change'
+      }
+    );
+
+    BBOmnibarToastContainer.updateUrl('https://example.com/2');
+
+    // Validate subsequent URLs are posted.
+    expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+      iframeEl,
+      {
+        href: 'https://example.com/2',
+        messageType: 'location-change'
+      }
+    );
+  });
+
 });

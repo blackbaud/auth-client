@@ -117,6 +117,7 @@ describe('Omnibar', () => {
   let pushNotificationsConnectSpy: jasmine.Spy;
   let pushNotificationsDisconnectSpy: jasmine.Spy;
   let toastContainerInitSpy: jasmine.Spy;
+  let toastContainerUpdateUrlSpy: jasmine.Spy;
   let toastContainerShowNewSpy: jasmine.Spy;
   let toastContainerDestroySpy: jasmine.Spy;
 
@@ -155,6 +156,11 @@ describe('Omnibar', () => {
       BBOmnibarToastContainer,
       'init'
     ).and.returnValue(Promise.resolve());
+
+    toastContainerUpdateUrlSpy = spyOn(
+      BBOmnibarToastContainer,
+      'updateUrl'
+    );
 
     toastContainerShowNewSpy = spyOn(
       BBOmnibarToastContainer,
@@ -1171,6 +1177,8 @@ describe('Omnibar', () => {
 
         setTimeout(() => {
           expect(toastContainerInitSpy).toHaveBeenCalled();
+
+          expect(toastContainerUpdateUrlSpy).toHaveBeenCalledWith(location.href);
 
           done();
         });

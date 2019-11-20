@@ -20,6 +20,7 @@ let iframeEl: HTMLIFrameElement;
 let initPromise: Promise<void>;
 let initResolve: () => void;
 let currentOpenMenuCallback: () => void;
+let currentUrl: string;
 
 function getContainerEl(): HTMLDivElement {
   /* istanbul ignore else */
@@ -74,6 +75,18 @@ function getOmnibarHeight(): number {
   return getElHeight('.sky-omnibar-iframe') + getElHeight('.sky-omnibar-environment');
 }
 
+function postLocationChangeMessage(): void {
+  if (iframeEl) {
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        href: currentUrl,
+        messageType: 'location-change'
+      }
+    );
+  }
+}
+
 function messageHandler(event: MessageEvent): void {
   if (!BBAuthInterop.messageIsFromOmnibar(event)) {
     return;
@@ -89,6 +102,8 @@ function messageHandler(event: MessageEvent): void {
           messageType: 'host-ready'
         }
       );
+
+      postLocationChangeMessage();
 
       iframeEl.classList.add(CLS_TOAST_CONTAINER_READY);
 
@@ -138,6 +153,12 @@ export class BBOmnibarToastContainer {
     );
   }
 
+  public static updateUrl(url: string): void {
+    currentUrl = url;
+
+    postLocationChangeMessage();
+  }
+
   public static destroy(): void {
     if (styleEl) {
       BBAuthDomUtility.removeCss(styleEl);
@@ -148,6 +169,7 @@ export class BBOmnibarToastContainer {
     }
 
     currentOpenMenuCallback =
+      currentUrl =
       iframeEl =
       initPromise =
       initResolve =

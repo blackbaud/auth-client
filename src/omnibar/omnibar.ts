@@ -189,13 +189,17 @@ function expandIframe(): void {
 }
 
 function handleStateChange(): void {
+  const url = document.location.href;
+
   BBAuthInterop.postOmnibarMessage(
     iframeEl,
     {
-      href: document.location.href,
+      href: url,
       messageType: 'location-change'
     }
   );
+
+  BBOmnibarToastContainer.updateUrl(url);
 }
 
 function handleSearch(searchArgs: BBOmnibarSearchArgs): void {
@@ -248,6 +252,9 @@ function connectPushNotifications(): void {
       if (hasNotificationsEntitlement(token)) {
         BBOmnibarToastContainer.init(openPushNotificationsMenu)
           .then(() => {
+            // Make sure the toast container is updated with the current URL.
+            handleStateChange();
+
             BBOmnibarPushNotifications.connect(
               omnibarConfig.leId,
               omnibarConfig.envId,
