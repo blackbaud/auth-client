@@ -45,7 +45,7 @@ describe('Omnibar toast container', () => {
     return document.querySelector('.sky-omnibar-toast-container');
   }
 
-  function validateIframeVisible(visible: boolean, height?: string): void {
+  function validateIframeVisible(visible: boolean, height?: string, top?: string): void {
     const iframeEl = getIframeEl();
 
     expect(getComputedStyle(iframeEl).visibility).toBe(visible ? 'visible' : 'hidden');
@@ -53,6 +53,40 @@ describe('Omnibar toast container', () => {
     if (height) {
       expect(getComputedStyle(iframeEl).height).toBe(height);
     }
+
+    if (top) {
+      expect(getComputedStyle(iframeEl).top).toBe(top);
+    }
+  }
+
+  function removeFakeOmnibar() {
+    const omnibarEl = document.querySelector('.sky-omnibar-iframe');
+
+    if (omnibarEl) {
+      omnibarEl.remove();
+    }
+
+    const envEl = document.querySelector('.sky-omnibar-environment');
+
+    if (envEl) {
+      envEl.remove();
+    }
+  }
+
+  function createFakeOmnibar(omnibarHeight: number, environmentHeight: number): void {
+    removeFakeOmnibar();
+
+    const omnibarEl = document.createElement('div');
+    omnibarEl.className = 'sky-omnibar-iframe';
+    omnibarEl.style.height = omnibarHeight + 'px';
+
+    document.body.appendChild(omnibarEl);
+
+    const envEl = document.createElement('div');
+    envEl.className = 'sky-omnibar-environment';
+    envEl.style.height = environmentHeight + 'px';
+
+    document.body.appendChild(envEl);
   }
 
   beforeAll(() => {
@@ -79,6 +113,8 @@ describe('Omnibar toast container', () => {
 
   afterEach(() => {
     BBOmnibarToastContainer.destroy();
+
+    removeFakeOmnibar();
   });
 
   afterAll(() => {
@@ -134,7 +170,29 @@ describe('Omnibar toast container', () => {
       messageType: 'toast-container-change'
     });
 
-    validateIframeVisible(true, '50px');
+    validateIframeVisible(true, '50px', '20px');
+
+    createFakeOmnibar(50, 20);
+
+    fireMessageEvent({
+      messageType: 'toast-ready'
+    });
+
+    fireMessageEvent({
+      height: 50,
+      messageType: 'toast-container-change'
+    });
+
+    validateIframeVisible(true, '50px', '90px');
+
+    createFakeOmnibar(80, 0);
+
+    fireMessageEvent({
+      height: 60,
+      messageType: 'toast-container-change'
+    });
+
+    validateIframeVisible(true, '60px', '100px');
 
     fireMessageEvent({
       height: 0,

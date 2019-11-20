@@ -65,6 +65,9 @@ import {
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
 
+  // tslint:disable-next-line:max-line-length
+  const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
+
   function loadOmnibar(config?: BBOmnibarConfig): void {
     config = config || {};
     config.url = BASE_URL;
@@ -178,7 +181,7 @@ describe('Omnibar', () => {
   beforeEach(() => {
     delete (window as any).BBHELP;
 
-    getTokenFake = () => Promise.resolve('some_token');
+    getTokenFake = () => Promise.resolve(testToken);
 
     navigateSpy.calls.reset();
     postOmnibarMessageSpy.calls.reset();
@@ -717,7 +720,6 @@ describe('Omnibar', () => {
         onSearch: (searchArgs) => {
           return undefined;
         },
-        previewPushNotifications: true,
         svcId,
         theme
       });
@@ -738,7 +740,6 @@ describe('Omnibar', () => {
         {
           compactNavOnly,
           enableHelp: undefined,
-          enablePushNotifications: true,
           envId,
           hideResourceLinks,
           leId,
@@ -849,7 +850,7 @@ describe('Omnibar', () => {
           getIframeEl(),
           {
             messageType: 'token',
-            token: 'some_token',
+            token: testToken,
             tokenRequestId: 123
           }
         );
@@ -902,7 +903,7 @@ describe('Omnibar', () => {
               getIframeEl(),
               {
                 messageType: 'refresh-user',
-                token: 'some_token'
+                token: testToken
               }
             );
 
@@ -1060,9 +1061,7 @@ describe('Omnibar', () => {
         cb(testNotifications);
       });
 
-      loadOmnibar({
-        previewPushNotifications: true
-      });
+      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'ready'
@@ -1074,9 +1073,7 @@ describe('Omnibar', () => {
         refreshUserCallback();
       });
 
-      loadOmnibar({
-        previewPushNotifications: true
-      });
+      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1112,9 +1109,7 @@ describe('Omnibar', () => {
         });
       });
 
-      loadOmnibar({
-        previewPushNotifications: true
-      });
+      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1140,9 +1135,51 @@ describe('Omnibar', () => {
         done();
       });
 
-      loadOmnibar({
-        previewPushNotifications: true
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
       });
+    });
+
+    it('should not connect to push notifications if the required entitlement is missing', (done) => {
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+
+        setTimeout(() => {
+          expect(toastContainerInitSpy).not.toHaveBeenCalled();
+
+          done();
+        });
+      });
+
+      // tslint:disable-next-line:max-line-length
+      getTokenFake = () => Promise.resolve('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
+
+    it('should connect to push notifications if the required entitlement is in an array in the JWT', (done) => {
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+
+        setTimeout(() => {
+          expect(toastContainerInitSpy).toHaveBeenCalled();
+
+          done();
+        });
+      });
+
+      // tslint:disable-next-line:max-line-length
+      getTokenFake = () => Promise.resolve('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjpbIm5vdGlmIiwiZm9vIl19.XskU9eHmCxzkRq0GIgmZd3MtFHZ9xaWJUWeuUkDjPb0');
+
+      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'get-token',

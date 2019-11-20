@@ -1,5 +1,7 @@
 //#region imports
 
+import * as jwtDecode from 'jwt-decode';
+
 import {
   BBAuth
 } from '../auth';
@@ -221,28 +223,52 @@ function openPushNotificationsMenu(): void {
   );
 }
 
+function hasNotificationsEntitlement(token: string): boolean {
+  const decodedToken: any = jwtDecode(token);
+  let entitlements: string | string[] = decodedToken['1bb.entitlements'];
+
+  if (entitlements) {
+    entitlements = Array.isArray(entitlements) ? entitlements : [entitlements];
+    return (entitlements as string[]).indexOf('notif') > -1;
+  }
+
+  return false;
+}
+
 function connectPushNotifications(): void {
-  if (omnibarConfig.previewPushNotifications && !pushNotificationsConnected) {
-    BBOmnibarToastContainer.init(openPushNotificationsMenu)
-      .then(() => {
-        BBOmnibarPushNotifications.connect(
-          omnibarConfig.leId,
-          omnibarConfig.envId,
-          (notifications) => {
-            BBAuthInterop.postOmnibarMessage(
-              iframeEl,
-              {
-                messageType: 'push-notifications-update',
-                pushNotifications: notifications
-              }
-            );
-
-            BBOmnibarToastContainer.showNewNotifications(notifications);
-          });
-        }
-      );
-
+  if (!pushNotificationsConnected) {
     pushNotificationsConnected = true;
+
+    BBAuth.getToken({
+      disableRedirect: true,
+      envId: omnibarConfig.envId,
+      leId: omnibarConfig.leId,
+      permissionScope: 'Notifications'
+    }).then((token: string) => {
+      if (hasNotificationsEntitlement(token)) {
+        BBOmnibarToastContainer.init(openPushNotificationsMenu)
+          .then(() => {
+            BBOmnibarPushNotifications.connect(
+              omnibarConfig.leId,
+              omnibarConfig.envId,
+              (notifications) => {
+                BBAuthInterop.postOmnibarMessage(
+                  iframeEl,
+                  {
+                    messageType: 'push-notifications-update',
+                    pushNotifications: notifications
+                  }
+                );
+
+                BBOmnibarToastContainer.showNewNotifications(notifications);
+              });
+            });
+      } else {
+        pushNotificationsConnected = false;
+      }
+    }).catch(() => {
+      pushNotificationsConnected = false;
+    });
   }
 }
 
@@ -250,6 +276,8 @@ function disconnectPushNotifications(): void {
   if (pushNotificationsConnected) {
     BBOmnibarToastContainer.destroy();
     BBOmnibarPushNotifications.disconnect();
+
+    pushNotificationsConnected = false;
   }
 }
 
@@ -443,7 +471,6 @@ function messageHandler(event: MessageEvent): void {
         {
           compactNavOnly: omnibarConfig.compactNavOnly,
           enableHelp: omnibarConfig.enableHelp,
-          enablePushNotifications: omnibarConfig.previewPushNotifications,
           envId: omnibarConfig.envId,
           hideResourceLinks: omnibarConfig.hideResourceLinks,
           leId: omnibarConfig.leId,

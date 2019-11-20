@@ -11,7 +11,7 @@ function createConfig(libraryTarget, mode, target, name) {
       libraryTarget
     },
     resolve: {
-      extensions: ['.ts']
+      extensions: ['.ts', '.js']
     },
     module: {
       rules: [

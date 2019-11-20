@@ -13,6 +13,7 @@ import {
 const CLS_TOAST_CONTAINER = 'sky-omnibar-toast-container';
 const CLS_TOAST_CONTAINER_READY = `${CLS_TOAST_CONTAINER}-ready`;
 const CLS_TOAST_CONTAINER_EMPTY = `${CLS_TOAST_CONTAINER}-empty`;
+const TOAST_CONTAINER_PADDING = 20;
 
 let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
@@ -29,10 +30,11 @@ function getContainerEl(): HTMLDivElement {
   border: none;
   display: none;
   position: fixed;
-  bottom: 0px;
   right: 0px;
   height: 0px;
   width: 300px;
+  /* z-index is 1 less than omnibar so menus will display over top the toast container */
+  z-index: 999;
 }
 
 .${CLS_TOAST_CONTAINER_READY} {
@@ -58,6 +60,20 @@ function getContainerEl(): HTMLDivElement {
   return iframeEl;
 }
 
+function getElHeight(selector: string): number {
+  const el = document.querySelector(selector);
+
+  if (el) {
+    return el.getBoundingClientRect().height;
+  }
+
+  return 0;
+}
+
+function getOmnibarHeight(): number {
+  return getElHeight('.sky-omnibar-iframe') + getElHeight('.sky-omnibar-environment');
+}
+
 function messageHandler(event: MessageEvent): void {
   if (!BBAuthInterop.messageIsFromOmnibar(event)) {
     return;
@@ -81,6 +97,8 @@ function messageHandler(event: MessageEvent): void {
     case 'toast-container-change':
       if (message.height > 0) {
         iframeEl.style.height = message.height + 'px';
+        iframeEl.style.top = (getOmnibarHeight() + TOAST_CONTAINER_PADDING) + 'px';
+
         iframeEl.classList.remove(CLS_TOAST_CONTAINER_EMPTY);
       } else {
         iframeEl.classList.add(CLS_TOAST_CONTAINER_EMPTY);
