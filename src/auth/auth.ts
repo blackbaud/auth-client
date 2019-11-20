@@ -19,6 +19,10 @@ import {
 //#endregion
 
 const TOKENIZED_URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?\/(.*)/;
+const SCS_INDEX = 1;
+const SERVICE_INDEX = 2;
+const ZONE_INDEX = 3;
+const ENDPOINT_INDEX = 4;
 
 function buildCacheKey(args: BBAuthGetTokenArgs) {
   const { envId, permissionScope, leId } = args;
@@ -57,11 +61,11 @@ export class BBAuth {
     }
 
     if (match) {
-      if (match[3]) {
-        zone = match[3].substring(1);
+      if (match[ZONE_INDEX]) {
+        zone = match[ZONE_INDEX].substring(1);
       }
       // https://eng-pusa01.app.blackbaud.net/hub00/version
-      result = `https://${match[1]}-${zone}.app.blackbaud.net/${match[2]}/${match[4]}`;
+      result = `https://${match[SCS_INDEX]}-${zone}.app.blackbaud.net/${match[SERVICE_INDEX]}/${match[ENDPOINT_INDEX]}`;
     }
     return Promise.resolve(result);
   }
