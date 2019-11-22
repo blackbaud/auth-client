@@ -90,19 +90,22 @@ function startActivityTimer() {
       legacyTtl,
       currentAllowAnonymous
     ).then((expirationDate) => {
-      BBOmnibarUserActivityProcessor.process({
-        allowAnonymous: currentAllowAnonymous,
-        closeInactivityPrompt,
-        expirationDate,
-        inactivityPromptDuration: BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION,
-        isShowingInactivityPrompt,
-        lastActivity,
-        maxSessionAge: BBOmnibarUserActivity.MAX_SESSION_AGE,
-        minRenewalAge: BBOmnibarUserActivity.MIN_RENEWAL_AGE,
-        redirectForInactivity,
-        renewSession,
-        showInactivityPrompt
-      });
+      // Verify activity tracking didn't stop since session expiration retrieval began.
+      if (isTracking) {
+        BBOmnibarUserActivityProcessor.process({
+          allowAnonymous: currentAllowAnonymous,
+          closeInactivityPrompt,
+          expirationDate,
+          inactivityPromptDuration: BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION,
+          isShowingInactivityPrompt,
+          lastActivity,
+          maxSessionAge: BBOmnibarUserActivity.MAX_SESSION_AGE,
+          minRenewalAge: BBOmnibarUserActivity.MIN_RENEWAL_AGE,
+          redirectForInactivity,
+          renewSession,
+          showInactivityPrompt
+        });
+      }
     });
   }, BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL);
 }
