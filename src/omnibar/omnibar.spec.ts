@@ -60,6 +60,10 @@ import {
   BBOmnibarToastContainer
 } from './omnibar-toast-container';
 
+import {
+  BBOmnibarToastContainerInitArgs
+} from './omnibar-toast-container-init-args';
+
 //#endregion
 
 describe('Omnibar', () => {
@@ -117,6 +121,7 @@ describe('Omnibar', () => {
   let pushNotificationsConnectSpy: jasmine.Spy;
   let pushNotificationsDisconnectSpy: jasmine.Spy;
   let toastContainerInitSpy: jasmine.Spy;
+  let toastContainerUpdateUrlSpy: jasmine.Spy;
   let toastContainerShowNewSpy: jasmine.Spy;
   let toastContainerDestroySpy: jasmine.Spy;
 
@@ -155,6 +160,11 @@ describe('Omnibar', () => {
       BBOmnibarToastContainer,
       'init'
     ).and.returnValue(Promise.resolve());
+
+    toastContainerUpdateUrlSpy = spyOn(
+      BBOmnibarToastContainer,
+      'updateUrl'
+    );
 
     toastContainerShowNewSpy = spyOn(
       BBOmnibarToastContainer,
@@ -1139,8 +1149,8 @@ describe('Omnibar', () => {
         refreshUserCallback();
       });
 
-      toastContainerInitSpy.and.callFake((openPushNotificationsCallback: () => void) => {
-        openPushNotificationsCallback();
+      toastContainerInitSpy.and.callFake((args: BBOmnibarToastContainerInitArgs) => {
+        args.openMenuCallback();
 
         expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
           getIframeEl(),
@@ -1188,6 +1198,8 @@ describe('Omnibar', () => {
 
         setTimeout(() => {
           expect(toastContainerInitSpy).toHaveBeenCalled();
+
+          expect(toastContainerUpdateUrlSpy).toHaveBeenCalledWith(location.href);
 
           done();
         });
