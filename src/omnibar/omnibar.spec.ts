@@ -60,6 +60,10 @@ import {
   BBOmnibarToastContainer
 } from './omnibar-toast-container';
 
+import {
+  BBOmnibarToastContainerInitArgs
+} from './omnibar-toast-container-init-args';
+
 //#endregion
 
 describe('Omnibar', () => {
@@ -989,7 +993,7 @@ describe('Omnibar', () => {
         messageType: 'ready'
       });
 
-      expect(postOmnibarMessageSpy.calls.argsFor(3)).toEqual([
+      expect(postOmnibarMessageSpy.calls.argsFor(2)).toEqual([
         getIframeEl(),
         {
           messageType: 'notifications-update',
@@ -1128,8 +1132,8 @@ describe('Omnibar', () => {
         refreshUserCallback();
       });
 
-      toastContainerInitSpy.and.callFake((openPushNotificationsCallback: () => void) => {
-        openPushNotificationsCallback();
+      toastContainerInitSpy.and.callFake((args: BBOmnibarToastContainerInitArgs) => {
+        args.openMenuCallback();
 
         expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
           getIframeEl(),

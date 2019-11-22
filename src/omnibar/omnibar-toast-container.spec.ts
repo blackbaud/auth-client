@@ -1,6 +1,10 @@
 //#region imports
 
 import {
+  BBAuth
+} from '../auth';
+
+import {
   BBOmnibarToastContainer
 } from './omnibar-toast-container';
 
@@ -11,17 +15,24 @@ import {
 //#endregion
 
 describe('Omnibar toast container', () => {
-
   const CONTAINER_URL = 'about:blank';
 
-  let messageIsFromOmnibarReturnValue: boolean;
+  // tslint:disable-next-line:max-line-length
+  const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
+
+  let messageIsFromToastContainerReturnValue: boolean;
+  let getTokenSpy: jasmine.Spy;
   let openMenuCallbackSpy: jasmine.Spy;
   let postOmnibarMessageSpy: jasmine.Spy;
   let previousContainerUrl: string;
+  let navigateCallbackSpy: jasmine.Spy;
+  let navigateUrlCallbackSpy: jasmine.Spy;
+
+  let getTokenFake: () => Promise<string>;
 
   function fireMessageEvent(data: any, includeSource = true): void {
     if (includeSource) {
-      data.source = 'skyux-spa-omnibar';
+      data.source = 'skyux-spa-omnibar-toast-container';
     }
 
     window.dispatchEvent(
@@ -32,7 +43,15 @@ describe('Omnibar toast container', () => {
   }
 
   function loadToastContainer(): Promise<any> {
-    const initPromise = BBOmnibarToastContainer.init(openMenuCallbackSpy);
+    const initPromise = BBOmnibarToastContainer.init({
+      envId: 'abc',
+      leId: '123',
+      navigateCallback: navigateCallbackSpy,
+      navigateUrlCallback: navigateUrlCallbackSpy,
+      openMenuCallback: openMenuCallbackSpy,
+      svcId: 'xyz',
+      url: 'https://example.com/init'
+    });
 
     fireMessageEvent({
       messageType: 'toast-ready'
@@ -94,20 +113,31 @@ describe('Omnibar toast container', () => {
 
     (BBOmnibarToastContainer as any).CONTAINER_URL = CONTAINER_URL;
 
-    messageIsFromOmnibarReturnValue = true;
+    messageIsFromToastContainerReturnValue = true;
   });
 
   beforeEach(() => {
-    messageIsFromOmnibarReturnValue = true;
+    messageIsFromToastContainerReturnValue = true;
 
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
     openMenuCallbackSpy = jasmine.createSpy('openMenuCallback');
+    navigateCallbackSpy = jasmine.createSpy('navigateCallback');
+    navigateUrlCallbackSpy = jasmine.createSpy('navigateUrlCallback');
+
+    getTokenFake = () => Promise.resolve(testToken);
+
+    getTokenSpy = spyOn(
+      BBAuth,
+      'getToken'
+    ).and.callFake(() => {
+      return getTokenFake();
+    });
 
     spyOn(
       BBAuthInterop,
-      'messageIsFromOmnibar'
+      'messageIsFromToastContainer'
     ).and.callFake(() => {
-      return messageIsFromOmnibarReturnValue;
+      return messageIsFromToastContainerReturnValue;
     });
   });
 
@@ -143,7 +173,7 @@ describe('Omnibar toast container', () => {
   });
 
   it('should ignore messages that do not originate from the toast container', () => {
-    messageIsFromOmnibarReturnValue = false;
+    messageIsFromToastContainerReturnValue = false;
 
     loadToastContainer();
 
@@ -257,9 +287,45 @@ describe('Omnibar toast container', () => {
     expect(openMenuCallbackSpy).toHaveBeenCalled();
   });
 
-  it('should post a message with the current URL', () => {
-    BBOmnibarToastContainer.updateUrl('https://example.com/1');
+  it('should call the specified navigate callback', () => {
+    loadToastContainer();
 
+    fireMessageEvent({
+      messageType: 'toast-ready'
+    });
+
+    expect(navigateCallbackSpy).not.toHaveBeenCalled();
+
+    fireMessageEvent({
+      messageType: 'navigate',
+      navItem: {
+        url: 'https://example.com/navigate'
+      }
+    });
+
+    expect(navigateCallbackSpy).toHaveBeenCalledWith({
+      url: 'https://example.com/navigate'
+    });
+  });
+
+  it('should call the specified navigate URL callback', () => {
+    loadToastContainer();
+
+    fireMessageEvent({
+      messageType: 'toast-ready'
+    });
+
+    expect(navigateUrlCallbackSpy).not.toHaveBeenCalled();
+
+    fireMessageEvent({
+      messageType: 'navigate-url',
+      url: 'https://example.com/navigate-url'
+    });
+
+    expect(navigateUrlCallbackSpy).toHaveBeenCalledWith('https://example.com/navigate-url');
+  });
+
+  it('should post a message with the current URL', () => {
     loadToastContainer();
 
     fireMessageEvent({
@@ -272,7 +338,7 @@ describe('Omnibar toast container', () => {
     expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
       iframeEl,
       {
-        href: 'https://example.com/1',
+        href: 'https://example.com/init',
         messageType: 'location-change'
       }
     );
@@ -287,6 +353,66 @@ describe('Omnibar toast container', () => {
         messageType: 'location-change'
       }
     );
+  });
+
+  it('should not post a message with the current URL if the toast container has not been initialized', () => {
+    BBOmnibarToastContainer.updateUrl('https://example.com/2');
+
+    // Validate subsequent URLs are posted.
+    expect(postOmnibarMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it('should notify the toast container when a requested token is available', (done) => {
+    loadToastContainer();
+
+    postOmnibarMessageSpy.calls.reset();
+
+    postOmnibarMessageSpy.and.callFake(() => {
+      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+        getIframeEl(),
+        {
+          messageType: 'token',
+          token: testToken,
+          tokenRequestId: 123
+        }
+      );
+
+      done();
+    });
+
+    fireMessageEvent({
+      messageType: 'get-token',
+      tokenRequestId: 123
+    });
+  });
+
+  it('should notify the toast container when a requested token is not available', (done) => {
+    getTokenFake = () => {
+      return Promise.reject('The user is not logged in.');
+    };
+
+    loadToastContainer();
+
+    postOmnibarMessageSpy.calls.reset();
+
+    postOmnibarMessageSpy.and.callFake(() => {
+      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+        getIframeEl(),
+        {
+          messageType: 'token-fail',
+          reason: 'The user is not logged in.',
+          tokenRequestId: 123
+        }
+      );
+
+      done();
+    });
+
+    fireMessageEvent({
+      disableRedirect: false,
+      messageType: 'get-token',
+      tokenRequestId: 123
+    });
   });
 
 });
