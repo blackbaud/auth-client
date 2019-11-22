@@ -125,7 +125,7 @@ describe('Omnibar toast container', () => {
 
     getTokenFake = () => Promise.resolve(testToken);
 
-    getTokenSpy = spyOn(
+    spyOn(
       BBAuth,
       'getToken'
     ).and.callFake(() => {
