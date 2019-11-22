@@ -1,12 +1,20 @@
 //#region imports
 
 import {
+  BBAuth
+} from '../auth/auth';
+
+import {
   BBAuthDomUtility
 } from '../shared/dom-utility';
 
 import {
   BBAuthInterop
 } from '../shared/interop';
+
+import {
+  BBOmnibarToastContainerInitArgs
+} from './omnibar-toast-container-init-args';
 
 //#endregion
 
@@ -19,7 +27,39 @@ let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
 let initPromise: Promise<void>;
 let initResolve: () => void;
-let currentOpenMenuCallback: () => void;
+let initArgs: BBOmnibarToastContainerInitArgs;
+let currentUrl: string;
+
+function handleGetToken(
+  tokenRequestId: any,
+  disableRedirect: boolean
+): void {
+  BBAuth.getToken({
+    disableRedirect
+  })
+    .then(
+      (token: string) => {
+        BBAuthInterop.postOmnibarMessage(
+          iframeEl,
+          {
+            messageType: 'token',
+            token,
+            tokenRequestId
+          }
+        );
+      },
+      (reason: any) => {
+        BBAuthInterop.postOmnibarMessage(
+          iframeEl,
+          {
+            messageType: 'token-fail',
+            reason,
+            tokenRequestId
+          }
+        );
+      }
+    );
+}
 
 function getContainerEl(): HTMLDivElement {
   /* istanbul ignore else */
@@ -74,8 +114,20 @@ function getOmnibarHeight(): number {
   return getElHeight('.sky-omnibar-iframe') + getElHeight('.sky-omnibar-environment');
 }
 
+function postLocationChangeMessage(): void {
+  if (iframeEl) {
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        href: currentUrl,
+        messageType: 'location-change'
+      }
+    );
+  }
+}
+
 function messageHandler(event: MessageEvent): void {
-  if (!BBAuthInterop.messageIsFromOmnibar(event)) {
+  if (!BBAuthInterop.messageIsFromToastContainer(event)) {
     return;
   }
 
@@ -90,9 +142,36 @@ function messageHandler(event: MessageEvent): void {
         }
       );
 
+      // Even though the toast container doesn't care about omnibar navigation per se, it does need
+      // the environment ID/legal entity ID/service ID values for analytics. Since the omnibar uses
+      // the 'nav-ready' message type to post these values, use that same pattern here.
+      BBAuthInterop.postOmnibarMessage(
+        iframeEl,
+        {
+          envId: initArgs.envId,
+          leId: initArgs.leId,
+          messageType: 'nav-ready',
+          svcId: initArgs.svcId
+        }
+      );
+
+      postLocationChangeMessage();
+
       iframeEl.classList.add(CLS_TOAST_CONTAINER_READY);
 
       initResolve();
+      break;
+    case 'get-token':
+      handleGetToken(
+        message.tokenRequestId,
+        message.disableRedirect
+      );
+      break;
+    case 'navigate-url':
+      initArgs.navigateUrlCallback(message.url);
+      break;
+    case 'navigate':
+      initArgs.navigateCallback(message.navItem);
       break;
     case 'toast-container-change':
       if (message.height > 0) {
@@ -106,7 +185,7 @@ function messageHandler(event: MessageEvent): void {
 
       break;
     case 'push-notifications-open':
-      currentOpenMenuCallback();
+      initArgs.openMenuCallback();
       break;
   }
 }
@@ -115,8 +194,10 @@ export class BBOmnibarToastContainer {
 
   public static readonly CONTAINER_URL = 'https://host.nxt.blackbaud.com/omnibar/toast';
 
-  public static init(openMenuCallback: () => void): Promise<void> {
-    currentOpenMenuCallback = openMenuCallback;
+  public static init(args: BBOmnibarToastContainerInitArgs): Promise<void> {
+    initArgs = args;
+
+    currentUrl = args.url;
 
     if (!initPromise) {
       initPromise = new Promise((resolve) => {
@@ -138,6 +219,12 @@ export class BBOmnibarToastContainer {
     );
   }
 
+  public static updateUrl(url: string): void {
+    currentUrl = url;
+
+    postLocationChangeMessage();
+  }
+
   public static destroy(): void {
     if (styleEl) {
       BBAuthDomUtility.removeCss(styleEl);
@@ -147,8 +234,9 @@ export class BBOmnibarToastContainer {
       BBAuthDomUtility.removeEl(iframeEl);
     }
 
-    currentOpenMenuCallback =
+    currentUrl =
       iframeEl =
+      initArgs =
       initPromise =
       initResolve =
       styleEl =

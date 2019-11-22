@@ -189,13 +189,17 @@ function expandIframe(): void {
 }
 
 function handleStateChange(): void {
+  const url = document.location.href;
+
   BBAuthInterop.postOmnibarMessage(
     iframeEl,
     {
-      href: document.location.href,
+      href: url,
       messageType: 'location-change'
     }
   );
+
+  BBOmnibarToastContainer.updateUrl(url);
 }
 
 function handleSearch(searchArgs: BBOmnibarSearchArgs): void {
@@ -246,7 +250,15 @@ function connectPushNotifications(): void {
       permissionScope: 'Notifications'
     }).then((token: string) => {
       if (hasNotificationsEntitlement(token)) {
-        BBOmnibarToastContainer.init(openPushNotificationsMenu)
+        BBOmnibarToastContainer.init({
+          envId: omnibarConfig.envId,
+          leId: omnibarConfig.leId,
+          navigateCallback: handleNavigate,
+          navigateUrlCallback: handleNavigateUrl,
+          openMenuCallback: openPushNotificationsMenu,
+          svcId: omnibarConfig.svcId,
+          url: document.location.href
+        })
           .then(() => {
             BBOmnibarPushNotifications.connect(
               omnibarConfig.leId,
@@ -400,6 +412,18 @@ function handleEnvironmentUpdate(name: string) {
   }
 }
 
+function handleNavigate(navItem: BBOmnibarNavigationItem): void {
+  const nav = omnibarConfig.nav;
+
+  if (!nav || !nav.beforeNavCallback || nav.beforeNavCallback(navItem) !== false) {
+    BBAuthNavigator.navigate(navItem.url);
+  }
+}
+
+function handleNavigateUrl(url: string): void {
+  BBAuthNavigator.navigate(url);
+}
+
 function monkeyPatchState(): void {
   const oldPushState = history.pushState;
   const oldReplaceState = history.replaceState;
@@ -503,15 +527,10 @@ function messageHandler(event: MessageEvent): void {
       collapseIframe();
       break;
     case 'navigate-url':
-      BBAuthNavigator.navigate(message.url);
+      handleNavigateUrl(message.url);
       break;
     case 'navigate':
-      const navItem: BBOmnibarNavigationItem = message.navItem;
-
-      if (!nav || !nav.beforeNavCallback || nav.beforeNavCallback(navItem) !== false) {
-        BBAuthNavigator.navigate(navItem.url);
-      }
-
+      handleNavigate(message.navItem);
       break;
     case 'search':
       handleSearch(message.searchArgs);
