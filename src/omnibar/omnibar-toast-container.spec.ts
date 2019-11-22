@@ -21,7 +21,6 @@ describe('Omnibar toast container', () => {
   const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
 
   let messageIsFromToastContainerReturnValue: boolean;
-  let getTokenSpy: jasmine.Spy;
   let openMenuCallbackSpy: jasmine.Spy;
   let postOmnibarMessageSpy: jasmine.Spy;
   let previousContainerUrl: string;
