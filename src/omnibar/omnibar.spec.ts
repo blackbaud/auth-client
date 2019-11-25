@@ -344,9 +344,9 @@ describe('Omnibar', () => {
   describe('interop with host page', () => {
 
     it('should ignore messages that do not originate from omnibar', () => {
-      loadOmnibar();
-
       messageIsFromOmnibarReturnValue = false;
+
+      loadOmnibar();
 
       fireMessageEvent(
         {
