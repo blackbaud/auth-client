@@ -1,3 +1,7 @@
+# 2.20.0 (2019-11-25)
+
+- Added logic to notify the omnibar toast container of the page's current URL. [#118](https://github.com/blackbaud/auth-client/pull/118)
+
 # 2.19.0 (2019-11-13)
 
 - Moved notification toasts to the top of the page. [#111](https://github.com/blackbaud/auth-client/pull/111)
