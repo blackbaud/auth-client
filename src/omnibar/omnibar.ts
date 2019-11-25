@@ -592,7 +592,7 @@ function buildOmnibarUrl(): string {
 
 function updateTitle(): void {
   if (currentTitleParts) {
-    const titleParts: string[] = currentTitleParts.slice();
+    const titleParts = currentTitleParts.slice();
 
     if (serviceName) {
       titleParts.push(serviceName);
