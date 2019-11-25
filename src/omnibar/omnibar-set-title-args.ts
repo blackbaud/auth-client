@@ -1,3 +1,3 @@
 export interface BBOmnibarSetTitleArgs {
-  titleParts?: string[];
+  titleParts: string[];
 }
