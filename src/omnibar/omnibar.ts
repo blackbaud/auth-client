@@ -35,6 +35,10 @@ import {
 } from './omnibar-search-args';
 
 import {
+  BBOmnibarSetTitleArgs
+} from './omnibar-set-title-args';
+
+import {
   BBOmnibarUserActivity
 } from './omnibar-user-activity';
 
@@ -71,6 +75,9 @@ let omnibarConfig: BBOmnibarConfig;
 let currentLegacyKeepAliveUrl: string;
 let promiseResolve: () => void;
 let pushNotificationsConnected: boolean;
+let unreadNotificationCount: number;
+let serviceName: string;
+let currentTitleParts: string[];
 
 function addIframeEl(): void {
   iframeEl = BBAuthDomUtility.addIframe(
@@ -273,6 +280,12 @@ function connectPushNotifications(): void {
                 );
 
                 BBOmnibarToastContainer.showNewNotifications(notifications);
+
+                unreadNotificationCount = notifications &&
+                  notifications.notifications &&
+                  notifications.notifications.filter((notification: any) => !notification.isRead).length;
+
+                updateTitle();
               });
             });
       } else {
@@ -562,6 +575,10 @@ function messageHandler(event: MessageEvent): void {
       currentLegacyKeepAliveUrl = message.url;
       startActivityTracking();
       break;
+
+    case 'selected-service-update':
+      serviceName = message.serviceName;
+      updateTitle();
   }
 }
 
@@ -571,6 +588,24 @@ function buildOmnibarUrl(): string {
     'https://host.nxt.blackbaud.com/omnibar/';
 
   return omnibarUrl;
+}
+
+function updateTitle(): void {
+  if (currentTitleParts) {
+    const titleParts = currentTitleParts.slice();
+
+    if (serviceName) {
+      titleParts.push(serviceName);
+    }
+
+    let title = titleParts.join(' - ');
+
+    if (unreadNotificationCount) {
+      title = `(${unreadNotificationCount}) ${title}`;
+    }
+
+    document.title = title;
+  }
 }
 
 export class BBOmnibar {
@@ -606,6 +641,11 @@ export class BBOmnibar {
     );
   }
 
+  public static setTitle(args: BBOmnibarSetTitleArgs): void {
+    currentTitleParts = args && args.titleParts;
+    updateTitle();
+  }
+
   public static destroy(): void {
     BBOmnibarToastContainer.destroy();
     BBOmnibarPushNotifications.disconnect();
@@ -625,6 +665,9 @@ export class BBOmnibar {
       envEl =
       promiseResolve =
       pushNotificationsConnected =
+      unreadNotificationCount =
+      currentTitleParts =
+      serviceName =
       undefined;
   }
 }

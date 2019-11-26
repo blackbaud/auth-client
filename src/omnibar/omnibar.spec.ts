@@ -72,6 +72,9 @@ describe('Omnibar', () => {
   // tslint:disable-next-line:max-line-length
   const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
 
+  // tslint:disable-next-line:max-line-length
+  const testTokenWithNotificationEntitlement = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjpbIm5vdGlmIiwiZm9vIl19.XskU9eHmCxzkRq0GIgmZd3MtFHZ9xaWJUWeuUkDjPb0';
+
   function loadOmnibar(config?: BBOmnibarConfig): void {
     config = config || {};
     config.url = BASE_URL;
@@ -593,6 +596,78 @@ describe('Omnibar', () => {
       );
     });
 
+    it('should set the document title with the service name if setTitle has been called with empty title parts', () => {
+      loadOmnibar();
+
+      const serviceName = 'test service';
+
+      BBOmnibar.setTitle({
+        titleParts: []
+      });
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      expect(document.title).toBe(serviceName);
+    });
+
+    it('should not set the document title with the service name if setTitle has not been called', () => {
+      loadOmnibar();
+
+      const serviceName = 'test service 2';
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      expect(document.title).not.toBe(serviceName);
+    });
+
+    it('should set the document title with the number of unread notifications', (done) => {
+      pushNotificationsConnectSpy.and.callFake((envId, leId, cb) => {
+        expect(document.title).toBe('with notifications - test service');
+
+        cb(
+          {
+            notifications: [
+              {
+                notificationId: '1',
+                shortMessage: 'Hello world'
+              }
+            ]
+          }
+        );
+
+        expect(document.title).toBe('(1) with notifications - test service');
+
+        done();
+      });
+
+      getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'ready'
+      });
+
+      const serviceName = 'test service';
+
+      BBOmnibar.setTitle({
+        titleParts: [
+          'with notifications'
+        ]
+      });
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+    });
+
     it('should show the inactivity prompt', (done) => {
       const showSpy = spyOn(BBOmnibarUserActivityPrompt, 'show');
 
@@ -1034,15 +1109,32 @@ describe('Omnibar', () => {
       BBOmnibar.update(updateArgs);
     });
 
+    it('should update the document title when setTitle() is called', () => {
+      const serviceName = 'Test Service';
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      BBOmnibar.setTitle({titleParts: ['Dropdown', 'Components']});
+
+      expect(document.title).toBe('Dropdown - Components - Test Service');
+    });
+
     it('should notify the omnibar and the toast container when new push notifications arrive', (done) => {
       let notificationsUpdatePosted: boolean;
 
-      const testNotifications = [
-        {
-          notificationId: '1',
-          shortMessage: 'Hello world'
-        }
-      ];
+      const testNotifications = {
+        notifications: [
+          {
+            notificationId: '1',
+            shortMessage: 'Hello world'
+          }
+        ]
+      };
 
       postOmnibarMessageSpy.and.callFake(
         (iframeEl: HTMLIFrameElement, data: any) => {
@@ -1188,8 +1280,7 @@ describe('Omnibar', () => {
         });
       });
 
-      // tslint:disable-next-line:max-line-length
-      getTokenFake = () => Promise.resolve('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjpbIm5vdGlmIiwiZm9vIl19.XskU9eHmCxzkRq0GIgmZd3MtFHZ9xaWJUWeuUkDjPb0');
+      getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
 
       loadOmnibar();
 
