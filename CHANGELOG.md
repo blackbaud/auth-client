@@ -1,3 +1,7 @@
+# 2.21.0 (2019-11-26)
+
+- Added a `setTitle()` method to `BBOmnibar` to enable setting the window title while preserving the omnibar's selected service name and unread notification count in the title. [#116](https://github.com/blackbaud/auth-client/pull/116)
+
 # 2.20.0 (2019-11-25)
 
 - Added logic to notify the omnibar toast container of the page's current URL. [#118](https://github.com/blackbaud/auth-client/pull/118)
