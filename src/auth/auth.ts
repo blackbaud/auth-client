@@ -18,12 +18,21 @@ import {
 
 //#endregion
 
-export const TOKENIZED_URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?(:[0-9]+)?\/(.*)/;
-export const SCS_INDEX = 1;
-export const SERVICE_INDEX = 2;
-export const ZONE_INDEX = 3;
-export const LOCAL_PORT_INDEX = 4;
-export const ENDPOINT_INDEX = 5;
+const TOKENIZED_URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?(:[0-9]+)?\/(.*)/;
+const SCS_INDEX = 1;
+const SERVICE_INDEX = 2;
+const ZONE_INDEX = 3;
+const LOCAL_PORT_INDEX = 4;
+const ENDPOINT_INDEX = 5;
+
+export interface OneBBUrlExtraction {
+  endpoint: string;
+  port: string;
+  scs: string;
+  service: string;
+  url: string;
+  zone: string;
+}
 
 function buildCacheKey(args: BBAuthGetTokenArgs) {
   const { envId, permissionScope, leId } = args;
@@ -47,28 +56,58 @@ export class BBAuth {
     }
   } = {};
 
+  public static extractUrl(
+    input: string,
+    zone?: string
+  ): OneBBUrlExtraction {
+    let url = input;
+    let scs;
+    let service;
+    let port;
+    let endpoint;
+
+    const match = TOKENIZED_URL_REGEX.exec(input);
+
+    if (match) {
+      scs = match[SCS_INDEX];
+      service = match[SERVICE_INDEX];
+      endpoint = match[ENDPOINT_INDEX];
+
+      if (match[ZONE_INDEX]) {
+        zone = match[ZONE_INDEX];
+      }
+      if (zone) {
+        zone = zone.replace('-', '');
+      }
+      // https://eng-pusa01.app.blackbaud.net/hub00/version
+      url = `https://${scs}-${zone}.app.blackbaud.net/${service}/${endpoint}`;
+
+      port = match[LOCAL_PORT_INDEX];
+      if (port) {
+        port = port.replace(':', '');
+      }
+    }
+    return {
+      endpoint,
+      port,
+      scs,
+      service,
+      url,
+      zone
+    };
+  }
+
   public static getUrl(
     tokenizedUrl: string,
     args?: BBAuthGetUrlArgs
   ): Promise<string> {
+    const zone = args ? args.zone : undefined;
+
     // Returning a promise so eventually this could be enhanced
     // to use a service discovery solution instead of using a convention.
-    const match = TOKENIZED_URL_REGEX.exec(tokenizedUrl);
-    let result = tokenizedUrl;
-    let zone = args ? args.zone : undefined;
-
-    if (zone) {
-      zone = zone.replace('-', '');
-    }
-
-    if (match) {
-      if (match[ZONE_INDEX]) {
-        zone = match[ZONE_INDEX].substring(1);
-      }
-      // https://eng-pusa01.app.blackbaud.net/hub00/version
-      result = `https://${match[SCS_INDEX]}-${zone}.app.blackbaud.net/${match[SERVICE_INDEX]}/${match[ENDPOINT_INDEX]}`;
-    }
-    return Promise.resolve(result);
+    return Promise.resolve(
+      this.extractUrl(tokenizedUrl, zone).url
+    );
   }
 
   public static getToken(

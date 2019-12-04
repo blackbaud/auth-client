@@ -247,7 +247,7 @@ describe('Auth', () => {
     });
   });
 
-  it('should tokenized urls honoring the hard-coded zone, while ignoring any port protocol information', (done) => {
+  it('should tokenize urls honoring the hard-coded zone, while ignoring any port protocol information', (done) => {
     BBAuth.getUrl(
       '1bb://eng-hub00-pusa01:8080/version'
     ).then((url: string) => {
@@ -256,7 +256,7 @@ describe('Auth', () => {
     });
   });
 
-  it('should tokenized urls getting the zone from the token, while ignoring any port protocol information', (done) => {
+  it('should tokenize urls getting the zone from the token, while ignoring any port protocol information', (done) => {
     BBAuth.getUrl(
       '1bb://eng-hub00:8080/version',
       {
