@@ -29,7 +29,7 @@ export class BBAuthTokenIntegration {
     }
 
     return BBCsrfXhr.request(
-      BBAuthGetDomain.getSTSDomain(this.getLocationHostname()) + '/oauth2/token',
+      BBAuthGetDomain.getSTSDomain() + '/oauth2/token',
       // todo ac validate that this does what we expect
       undefined,
       disableRedirect,

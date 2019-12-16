@@ -4,6 +4,7 @@ import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
 
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
+import { BBAuthGetDomain } from '../auth/auth-get-domain';
 import { BBAuthNavigator } from '../shared/navigator';
 
 let isTracking: boolean;
@@ -44,7 +45,7 @@ function renewSession() {
     lastRenewal = now;
 
     BBCsrfXhr.request(
-      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
+      BBAuthGetDomain.getSTSDomain() + '/session/renew',
       {
         inactivity: 1
       }

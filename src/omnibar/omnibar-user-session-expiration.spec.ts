@@ -1,13 +1,18 @@
 import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
 
+import { BBAuthGetDomain } from '../auth/auth-get-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 describe('Omnibar user session expiration', () => {
   let requestSpy: jasmine.Spy;
+  let domainSpy: jasmine.Spy;
   let authTtl: number;
   let ttlPromiseOverride: Promise<number>;
 
   beforeAll(() => {
+    domainSpy = spyOn(BBAuthGetDomain, 'getSTSDomain').and
+      .returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
       switch (url.substr('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/'.length)) {
         case 'ttl':
@@ -38,6 +43,7 @@ describe('Omnibar user session expiration', () => {
     )
       .then((expirationDate) => {
         expect(expirationDate).toBeNull();
+        expect(domainSpy).toHaveBeenCalled();
         done();
       });
   });
@@ -54,6 +60,7 @@ describe('Omnibar user session expiration', () => {
     )
       .then((expirationDate) => {
         expect(expirationDate).toBe(150000);
+        expect(domainSpy).toHaveBeenCalled();
         done();
       });
   });
@@ -72,7 +79,7 @@ describe('Omnibar user session expiration', () => {
     )
       .then((expirationDate1) => {
         expect(expirationDate1).toBe(150000);
-
+        expect(domainSpy).toHaveBeenCalled();
         BBOmnibarUserSessionExpiration.reset();
 
         BBOmnibarUserSessionExpiration.getSessionExpiration(
@@ -99,7 +106,7 @@ describe('Omnibar user session expiration', () => {
     )
       .then((expirationDate) => {
         expect(expirationDate).toBe(150000);
-
+        expect(domainSpy).toHaveBeenCalled();
         // Simulate the passage of time which should not affect the cached expiration date.
         nowSpy.and.returnValue(200000);
 
@@ -143,6 +150,7 @@ describe('Omnibar user session expiration', () => {
           )
             .then((newExpirationDate) => {
               expect(newExpirationDate).toBe(250000);
+              expect(domainSpy).toHaveBeenCalled();
               done();
             });
         }, 200);
@@ -160,6 +168,7 @@ describe('Omnibar user session expiration', () => {
     )
       .then((expirationDate) => {
         expect(expirationDate).toBeNull();
+        expect(domainSpy).toHaveBeenCalled();
         done();
       });
   });
