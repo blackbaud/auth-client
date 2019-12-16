@@ -20,13 +20,15 @@ import {
   BBAuthTokenErrorCode
 } from './auth-token-error-code';
 
+import { BBAuthGetDomain } from './auth-get-domain';
 import {
   BBAuthTokenResponse
 } from './auth-token-response';
 
 //#endregion
 
-const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
+const URL = BBAuthGetDomain.getSTSDomain(window.location.hostname)
+            + '/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
 const HOST = 'security-token-svc';
 const SOURCE = 'auth-client';
 
@@ -41,7 +43,8 @@ export class BBAuthCrossDomainIframe {
   public static tokenRequests: any = {};
   public static requestCounter = 0;
 
-  private static TARGETORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
+  private static TARGETORIGIN = BBAuthGetDomain.getSTSDomain(window.location.hostname);
+  // 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
   public static reset() {
     this.requestCounter = 0;

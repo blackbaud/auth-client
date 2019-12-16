@@ -25,7 +25,7 @@ import {
 describe('Auth Cross Domain Iframe', () => {
   // URL to get IFrame
   const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html';
-
+// todo ac mock out the get domain call for these tests
   let fakeIframe: HTMLIFrameElement;
 
   let getTokenCalls: number;

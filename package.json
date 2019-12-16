@@ -61,6 +61,7 @@
     "webpack-cli": "3.3.5"
   },
   "dependencies": {
+    "@skyux-sdk/cli": "^3.3.0",
     "@types/jwt-decode": "2.2.1",
     "jwt-decode": "2.2.0"
   }

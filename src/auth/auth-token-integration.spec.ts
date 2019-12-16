@@ -13,6 +13,7 @@ import {
 } from './auth-cross-domain-iframe';
 
 import 'jasmine-ajax';
+import { BBAuthGetDomain } from './auth-get-domain';
 
 //#endregion
 
@@ -22,6 +23,8 @@ describe('Auth token integration', () => {
   describe('when the location host name is blackbaud.com', () => {
     beforeEach(() => {
       requestSpy = spyOn(BBCsrfXhr, 'request');
+      spyOn(BBAuthGetDomain, 'getSTSDomain')
+        .and.returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
       spyOn(BBAuthTokenIntegration, 'getLocationHostname').and.returnValue('blackbaud.com');
     });
 
@@ -74,7 +77,6 @@ describe('Auth token integration', () => {
   describe('when the host name location is not blackbaud.com', () => {
     beforeEach(() => {
       requestSpy = spyOn(BBAuthCrossDomainIframe, 'getToken');
-
       spyOn(BBAuthTokenIntegration, 'getLocationHostname').and.returnValue('forgoodfund.com');
     });
 
@@ -88,7 +90,6 @@ describe('Auth token integration', () => {
         permissionScope: undefined
       });
     });
-
   });
 
   describe('getLocationHostname', () => {

@@ -8,6 +8,8 @@ import {
   BBAuthCrossDomainIframe
 } from './auth-cross-domain-iframe';
 
+import { BBAuthGetDomain } from './auth-get-domain';
+
 //#endregion
 
 export class BBAuthTokenIntegration {
@@ -27,7 +29,8 @@ export class BBAuthTokenIntegration {
     }
 
     return BBCsrfXhr.request(
-      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
+      BBAuthGetDomain.getSTSDomain(this.getLocationHostname()) + '/oauth2/token',
+      // todo ac validate that this does what we expect
       undefined,
       disableRedirect,
       envId,
