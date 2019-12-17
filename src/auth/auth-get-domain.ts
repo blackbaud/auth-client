@@ -6,7 +6,11 @@ const defaultSTSUrl = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
 export class BBAuthGetDomain {
 
-  public static getSTSDomain(domain: string = window.location.hostname) {
+  public static isRegisteredDomain(domain: string = window.location.hostname): boolean {
+    return domain in thirdPartyDomainSTSUrls;
+  }
+
+  public static getSTSDomain(domain: string = window.location.hostname): string {
     return domain in thirdPartyDomainSTSUrls ? thirdPartyDomainSTSUrls[domain] : defaultSTSUrl;
   }
 

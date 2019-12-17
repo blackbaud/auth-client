@@ -5,6 +5,7 @@ import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 import { BBAuthGetDomain } from '../auth/auth-get-domain';
+import { BBAuthRenewSessionIframe } from '../auth/auth-renew-session-iframe';
 import { BBAuthNavigator } from '../shared/navigator';
 
 let isTracking: boolean;
@@ -43,7 +44,9 @@ function renewSession() {
 
   if (!lastRenewal || now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY) {
     lastRenewal = now;
-
+    if (BBAuthGetDomain.isRegisteredDomain()) {
+      BBAuthRenewSessionIframe.renewSession();
+    }
     BBCsrfXhr.request(
       BBAuthGetDomain.getSTSDomain() + '/session/renew',
       {
