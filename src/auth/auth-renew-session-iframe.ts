@@ -33,17 +33,17 @@ export class BBAuthRenewSessionIframe {
   }
 
   public static getOrMakeIframe(): HTMLIFrameElement {
-    BBAuthRenewSessionIframe.iframeEl = document.getElementById('auth-cross-domain-iframe') as HTMLIFrameElement;
+    BBAuthRenewSessionIframe.iframeEl = document.getElementById('auth-renew-session-iframe') as HTMLIFrameElement;
 
     // if iframe doesn't exist, make it
     if (!BBAuthRenewSessionIframe.iframeEl) {
       BBAuthRenewSessionIframe.iframeEl = BBAuthDomUtility.addIframe(
         URL,
-        'auth-cross-domain-iframe',
+        'auth-renew-session-iframe',
         ''
       );
 
-      BBAuthRenewSessionIframe.iframeEl.id = 'auth-cross-domain-iframe';
+      BBAuthRenewSessionIframe.iframeEl.id = 'auth-renew-session-iframe';
       BBAuthRenewSessionIframe.iframeEl.hidden = true;
     }
 
