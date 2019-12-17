@@ -7,14 +7,17 @@ import {
 } from '../auth';
 
 import 'jasmine-ajax';
+import { BBAuthGetDomain } from '../auth/auth-get-domain';
 
 describe('Auth token integration', () => {
   let navigateSpy: jasmine.Spy;
+  let domainSpy: jasmine.Spy;
 
   beforeAll(() => {
     jasmine.Ajax.install();
 
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
+    domainSpy = spyOn(BBAuthGetDomain, 'getSTSDomain');
   });
 
   beforeEach(() => {
@@ -25,6 +28,7 @@ describe('Auth token integration', () => {
 
   afterAll(() => {
     jasmine.Ajax.uninstall();
+    expect(domainSpy).toHaveBeenCalled();
   });
 
   it('should redirect to the signin page if the user is not signed in', (done) => {

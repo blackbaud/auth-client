@@ -130,8 +130,6 @@ export class BBOmnibarUserActivity {
   // the session by calculating the difference between the max session age and the min renewal age.
   public static MAX_SESSION_AGE = 90 * 60 * 1000;
 
-  public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
-
   public static startTracking(
     refreshUserCallback: () => void,
     showInactivityCallback: () => void,

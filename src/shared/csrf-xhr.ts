@@ -1,11 +1,11 @@
-const CSRF_URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/csrf';
-
 import {
   BBAuthTokenError,
   BBAuthTokenErrorCode
 } from '../auth';
 
+import { BBAuthGetDomain } from '../auth/auth-get-domain';
 import { BBAuthNavigator } from './navigator';
+const CSRF_URL = BBAuthGetDomain.getSTSDomain() + '/session/csrf';
 
 function post(
   url: string,
