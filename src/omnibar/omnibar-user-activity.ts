@@ -7,7 +7,6 @@ import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBAuthGetDomain } from '../auth/auth-get-domain';
 import { BBAuthRenewSessionIframe } from '../auth/auth-renew-session-iframe';
 import { BBAuthNavigator } from '../shared/navigator';
-import { ConsoleReporter } from 'jasmine';
 
 let isTracking: boolean;
 let clientX: number;
