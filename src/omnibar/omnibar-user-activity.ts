@@ -41,8 +41,9 @@ function trackMouseMove(e: MouseEvent) {
 
 function renewSession() {
   const now = Date.now();
-
+  console.log('inside renew session');
   if (!lastRenewal || now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY) {
+    console.log('due for renewal, ready to check for registered domain');
     lastRenewal = now;
     if (BBAuthGetDomain.isRegisteredDomain()) {
       console.log('domain is registered, calling iframe to renew session');
@@ -85,6 +86,7 @@ function startActivityTimer() {
   // It's possible the user was active on another web page and just navigated to this
   // one.  Since the activity tracking does not carry over from the previous page,
   // play it safe and renew the session immediately.
+  console.log('started activity timer');
   if (!currentAllowAnonymous) {
     renewSession();
   }
