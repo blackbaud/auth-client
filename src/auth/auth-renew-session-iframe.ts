@@ -37,6 +37,7 @@ export class BBAuthRenewSessionIframe {
 
     // if iframe doesn't exist, make it
     if (!BBAuthRenewSessionIframe.iframeEl) {
+      console.log('creating iframe which didnt exist');
       BBAuthRenewSessionIframe.iframeEl = BBAuthDomUtility.addIframe(
         URL,
         'auth-renew-session-iframe',
@@ -51,6 +52,7 @@ export class BBAuthRenewSessionIframe {
   }
 
   public static renewSession(): Promise<any> {
+    console.log('setting up renew session iframe listeners');
     this.setupListenersForIframe();
 
     return this.renewSessionFromIframe(
@@ -80,6 +82,7 @@ export class BBAuthRenewSessionIframe {
   public static renewSessionFromIframe(
     iframeEl: HTMLIFrameElement
   ): Promise<any> {
+    console.log('posting renew message to iframe');
     return new Promise<any>((resolve, reject) => {
       BBAuthRenewSessionIframe.iframeReadyPromise.then(() => {
         iframeEl.contentWindow.postMessage({

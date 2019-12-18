@@ -45,6 +45,7 @@ function renewSession() {
   if (!lastRenewal || now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY) {
     lastRenewal = now;
     if (BBAuthGetDomain.isRegisteredDomain()) {
+      console.log('domain is registered, calling iframe to renew session');
       BBAuthRenewSessionIframe.renewSession();
     }
     BBCsrfXhr.request(
