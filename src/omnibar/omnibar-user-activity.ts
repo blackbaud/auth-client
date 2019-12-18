@@ -7,6 +7,7 @@ import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBAuthGetDomain } from '../auth/auth-get-domain';
 import { BBAuthRenewSessionIframe } from '../auth/auth-renew-session-iframe';
 import { BBAuthNavigator } from '../shared/navigator';
+import { ConsoleReporter } from 'jasmine';
 
 let isTracking: boolean;
 let clientX: number;
@@ -32,6 +33,7 @@ function trackMouseMove(e: MouseEvent) {
   // We have seen issues where the browser sometimes raises the mousemove event even when it isn't moving.
   // Since that might prevent the user from ever timing out, adding this check to ensure the location
   // actually changed.
+  console.log('tracking mouse movement');
   if (e.clientX !== clientX || e.clientY !== clientY) {
     clientX = e.clientX;
     clientY = e.clientY;
@@ -59,11 +61,13 @@ function renewSession() {
 }
 
 function addActivityListeners() {
+  console.log('adding activity listeners');
   document.addEventListener('keypress', trackUserActivity);
   document.addEventListener('mousemove', trackMouseMove);
 }
 
 function showInactivityPrompt() {
+  console.log('showing inactivity prompt');
   isShowingInactivityPrompt = true;
   currentShowInactivityCallback();
 }
@@ -75,6 +79,7 @@ function closeInactivityPrompt() {
 }
 
 function redirectForInactivity() {
+  console.log('redirecting for inactivity');
   if (legacySigninUrl) {
     BBAuthNavigator.navigate(legacySigninUrl);
   } else {
@@ -99,6 +104,7 @@ function startActivityTimer() {
     ).then((expirationDate) => {
       // Verify activity tracking didn't stop since session expiration retrieval began.
       if (isTracking) {
+        console.log('calling proccesor to process activity');
         BBOmnibarUserActivityProcessor.process({
           allowAnonymous: currentAllowAnonymous,
           closeInactivityPrompt,
@@ -148,6 +154,7 @@ export class BBOmnibarUserActivity {
       allowAnonymous !== currentAllowAnonymous ||
       legacyKeepAliveUrl !== currentLegacyKeepAliveUrl
     ) {
+      console.log('stopping tracking');
       BBOmnibarUserActivity.stopTracking();
 
       currentRefreshUserCallback = refreshUserCallback;
