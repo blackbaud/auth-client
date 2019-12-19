@@ -4,11 +4,11 @@ describe('Auth Get Domain', () => {
 
   describe('isRegisteredDomain', () => {
     it('returns true for registered domain', () => {
-      expect(BBAuthGetDomain.isRegisteredDomain('bryonwilkins.com')).toBe(true);
+      expect(BBAuthGetDomain.isRegisteredDomain('bbk12.com')).toBe(true);
     });
 
     it('returns true for registered subdomain', () => {
-      expect(BBAuthGetDomain.isRegisteredDomain('app.bryonwilkins.com')).toBe(true);
+      expect(BBAuthGetDomain.isRegisteredDomain('app.bbk12.com')).toBe(true);
     });
 
     it('returns false for unregistered domain', () => {
@@ -16,14 +16,14 @@ describe('Auth Get Domain', () => {
     });
 
     it('returns false for unregistered subdomain', () => {
-      expect(BBAuthGetDomain.isRegisteredDomain('badappbryonwilkins.com')).toBe(false);
+      expect(BBAuthGetDomain.isRegisteredDomain('badappbbk12.com')).toBe(false);
     });
   });
 
   describe('getSTSDomain', () => {
     // tslint:disable-next-line:max-line-length
     it('returns CNAME STS Url when provided a white listed third party domain which has declared a CNAME STS endpoint', () => {
-      expect(BBAuthGetDomain.getSTSDomain('bryonwilkins.com')).toBe('https://sts.bryonwilkins.com');
+      expect(BBAuthGetDomain.getSTSDomain('bbk12.com')).toBe('https://sts-ss.bbk12.com');
     });
 
     it('returns s21 STS Url when provided a blackbaud domain', () => {

@@ -1,8 +1,7 @@
 const registeredThirdPartyDomains = ['bbk12.com', 'bryonwilkins.com'];
 
 const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
-  'bbk12.com': 'https://sts-ss.bbk12.com',
-  'bryonwilkins.com': 'https://sts.bryonwilkins.com'
+  'bbk12.com': 'https://sts-ss.bbk12.com'
 };
 const defaultSTSUrl = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
