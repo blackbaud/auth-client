@@ -9,7 +9,7 @@ import {
 import 'jasmine-ajax';
 import { BBAuthGetDomain } from '../auth/auth-get-domain';
 
-xdescribe('Auth token integration', () => {
+describe('Auth token integration', () => {
   let navigateSpy: jasmine.Spy;
   let domainSpy: jasmine.Spy;
 
