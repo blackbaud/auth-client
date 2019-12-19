@@ -32,7 +32,6 @@ function trackMouseMove(e: MouseEvent) {
   // We have seen issues where the browser sometimes raises the mousemove event even when it isn't moving.
   // Since that might prevent the user from ever timing out, adding this check to ensure the location
   // actually changed.
-  console.log('tracking mouse movement');
   if (e.clientX !== clientX || e.clientY !== clientY) {
     clientX = e.clientX;
     clientY = e.clientY;
@@ -42,12 +41,9 @@ function trackMouseMove(e: MouseEvent) {
 
 function renewSession() {
   const now = Date.now();
-  console.log('inside renew session');
   if (!lastRenewal || now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY) {
-    console.log('due for renewal, ready to check for registered domain');
     lastRenewal = now;
     if (BBAuthGetDomain.isRegisteredDomain()) {
-      console.log('domain is registered, calling iframe to renew session');
       BBAuthRenewSessionIframe.renewSession();
     }
     BBCsrfXhr.request(
@@ -60,13 +56,11 @@ function renewSession() {
 }
 
 function addActivityListeners() {
-  console.log('adding activity listeners');
   document.addEventListener('keypress', trackUserActivity);
   document.addEventListener('mousemove', trackMouseMove);
 }
 
 function showInactivityPrompt() {
-  console.log('showing inactivity prompt');
   isShowingInactivityPrompt = true;
   currentShowInactivityCallback();
 }
@@ -78,7 +72,6 @@ function closeInactivityPrompt() {
 }
 
 function redirectForInactivity() {
-  console.log('redirecting for inactivity');
   if (legacySigninUrl) {
     BBAuthNavigator.navigate(legacySigninUrl);
   } else {
@@ -90,7 +83,6 @@ function startActivityTimer() {
   // It's possible the user was active on another web page and just navigated to this
   // one.  Since the activity tracking does not carry over from the previous page,
   // play it safe and renew the session immediately.
-  console.log('started activity timer');
   if (!currentAllowAnonymous) {
     renewSession();
   }
@@ -103,7 +95,6 @@ function startActivityTimer() {
     ).then((expirationDate) => {
       // Verify activity tracking didn't stop since session expiration retrieval began.
       if (isTracking) {
-        console.log('calling proccesor to process activity');
         BBOmnibarUserActivityProcessor.process({
           allowAnonymous: currentAllowAnonymous,
           closeInactivityPrompt,
@@ -153,7 +144,6 @@ export class BBOmnibarUserActivity {
       allowAnonymous !== currentAllowAnonymous ||
       legacyKeepAliveUrl !== currentLegacyKeepAliveUrl
     ) {
-      console.log('stopping tracking');
       BBOmnibarUserActivity.stopTracking();
 
       currentRefreshUserCallback = refreshUserCallback;

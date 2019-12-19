@@ -16,7 +16,7 @@ export class BBAuthRenewSessionIframe {
   public static listenerSetup = false;
   public static iframeReadyResolve: any;
   public static iframeReadyPromise = new Promise<boolean>((resolve) =>
-  BBAuthRenewSessionIframe.iframeReadyResolve = resolve
+    BBAuthRenewSessionIframe.iframeReadyResolve = resolve
   );
 
   private static TARGETORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
@@ -37,7 +37,6 @@ export class BBAuthRenewSessionIframe {
 
     // if iframe doesn't exist, make it
     if (!BBAuthRenewSessionIframe.iframeEl) {
-      console.log('creating iframe which didnt exist');
       BBAuthRenewSessionIframe.iframeEl = BBAuthDomUtility.addIframe(
         URL,
         'auth-renew-session-iframe',
@@ -52,7 +51,6 @@ export class BBAuthRenewSessionIframe {
   }
 
   public static renewSession(): Promise<any> {
-    console.log('setting up renew session iframe listeners');
     this.setupListenersForIframe();
 
     return this.renewSessionFromIframe(
@@ -82,14 +80,14 @@ export class BBAuthRenewSessionIframe {
   public static renewSessionFromIframe(
     iframeEl: HTMLIFrameElement
   ): Promise<any> {
-    console.log('posting renew message to iframe');
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<any>((res) => {
       BBAuthRenewSessionIframe.iframeReadyPromise.then(() => {
         iframeEl.contentWindow.postMessage({
           messageType: 'renew',
           source: SOURCE
         },
         BBAuthRenewSessionIframe.TARGET_ORIGIN());
+        res();
       });
     });
   }

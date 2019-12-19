@@ -5,7 +5,6 @@ import {
 
 import { BBAuthGetDomain } from '../auth/auth-get-domain';
 import { BBAuthNavigator } from './navigator';
-const CSRF_URL = BBAuthGetDomain.getSTSDomain() + '/session/csrf';
 
 function post(
   url: string,
@@ -106,6 +105,8 @@ function requestToken(url: string, csrfValue: string, envId?: string, permission
 }
 
 export class BBCsrfXhr {
+  private static CSRF_URL = BBAuthGetDomain.getSTSDomain() + '/session/csrf';
+
   public static request(
     url: string,
     signinRedirectParams?: any,
@@ -131,7 +132,7 @@ export class BBCsrfXhr {
             csrf_token: 'token_needed'
           });
         } else {
-          requestToken(CSRF_URL, 'token_needed')
+          requestToken(this.CSRF_URL, 'token_needed')
             .then(resolveCsrf)
             .catch(rejectCsrf);
         }

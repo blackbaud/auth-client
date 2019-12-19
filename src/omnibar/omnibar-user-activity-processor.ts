@@ -16,7 +16,6 @@ export class BBOmnibarUserActivityProcessor {
       showInactivityPrompt
     } = args;
 
-    console.log('processing user activity');
     const now = Date.now();
 
     // This is for the edge case where the user has signed out in another window but session
@@ -32,11 +31,9 @@ export class BBOmnibarUserActivityProcessor {
 
     // When the inactivity prompt is scheduled to be shown.
     const promptDate = expirationDate - inactivityPromptDuration;
-    console.log('promptDate when we should see inactivity prompt' + promptDate);
 
     // When the next renewal opportunity will occur.
     const renewDate = expirationDate - maxSessionAge + minRenewalAge;
-    console.log('renewalDate' + renewDate);
 
     // If we're showing the prompt, then don't process renewals based on activity.  They will need to
     // physically click on the prompt now.
@@ -46,7 +43,6 @@ export class BBOmnibarUserActivityProcessor {
         closeInactivityPrompt();
       }
     } else {
-      console.log('about to call renew session or show inactivity prompt');
       if (lastActivity > renewDate) {
         renewSession();
       } else if (!allowAnonymous && now > promptDate) {

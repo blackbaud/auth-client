@@ -15,21 +15,22 @@ describe('Auth Renew Session Iframe', () => {
   const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/RenewSessionFrame.html';
 
   let fakeIframe: HTMLIFrameElement;
+  let renewCalled: boolean;
 
-  function iframeMock(frame: HTMLIFrameElement, error = false) {
+  function iframeMock(frame: HTMLIFrameElement, resolve: any = null) {
     // This mock should match the code at the URL
     const SOURCE = 'security-token-svc';
 
     frame.contentWindow.addEventListener('message', (event: MessageEvent) => {
       const HOST = 'auth-client';
-
       const message = event.data;
 
       if (message.source !== HOST) {
         return;
       }
       if (message.messageType === 'renew') {
-        /* todo ac - how do we represent the ajax calls to relying party, csrf, and session renew? */
+        renewCalled = true;
+        resolve();
       }
     });
     window.postMessage(
@@ -43,6 +44,7 @@ describe('Auth Renew Session Iframe', () => {
 
   beforeEach(() => {
     fakeIframe = document.createElement('iframe');
+    renewCalled = false;
   });
 
   afterEach(() => {
@@ -112,17 +114,18 @@ describe('Auth Renew Session Iframe', () => {
       spyOn(BBAuthRenewSessionIframe, 'TARGET_ORIGIN').and.returnValue('*');
     });
 
-    /* todo ac - how do we change this to just test the communication via 'ready' and 'renew'? */
-    it('communicates with the iframe via "ready" and "getToken" and kicks off "ready"', (done) => {
-      fakeIframe = BBAuthDomUtility.addIframe('', 'auth-cross-domain-iframe', '');
+    it('communicates with the iframe via "ready" and "renew" and kicks off "ready"', (done) => {
+      const promise = new Promise((resolve) => {
+        fakeIframe = BBAuthDomUtility.addIframe('', 'auth-renew-session-iframe', '');
 
-      iframeMock(fakeIframe);
+        iframeMock(fakeIframe, resolve);
 
-      BBAuthRenewSessionIframe.renewSessionFromIframe(fakeIframe).then((tokenResonse) => {
-          expect(tokenResonse.access_token).toEqual('accessToken!');
-          expect(tokenResonse.expires_in).toEqual(0);
-          done();
-        });
+        BBAuthRenewSessionIframe.renewSessionFromIframe(fakeIframe);
+      });
+      promise.then(() => {
+        expect(renewCalled).toBe(true);
+        done();
+      });
     });
   });
 });
