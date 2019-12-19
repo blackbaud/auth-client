@@ -17,15 +17,12 @@ describe('Auth token integration', () => {
     jasmine.Ajax.install();
 
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
-    domainSpy = spyOn(BBAuthGetDomain, 'getSTSDomain').and.returnValue('https://foo.com');
+    domainSpy = spyOn(BBAuthGetDomain, 'getSTSDomain');
   });
 
   beforeEach(() => {
-
     navigateSpy.and.stub();
     navigateSpy.calls.reset();
-    domainSpy.and.stub();
-    domainSpy.calls.reset();
   });
 
   afterAll(() => {
@@ -46,6 +43,7 @@ describe('Auth token integration', () => {
       responseText: undefined,
       status: 401
     });
+    expect(domainSpy).toHaveBeenCalled();
   });
 
   it('should not redirect to the signin page when redirecting is disabled', (done) => {

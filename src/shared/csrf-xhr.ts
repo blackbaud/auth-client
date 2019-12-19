@@ -105,7 +105,6 @@ function requestToken(url: string, csrfValue: string, envId?: string, permission
 }
 
 export class BBCsrfXhr {
-  private static CSRF_URL = BBAuthGetDomain.getSTSDomain() + '/session/csrf';
 
   public static request(
     url: string,
@@ -132,7 +131,7 @@ export class BBCsrfXhr {
             csrf_token: 'token_needed'
           });
         } else {
-          requestToken(this.CSRF_URL, 'token_needed')
+          requestToken(BBAuthGetDomain.getSTSDomain() + '/session/csrf', 'token_needed')
             .then(resolveCsrf)
             .catch(rejectCsrf);
         }
