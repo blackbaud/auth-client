@@ -19,6 +19,17 @@ export class BBAuthTokenIntegration {
     permissionScope?: string,
     leId?: string
   ): Promise<any> {
+    if (BBAuthGetDomain.isRegisteredDomain()) {
+      return BBCsrfXhr.request(
+        BBAuthGetDomain.getSTSDomain() + '/oauth2/token',
+        undefined,
+        disableRedirect,
+        envId,
+        permissionScope,
+        leId,
+        true
+      );
+    }
     if (!this.hostNameEndsWith('blackbaud.com')) {
       return BBAuthCrossDomainIframe.getToken({
         disableRedirect,
@@ -27,7 +38,6 @@ export class BBAuthTokenIntegration {
         permissionScope
       });
     }
-
     return BBCsrfXhr.request(
       BBAuthGetDomain.getSTSDomain() + '/oauth2/token',
       undefined,
