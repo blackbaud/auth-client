@@ -1,7 +1,10 @@
 import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
+import { BBOmnibarServiceItem } from './omnibar-service-item';
 
-export class BBOmnibarNavigation {
-  public localNavItems?: BBOmnibarNavigationItem[];
+export interface BBOmnibarNavigation {
+  services?: BBOmnibarServiceItem[];
 
-  public beforeNavCallback?: (item: BBOmnibarNavigationItem) => void | boolean;
+  localNavItems?: BBOmnibarNavigationItem[];
+
+  beforeNavCallback?: (item: BBOmnibarNavigationItem) => void | boolean;
 }

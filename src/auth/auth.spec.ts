@@ -1,27 +1,40 @@
-import { BBAuth } from './auth';
-import { BBAuthTokenIntegration } from './auth-token-integration';
+//#region imports
+
+import {
+  BBAuth
+} from './auth';
+
+import {
+  BBAuthTokenIntegration
+} from './auth-token-integration';
+
+//#endregion
 
 describe('Auth', () => {
   let authIntegrationGetTokenFake: any;
+  let getTokenSpy: jasmine.Spy;
 
   beforeAll(() => {
+    getTokenSpy = spyOn(BBAuthTokenIntegration, 'getToken')
+      .and.callFake(() => {
+        return authIntegrationGetTokenFake();
+      });
+  });
+
+  beforeEach(() => {
     authIntegrationGetTokenFake = () => {
         return Promise.resolve({
           access_token: 'xyz',
           expires_in: 5
         });
       };
-
-    spyOn(BBAuthTokenIntegration, 'getToken')
-      .and.callFake(() => {
-        return authIntegrationGetTokenFake();
-      });
   });
 
   afterEach(() => {
     BBAuth.mock = false;
-    (BBAuth as any).lastToken = undefined;
-    (BBAuth as any).expirationTime = undefined;
+    (BBAuth as any).tokenCache = {};
+
+    getTokenSpy.calls.reset();
   });
 
   it('should return a mock token when mock = true', (done) => {
@@ -34,8 +47,12 @@ describe('Auth', () => {
   });
 
   it('should return the cached token if it has not expired', (done) => {
-    (BBAuth as any).lastToken = 'abc';
-    (BBAuth as any).expirationTime = new Date().valueOf() + 100000;
+    const tokenCache = (BBAuth as any).tokenCache;
+
+    tokenCache['token|-|-|-'] = {
+      expirationTime: new Date().valueOf() + 100000,
+      lastToken: 'abc'
+    };
 
     BBAuth.getToken().then((token: string) => {
       expect(token).toBe('abc');
@@ -44,10 +61,16 @@ describe('Auth', () => {
   });
 
   it('should return a new token if requested even if there is a cached token', (done) => {
-    (BBAuth as any).lastToken = 'abc';
-    (BBAuth as any).expirationTime = new Date().valueOf() + 100000;
+    const tokenCache = (BBAuth as any).tokenCache;
 
-    BBAuth.getToken(true).then((token: string) => {
+    tokenCache['token|-|-|-'] = {
+      expirationTime: new Date().valueOf() + 100000,
+      lastToken: 'abc'
+    };
+
+    BBAuth.getToken({
+      forceNewToken: true
+    }).then((token: string) => {
       expect(token).toBe('xyz');
       done();
     });
@@ -61,8 +84,12 @@ describe('Auth', () => {
   });
 
   it('should return a new token if the cached token is expired', (done) => {
-    (BBAuth as any).lastToken = 'abc';
-    (BBAuth as any).expirationTime = new Date().valueOf() - 100000;
+    const tokenCache = (BBAuth as any).tokenCache;
+
+    tokenCache['token|-|-|-'] = {
+      expirationTime: new Date().valueOf() - 100000,
+      lastToken: 'abc'
+    };
 
     BBAuth.getToken().then((token: string) => {
       expect(token).toBe('xyz');
@@ -71,9 +98,38 @@ describe('Auth', () => {
   });
 
   it('should cache new tokens', (done) => {
-    BBAuth.getToken().then((token: string) => {
-      expect((BBAuth as any).lastToken).toBe('xyz');
-      expect((BBAuth as any).expirationTime).toBeGreaterThan(new Date().valueOf());
+    BBAuth.getToken().then(() => {
+      const tokenCache = (BBAuth as any).tokenCache;
+
+      expect(tokenCache['token|-|-|-'].lastToken).toBe('xyz');
+      expect(tokenCache['token|-|-|-'].expirationTime).toBeGreaterThan(new Date().valueOf());
+      done();
+    });
+  });
+
+  it('should cache tokens based on the specified legal entity ID, environment ID, and permission scope', (done) => {
+    BBAuth.getToken({
+      envId: '123',
+      leId: 'foo',
+      permissionScope: 'abc'
+    }).then(() => {
+      const tokenCache = (BBAuth as any).tokenCache;
+
+      expect(tokenCache['token|foo|123|abc'].lastToken).toBe('xyz');
+      expect(tokenCache['token|foo|123|abc'].expirationTime).toBeGreaterThan(new Date().valueOf());
+      done();
+    });
+  });
+
+  it('should cache tokens based on the specified environment ID and permission scope', (done) => {
+    BBAuth.getToken({
+      envId: '123',
+      permissionScope: 'abc'
+    }).then(() => {
+      const tokenCache = (BBAuth as any).tokenCache;
+
+      expect(tokenCache['token|-|123|abc'].lastToken).toBe('xyz');
+      expect(tokenCache['token|-|123|abc'].expirationTime).toBeGreaterThan(new Date().valueOf());
       done();
     });
   });
@@ -106,7 +162,7 @@ describe('Auth', () => {
         expires_in: 10
       });
 
-    tokenPromise1.then((token: string) => {
+    tokenPromise1.then(() => {
       const tokenPromise3 = BBAuth.getToken();
       const tokenPromise4 = BBAuth.getToken();
 
@@ -118,7 +174,6 @@ describe('Auth', () => {
       rejectTokenPromise();
 
       tokenPromise3.catch(() => {
-        done();
         const tokenPromise5 = BBAuth.getToken();
         const tokenPromise6 = BBAuth.getToken();
 
@@ -126,7 +181,69 @@ describe('Auth', () => {
         // auth integration requset
         expect(tokenRequestCount).toBe(3);
         expect(tokenPromise5).toBe(tokenPromise6);
+
+        done();
       });
+    });
+  });
+
+  it('should allow redirecting to signin to be disabled', (done) => {
+    BBAuth.getToken({
+      disableRedirect: true
+    }).then(() => {
+      expect(getTokenSpy).toHaveBeenCalledWith(true, undefined, undefined, undefined);
+      done();
+    });
+  });
+
+  it('should pass environment ID and permission scope', (done) => {
+    BBAuth.getToken({
+      envId: 'abc',
+      permissionScope: '123'
+    }).then((token: string) => {
+      expect(getTokenSpy).toHaveBeenCalledWith(undefined, 'abc', '123', undefined);
+      done();
+    });
+  });
+
+  it('should pass legal entity ID', (done) => {
+    BBAuth.getToken({
+      leId: 'bar'
+    }).then((token: string) => {
+      expect(getTokenSpy).toHaveBeenCalledWith(undefined, undefined, undefined, 'bar');
+      done();
+    });
+  });
+
+  it('should pass legal entity ID, environment ID, and permission scope', (done) => {
+    BBAuth.getToken({
+      envId: 'abc',
+      leId: 'baz',
+      permissionScope: '123'
+    }).then((token: string) => {
+      expect(getTokenSpy).toHaveBeenCalledWith(undefined, 'abc', '123', 'baz');
+      done();
+    });
+  });
+
+  it('should convert tokenized urls and honor the hard-coded zone.', (done) => {
+    BBAuth.getUrl(
+      '1bb://eng-hub00-pusa01/version'
+    ).then((url: string) => {
+      expect(url).toBe('https://eng-pusa01.app.blackbaud.net/hub00/version');
+      done();
+    });
+  });
+
+  it('should convert tokenized urls and get zone from the token.', (done) => {
+    BBAuth.getUrl(
+      '1bb://eng-hub00/version',
+      {
+        zone: 'p-can01'
+      }
+    ).then((url: string) => {
+      expect(url).toBe('https://eng-pcan01.app.blackbaud.net/hub00/version');
+      done();
     });
   });
 });

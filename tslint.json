@@ -3,6 +3,9 @@
     "tslint:recommended"
   ],
   "rules": {
+    "interface-name": [
+      false
+    ],
     "member-ordering": [
       true,
       "public-before-private",

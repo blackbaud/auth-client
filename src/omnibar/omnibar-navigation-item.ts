@@ -1,9 +1,17 @@
-export class BBOmnibarNavigationItem {
-  public title: string;
+import {
+  BBOmnibarNavigationItemDisplayStyle
+} from './omnibar-navigation-item-display-style';
 
-  public url?: string;
+export interface BBOmnibarNavigationItem {
+  title: string;
 
-  public items?: BBOmnibarNavigationItem[];
+  url?: string;
 
-  public data?: any;
+  icon?: string;
+
+  items?: BBOmnibarNavigationItem[];
+
+  data?: any;
+
+  displayStyle?: BBOmnibarNavigationItemDisplayStyle;
 }

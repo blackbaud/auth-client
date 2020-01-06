@@ -1,3 +1,7 @@
+import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
+import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
+import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
+
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 import { BBAuthNavigator } from '../shared/navigator';
@@ -5,16 +9,21 @@ import { BBAuthNavigator } from '../shared/navigator';
 let isTracking: boolean;
 let clientX: number;
 let clientY: number;
+let currentHideInactivityCallback: () => void;
+let currentRefreshUserCallback: () => void;
+let currentShowInactivityCallback: () => void;
+let isShowingInactivityPrompt: boolean;
 let lastActivity: number;
 let lastRenewal: number;
-let renewOnNextActivity: boolean;
 let intervalId: any;
-let lastSessionId: string;
-let watcherIFrame: HTMLIFrameElement;
-let currentRefreshUserCallback: () => void;
+let lastRefreshId = '';
+let currentAllowAnonymous: boolean;
+let currentLegacyKeepAliveUrl: string;
+let legacyTtl: number;
+let legacySigninUrl: string;
 
-function getTimestamp() {
-  return new Date().getTime();
+function trackUserActivity() {
+  lastActivity = Date.now();
 }
 
 function trackMouseMove(e: MouseEvent) {
@@ -29,23 +38,17 @@ function trackMouseMove(e: MouseEvent) {
 }
 
 function renewSession() {
-  BBCsrfXhr.request(
-    'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
-    {
-      inactivity: 1
-    }
-  );
+  const now = Date.now();
 
-  lastRenewal = getTimestamp();
+  if (!lastRenewal || now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY) {
+    lastRenewal = now;
 
-  renewOnNextActivity = false;
-}
-
-function trackUserActivity() {
-  lastActivity = getTimestamp();
-
-  if (renewOnNextActivity) {
-    renewSession();
+    BBCsrfXhr.request(
+      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
+      {
+        inactivity: 1
+      }
+    ).catch(/* istanbul ignore next */ () => undefined);
   }
 }
 
@@ -54,108 +57,126 @@ function addActivityListeners() {
   document.addEventListener('mousemove', trackMouseMove);
 }
 
+function showInactivityPrompt() {
+  isShowingInactivityPrompt = true;
+  currentShowInactivityCallback();
+}
+
+function closeInactivityPrompt() {
+  isShowingInactivityPrompt = false;
+  trackUserActivity();
+  currentHideInactivityCallback();
+}
+
+function redirectForInactivity() {
+  if (legacySigninUrl) {
+    BBAuthNavigator.navigate(legacySigninUrl);
+  } else {
+    BBAuthNavigator.redirectToSignoutForInactivity();
+  }
+}
+
 function startActivityTimer() {
   // It's possible the user was active on another web page and just navigated to this
   // one.  Since the activity tracking does not carry over from the previous page,
   // play it safe and renew the session immediately.
-  renewSession();
+  if (!currentAllowAnonymous) {
+    renewSession();
+  }
 
   intervalId = setInterval(() => {
-    if (getTimestamp() - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_AGE) {
-      renewOnNextActivity = true;
-    }
+    BBOmnibarUserSessionExpiration.getSessionExpiration(
+      lastRefreshId,
+      legacyTtl,
+      currentAllowAnonymous
+    ).then((expirationDate) => {
+      // Verify activity tracking didn't stop since session expiration retrieval began.
+      if (isTracking) {
+        BBOmnibarUserActivityProcessor.process({
+          allowAnonymous: currentAllowAnonymous,
+          closeInactivityPrompt,
+          expirationDate,
+          inactivityPromptDuration: BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION,
+          isShowingInactivityPrompt,
+          lastActivity,
+          maxSessionAge: BBOmnibarUserActivity.MAX_SESSION_AGE,
+          minRenewalAge: BBOmnibarUserActivity.MIN_RENEWAL_AGE,
+          redirectForInactivity,
+          renewSession,
+          showInactivityPrompt
+        });
+      }
+    });
   }, BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL);
 }
 
-function createWatcherIFrame(url: string) {
-  watcherIFrame = document.createElement('iframe');
-
-  watcherIFrame.width = '0';
-  watcherIFrame.height = '0';
-  watcherIFrame.frameBorder = '0';
-  watcherIFrame.src = url;
-
-  document.body.appendChild(watcherIFrame);
-}
-
-function messageListener(event: MessageEvent) {
-  if (
-    event.origin === BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN &&
-    typeof event.data === 'string'
-  ) {
-    let data: any;
-
-    try {
-      data = JSON.parse(event.data);
-    } catch (err) {
-      // This is irrelevant data posted by a browser plugin or some other IFRAME, so just discard it.
-      return;
-    }
-
-    if (data.messageType === 'session_change') {
-      const message = data.message;
-      const sessionId = message && message.sessionId;
-
-      if (sessionId) {
-        if (lastSessionId && sessionId !== lastSessionId) {
-          currentRefreshUserCallback();
-        }
-
-        lastSessionId = sessionId;
-      } else {
-        BBAuthNavigator.redirectToSignin();
-      }
-    }
-  }
-}
-
-function redirectIfUserLogsOutLater() {
-  window.addEventListener('message', messageListener, false);
-
-  createWatcherIFrame(
-    BBOmnibarUserActivity.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN +
-    '/SessionWatcher.html?origin=' +
-    encodeURIComponent(location.origin)
-  );
-}
-
 export class BBOmnibarUserActivity {
+  // The interval in milliseconds that the last activity is evaluated against the session timeout period.
   public static ACTIVITY_TIMER_INTERVAL = 1000;
 
-  // The amount of millseconds that the expiration prompt will show before the session actually expires.
-  public static ABOUT_TO_EXPIRE_PROMPT_TIMEFRAME = 2 * 60 * 1000;
+  // The minimum time in milliseconds that must elapse before this omnibar instance will issue a session renewal
+  // after the previous session renewal.
+  public static MIN_RENEWAL_RETRY = 1 * 60 * 1000;
 
-  // The amount of millseconds that a session is allowed without activity.
-  public static MAX_SESSION_AGE = 30 * 60 * 1000;
+  // The time in millseconds that the expiration prompt will show before the session actually expires.
+  public static INACTIVITY_PROMPT_DURATION = 2 * 60 * 1000;
 
   // The minimum age in milliseconds of the session before it will be renewed in response to user activity.
   public static MIN_RENEWAL_AGE = 5 * 60 * 1000;
 
-  // The minimum amount of milliseconds that must ellapse before this omnibar instance will issue a session renewal
-  // after the previos time one is
-  public static MIN_RENEWAL_RETRY = 60 * 1000;
+  // The time in millseconds that a session is allowed without activity.  While the actual length of the current
+  // session is determined by calls to auth's TTL endpoint, this value is used to determine when to start renewing
+  // the session by calculating the difference between the max session age and the min renewal age.
+  public static MAX_SESSION_AGE = 90 * 60 * 1000;
 
   public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
-  public static startTracking(refreshUserCallback: () => void) {
-    if (!isTracking) {
-      addActivityListeners();
-      startActivityTimer();
-      redirectIfUserLogsOutLater();
+  public static startTracking(
+    refreshUserCallback: () => void,
+    showInactivityCallback: () => void,
+    hideInactivityCallback: () => void,
+    allowAnonymous: boolean,
+    legacyKeepAliveUrl: string
+  ) {
+    if (
+      !isTracking ||
+      allowAnonymous !== currentAllowAnonymous ||
+      legacyKeepAliveUrl !== currentLegacyKeepAliveUrl
+    ) {
+      BBOmnibarUserActivity.stopTracking();
 
       currentRefreshUserCallback = refreshUserCallback;
+      currentShowInactivityCallback = showInactivityCallback;
+      currentHideInactivityCallback = hideInactivityCallback;
+      currentAllowAnonymous = allowAnonymous;
+      currentLegacyKeepAliveUrl = legacyKeepAliveUrl;
+
+      addActivityListeners();
+      startActivityTimer();
+
+      BBOmnibarUserSessionWatcher.start(
+        allowAnonymous,
+        legacyKeepAliveUrl,
+        currentRefreshUserCallback,
+        (state) => {
+          legacyTtl = state.legacyTtl;
+          lastRefreshId = state.refreshId;
+          legacySigninUrl = state.legacySigninUrl;
+        }
+      );
 
       isTracking = true;
     }
   }
 
-  public static stopTracking() {
-    if (watcherIFrame) {
-      document.body.removeChild(watcherIFrame);
-      watcherIFrame = undefined;
-    }
+  public static userRenewedSession() {
+    closeInactivityPrompt();
+    renewSession();
+  }
 
-    window.removeEventListener('message', messageListener, false);
+  public static stopTracking() {
+    BBOmnibarUserSessionWatcher.stop();
+    BBOmnibarUserSessionExpiration.reset();
 
     document.removeEventListener('keypress', trackUserActivity);
     document.removeEventListener('mousemove', trackMouseMove);
@@ -166,13 +187,17 @@ export class BBOmnibarUserActivity {
       intervalId = undefined;
     }
 
-    isTracking = undefined;
-    clientX = undefined;
-    clientY = undefined;
-    lastActivity = undefined;
-    lastRenewal = undefined;
-    renewOnNextActivity = undefined;
-    lastSessionId = undefined;
-    currentRefreshUserCallback = undefined;
+    isTracking =
+      clientX =
+      clientY =
+      lastActivity =
+      lastRenewal =
+      isShowingInactivityPrompt =
+      currentRefreshUserCallback =
+      currentShowInactivityCallback =
+      currentHideInactivityCallback =
+      currentAllowAnonymous =
+      currentLegacyKeepAliveUrl =
+      undefined;
   }
 }

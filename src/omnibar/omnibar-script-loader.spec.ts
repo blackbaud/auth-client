@@ -9,6 +9,7 @@ describe('Omnibar script loader', () => {
     )
       .and.callFake((el: any) => {
         el.onload();
+        return undefined;
       });
 
     BBOmnibarScriptLoader
@@ -25,12 +26,13 @@ describe('Omnibar script loader', () => {
   });
 
   it('should handle scripts that fail to load', (done) => {
-    const appendChildSpy = spyOn(
+    spyOn(
       document.body,
       'appendChild'
     )
       .and.callFake((el: any) => {
         el.onerror();
+        return undefined;
       });
 
     BBOmnibarScriptLoader
@@ -50,6 +52,7 @@ describe('Omnibar script loader', () => {
     )
       .and.callFake((el: any) => {
         el.onload();
+        return undefined;
       });
 
     BBOmnibarScriptLoader
@@ -71,6 +74,7 @@ describe('Omnibar script loader', () => {
     )
       .and.callFake((el: any) => {
         el.onload();
+        return undefined;
       });
 
     BBOmnibarScriptLoader
@@ -92,6 +96,7 @@ describe('Omnibar script loader', () => {
     )
       .and.callFake((el: any) => {
         el.onload();
+        return undefined;
       });
 
     BBOmnibarScriptLoader
@@ -113,6 +118,7 @@ describe('Omnibar script loader', () => {
     )
       .and.callFake((el: any) => {
         el.onload();
+        return undefined;
       });
 
     BBOmnibarScriptLoader
@@ -134,6 +140,7 @@ describe('Omnibar script loader', () => {
     )
       .and.callFake((el: any) => {
         el.onload();
+        return undefined;
       });
 
     BBOmnibarScriptLoader

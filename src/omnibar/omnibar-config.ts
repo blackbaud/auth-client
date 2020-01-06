@@ -1,19 +1,63 @@
-import { BBOmnibarNavigation } from './omnibar-navigation';
-import { BBOmnibarSearchArgs } from './omnibar-search-args';
-import { BBOmnibarSearchResults } from './omnibar-search-results';
+//#region imports
 
-export class BBOmnibarConfig {
-  public serviceName?: string;
+import {
+  BBOmnibarNavigation
+} from './omnibar-navigation';
 
-  public svcId?: string;
+import {
+  BBOmnibarNotificationsConfig
+} from './omnibar-notifications-config';
 
-  public envId?: string;
+import {
+  BBOmnibarSearchArgs
+} from './omnibar-search-args';
 
-  public nav?: BBOmnibarNavigation;
+import {
+  BBOmnibarSearchResults
+} from './omnibar-search-results';
 
-  public experimental?: boolean;
+import {
+  BBOmnibarServiceItem
+} from './omnibar-service-item';
 
-  public url?: string;
+import {
+  BBOmnibarTheme
+} from './theming';
 
-  public onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
+//#endregion
+
+export interface BBOmnibarConfig {
+  serviceName?: string;
+
+  svcId?: string;
+
+  envId?: string;
+
+  leId?: string;
+
+  nav?: BBOmnibarNavigation;
+
+  legacy?: boolean;
+
+  url?: string;
+
+  onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
+
+  services?: BBOmnibarServiceItem[];
+
+  enableHelp?: boolean;
+
+  notifications?: BBOmnibarNotificationsConfig;
+
+  legacyKeepAliveUrl?: string;
+
+  allowAnonymous?: boolean;
+
+  theme?: BBOmnibarTheme;
+
+  compactNavOnly?: boolean;
+
+  navVersion?: string;
+
+  hideResourceLinks?: boolean;
 }
