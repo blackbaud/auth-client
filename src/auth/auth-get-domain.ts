@@ -1,5 +1,3 @@
-const registeredThirdPartyDomains = ['bbk12.com'];
-
 const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
   'bbk12.com': 'https://sts-sso.bbk12.com'
 };
@@ -14,7 +12,9 @@ export class BBAuthGetDomain {
       return this.cacheDictionary[domain].isRegistered;
     }
     let isRegistered = false;
-    registeredThirdPartyDomains.forEach((d) => {
+
+    // tslint:disable-next-line:forin
+    for (const d in thirdPartyDomainSTSUrlMappings) {
       let domainEndingCompare = d;
       if (!domainEndingCompare.startsWith('.')) {
         domainEndingCompare = '.' + domainEndingCompare;
@@ -23,7 +23,7 @@ export class BBAuthGetDomain {
         isRegistered = true;
         this.cacheDictionary[domain] = { isRegistered: true, domainKey: d };
       }
-    });
+    }
     if (!isRegistered) { this.cacheDictionary[domain] = { isRegistered: false }; }
     return isRegistered;
   }

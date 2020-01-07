@@ -23,7 +23,7 @@ describe('Auth Get Domain', () => {
   describe('getSTSDomain', () => {
     // tslint:disable-next-line:max-line-length
     it('returns CNAME STS Url when provided a white listed third party domain which has declared a CNAME STS endpoint', () => {
-      expect(BBAuthGetDomain.getSTSDomain('bbk12.com')).toBe('https://sts-ss.bbk12.com');
+      expect(BBAuthGetDomain.getSTSDomain('bbk12.com')).toBe('https://sts-sso.bbk12.com');
     });
 
     it('returns s21 STS Url when provided a blackbaud domain', () => {
@@ -37,7 +37,7 @@ describe('Auth Get Domain', () => {
 
     // tslint:disable-next-line:max-line-length
     it('returns CNAME STS Url when provided a white listed third party subdomain which has declared a CNAME STS endpoint', () => {
-      expect(BBAuthGetDomain.getSTSDomain('app.bbk12.com')).toBe('https://sts-ss.bbk12.com');
+      expect(BBAuthGetDomain.getSTSDomain('app.bbk12.com')).toBe('https://sts-sso.bbk12.com');
     });
   });
 });
