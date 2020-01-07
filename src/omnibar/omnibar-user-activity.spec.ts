@@ -1,11 +1,11 @@
+import { BBAuthGetDomain } from '../auth/auth-get-domain';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
+import { BBAuthNavigator } from '../shared/navigator';
 import { BBOmnibarUserActivity } from './omnibar-user-activity';
 import { BBOmnibarUserActivityProcessArgs } from './omnibar-user-activity-process-args';
 import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
 import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
 import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
-
-import { BBCsrfXhr } from '../shared/csrf-xhr';
-import { BBAuthNavigator } from '../shared/navigator';
 
 const TEST_TIMEOUT = 50;
 
@@ -16,6 +16,7 @@ describe('Omnibar user activity', () => {
   let showInactivityCallbackSpy: jasmine.Spy;
   let hideInactivityCallbackSpy: jasmine.Spy;
   let getSessionExpirationSpy: jasmine.Spy;
+  let myDomain: jasmine.Spy;
   let renewWasCalled: boolean;
   let expirationDate: number;
 
@@ -37,6 +38,7 @@ describe('Omnibar user activity', () => {
 
   function validateRenewCall(called = true) {
     expect(renewWasCalled).toBe(called);
+    expect(myDomain).toHaveBeenCalled();
   }
 
   function startTracking(allowAnonymous = false, legacyKeepAliveUrl?: string) {
@@ -105,6 +107,9 @@ describe('Omnibar user activity', () => {
     getSessionExpirationSpy = spyOn(BBOmnibarUserSessionExpiration, 'getSessionExpiration').and.callFake(() => {
       return Promise.resolve(expirationDate);
     });
+
+    myDomain = spyOn(BBAuthGetDomain, 'getSTSDomain').and
+    .returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
 
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
       switch (url.substr('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/'.length)) {

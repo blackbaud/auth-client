@@ -1,10 +1,9 @@
-const CSRF_URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/csrf';
-
 import {
   BBAuthTokenError,
   BBAuthTokenErrorCode
 } from '../auth';
 
+import { BBAuthGetDomain } from '../auth/auth-get-domain';
 import { BBAuthNavigator } from './navigator';
 
 function post(
@@ -131,7 +130,7 @@ export class BBCsrfXhr {
             csrf_token: 'token_needed'
           });
         } else {
-          requestToken(CSRF_URL, 'token_needed')
+          requestToken(BBAuthGetDomain.getSTSDomain() + '/session/csrf', 'token_needed')
             .then(resolveCsrf)
             .catch(rejectCsrf);
         }

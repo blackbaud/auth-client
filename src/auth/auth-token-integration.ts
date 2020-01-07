@@ -8,6 +8,7 @@ import {
   BBAuthCrossDomainIframe
 } from './auth-cross-domain-iframe';
 
+import { BBAuthGetDomain } from './auth-get-domain';
 //#endregion
 
 export class BBAuthTokenIntegration {
@@ -17,6 +18,17 @@ export class BBAuthTokenIntegration {
     permissionScope?: string,
     leId?: string
   ): Promise<any> {
+    if (BBAuthGetDomain.isRegisteredDomain()) {
+      return BBCsrfXhr.request(
+        BBAuthGetDomain.getSTSDomain() + '/oauth2/token',
+        undefined,
+        disableRedirect,
+        envId,
+        permissionScope,
+        leId,
+        true
+      );
+    }
     if (!this.hostNameEndsWith('blackbaud.com')) {
       return BBAuthCrossDomainIframe.getToken({
         disableRedirect,
@@ -27,7 +39,7 @@ export class BBAuthTokenIntegration {
     }
 
     return BBCsrfXhr.request(
-      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
+      BBAuthGetDomain.getSTSDomain() + '/oauth2/token',
       undefined,
       disableRedirect,
       envId,
