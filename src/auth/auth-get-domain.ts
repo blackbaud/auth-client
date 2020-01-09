@@ -17,7 +17,6 @@ export class BBAuthDomain {
       if (this.CURRENT_DOMAIN === d || this.CURRENT_DOMAIN.substr(-domainEndCompare.length) === domainEndCompare) {
         domain = d;
       }
-
     });
 
     return domain;
