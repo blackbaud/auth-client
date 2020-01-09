@@ -1,43 +1,52 @@
-import { BBAuthGetDomain } from './auth-get-domain';
+import { BBAuthDomain } from './auth-get-domain';
 
 describe('Auth Get Domain', () => {
 
-  describe('isRegisteredDomain', () => {
-    it('returns true for registered domain', () => {
-      expect(BBAuthGetDomain.isRegisteredDomain('bbk12.com')).toBe(true);
+  describe('getRegisteredDomain', () => {
+
+    it('returns registered domain when user is on the registered domain', () => {
+      BBAuthDomain.CURRENT_DOMAIN = 'bbk12.com';
+      expect(BBAuthDomain.getRegisteredDomain()).toBe('bbk12.com');
     });
 
-    it('returns true for registered subdomain', () => {
-      expect(BBAuthGetDomain.isRegisteredDomain('app.bbk12.com')).toBe(true);
+    it('returns registered domain when user is on a valid subdomain ', () => {
+      BBAuthDomain.CURRENT_DOMAIN = 'app.bbk12.com';
+      expect(BBAuthDomain.getRegisteredDomain()).toBe('bbk12.com');
     });
 
-    it('returns false for unregistered domain', () => {
-      expect(BBAuthGetDomain.isRegisteredDomain('unregistered.com')).toBe(false);
+    it('returns undefined for an unregistered domain', () => {
+      BBAuthDomain.CURRENT_DOMAIN = 'unregistered.com';
+      expect(BBAuthDomain.getRegisteredDomain()).toBeUndefined();
     });
 
-    it('returns false for unregistered subdomain', () => {
-      expect(BBAuthGetDomain.isRegisteredDomain('badappbbk12.com')).toBe(false);
+    it('returns undefined for unregistered subdomain', () => {
+      BBAuthDomain.CURRENT_DOMAIN = 'badappbbk12.com';
+      expect(BBAuthDomain.getRegisteredDomain()).toBeUndefined();
     });
   });
 
   describe('getSTSDomain', () => {
     // tslint:disable-next-line:max-line-length
-    it('returns CNAME STS Url when provided a white listed third party domain which has declared a CNAME STS endpoint', () => {
-      expect(BBAuthGetDomain.getSTSDomain('bbk12.com')).toBe('https://sts-sso.bbk12.com');
+    it('returns CNAME STS Url when user is on a registered third party domain which has declared a CNAME STS endpoint', () => {
+      BBAuthDomain.CURRENT_DOMAIN = 'bbk12.com';
+      expect(BBAuthDomain.getSTSDomain()).toBe('https://sts-sso.bbk12.com');
     });
 
-    it('returns s21 STS Url when provided a blackbaud domain', () => {
-      expect(BBAuthGetDomain.getSTSDomain('blackbaud.com')).toBe('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
-    });
-
-    // tslint:disable-next-line:max-line-length
-    it('returns s21 STS Url when provided a white listed third party domain which has NOT declared a CNAME STS endpoint', () => {
-      expect(BBAuthGetDomain.getSTSDomain('thirdparty.com')).toBe('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+    it('returns S21 STS Url when user is on a Blackbaud domain', () => {
+      BBAuthDomain.CURRENT_DOMAIN = 'blackbaud.com';
+      expect(BBAuthDomain.getSTSDomain()).toBe('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
     });
 
     // tslint:disable-next-line:max-line-length
-    it('returns CNAME STS Url when provided a white listed third party subdomain which has declared a CNAME STS endpoint', () => {
-      expect(BBAuthGetDomain.getSTSDomain('app.bbk12.com')).toBe('https://sts-sso.bbk12.com');
+    it('returns S21 STS Url when user is on a registered third party domain which has NOT declared a CNAME STS endpoint', () => {
+      BBAuthDomain.CURRENT_DOMAIN = 'unregisteredthirdparty.com';
+      expect(BBAuthDomain.getSTSDomain()).toBe('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+    });
+
+    // tslint:disable-next-line:max-line-length
+    it('returns CNAME STS Url when user is on a registered third party subdomain which has declared a CNAME STS endpoint', () => {
+      BBAuthDomain.CURRENT_DOMAIN = 'app.bbk12.com';
+      expect(BBAuthDomain.getSTSDomain()).toBe('https://sts-sso.bbk12.com');
     });
   });
 });

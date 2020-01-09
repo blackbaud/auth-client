@@ -4,7 +4,7 @@ import { BBAuthInterop } from '../shared/interop';
 
 import { BBAuthNavigator } from '../shared/navigator';
 
-import { BBAuthGetDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-get-domain';
 
 let isWatching: boolean;
 let currentLegacyKeepAliveUrl: string;
@@ -144,7 +144,7 @@ function messageListener(event: MessageEvent) {
 }
 
 export class BBOmnibarUserSessionWatcher {
-  public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = BBAuthGetDomain.getSTSDomain();
+  public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = BBAuthDomain.getSTSDomain();
 
   public static start(
     allowAnonymous: boolean,

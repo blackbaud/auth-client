@@ -12,8 +12,12 @@ import {
   BBAuthCrossDomainIframe
 } from './auth-cross-domain-iframe';
 
+import {
+  BBAuthDomain
+} from './auth-get-domain';
+
 import 'jasmine-ajax';
-import { BBAuthGetDomain } from './auth-get-domain';
+
 //#endregion
 
 describe('Auth token integration', () => {
@@ -22,10 +26,8 @@ describe('Auth token integration', () => {
   describe('when the location host name is blackbaud.com', () => {
     beforeEach(() => {
       requestSpy = spyOn(BBCsrfXhr, 'request');
-      spyOn(BBAuthGetDomain, 'isRegisteredDomain')
-      .and.returnValue(false);
-      spyOn(BBAuthGetDomain, 'getSTSDomain')
-        .and.returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+      spyOn(BBAuthDomain, 'getRegisteredDomain').and.returnValue(undefined);
+      spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
       spyOn(BBAuthTokenIntegration, 'getLocationHostname').and.returnValue('blackbaud.com');
     });
 
@@ -78,8 +80,7 @@ describe('Auth token integration', () => {
   describe('when the host name location is not blackbaud.com or a registered third party', () => {
     beforeEach(() => {
       requestSpy = spyOn(BBAuthCrossDomainIframe, 'getToken');
-      spyOn(BBAuthGetDomain, 'isRegisteredDomain')
-      .and.returnValue(false);
+      spyOn(BBAuthDomain, 'getRegisteredDomain').and.returnValue(undefined);
       spyOn(BBAuthTokenIntegration, 'getLocationHostname').and.returnValue('forgoodfund.com');
     });
 
@@ -98,10 +99,8 @@ describe('Auth token integration', () => {
   describe('when the location host name is a registered third party', () => {
     beforeEach(() => {
       requestSpy = spyOn(BBCsrfXhr, 'request');
-      spyOn(BBAuthGetDomain, 'isRegisteredDomain')
-      .and.returnValue(true);
-      spyOn(BBAuthGetDomain, 'getSTSDomain')
-        .and.returnValue('https://myRegisteredThirdPartySTS.com');
+      spyOn(BBAuthDomain, 'getRegisteredDomain').and.returnValue('myregisteredthirdparty.com');
+      spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue('https://myRegisteredThirdPartySTS.com');
       spyOn(BBAuthTokenIntegration, 'getLocationHostname').and.returnValue('myRegisteredThirdParty.com');
     });
 

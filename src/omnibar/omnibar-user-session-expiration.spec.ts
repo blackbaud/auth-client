@@ -1,4 +1,4 @@
-import { BBAuthGetDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-get-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
 
@@ -9,7 +9,7 @@ describe('Omnibar user session expiration', () => {
   let ttlPromiseOverride: Promise<number>;
 
   beforeAll(() => {
-    domainSpy = spyOn(BBAuthGetDomain, 'getSTSDomain').and
+    domainSpy = spyOn(BBAuthDomain, 'getSTSDomain').and
       .returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
 
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
@@ -42,7 +42,11 @@ describe('Omnibar user session expiration', () => {
     )
       .then((expirationDate) => {
         expect(expirationDate).toBeNull();
-        expect(domainSpy).toHaveBeenCalled();
+        expect(requestSpy).toHaveBeenCalledWith(
+          'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/ttl',
+          undefined,
+          false
+        );
         done();
       });
   });

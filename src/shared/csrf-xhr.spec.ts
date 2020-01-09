@@ -6,8 +6,11 @@ import {
   BBAuthTokenErrorCode
 } from '../auth';
 
+import {
+  BBAuthDomain
+} from '../auth/auth-get-domain';
+
 import 'jasmine-ajax';
-import { BBAuthGetDomain } from '../auth/auth-get-domain';
 
 describe('Auth token integration', () => {
   let navigateSpy: jasmine.Spy;
@@ -17,7 +20,7 @@ describe('Auth token integration', () => {
     jasmine.Ajax.install();
 
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
-    domainSpy = spyOn(BBAuthGetDomain, 'getSTSDomain');
+    domainSpy = spyOn(BBAuthDomain, 'getSTSDomain');
   });
 
   beforeEach(() => {

@@ -3,7 +3,7 @@ import {
   BBAuthTokenErrorCode
 } from '../auth';
 
-import { BBAuthGetDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-get-domain';
 import { BBAuthNavigator } from './navigator';
 
 function post(
@@ -130,7 +130,7 @@ export class BBCsrfXhr {
             csrf_token: 'token_needed'
           });
         } else {
-          requestToken(BBAuthGetDomain.getSTSDomain() + '/session/csrf', 'token_needed')
+          requestToken(BBAuthDomain.getSTSDomain() + '/session/csrf', 'token_needed')
             .then(resolveCsrf)
             .catch(rejectCsrf);
         }

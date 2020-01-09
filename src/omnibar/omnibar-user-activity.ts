@@ -1,4 +1,4 @@
-import { BBAuthGetDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-get-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
 import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
@@ -44,7 +44,7 @@ function renewSession() {
     lastRenewal = now;
 
     BBCsrfXhr.request(
-      BBAuthGetDomain.getSTSDomain() + '/session/renew',
+      BBAuthDomain.getSTSDomain() + '/session/renew',
       {
         inactivity: 1
       }

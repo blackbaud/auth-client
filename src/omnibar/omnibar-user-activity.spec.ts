@@ -1,4 +1,4 @@
-import { BBAuthGetDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-get-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBAuthNavigator } from '../shared/navigator';
 import { BBOmnibarUserActivity } from './omnibar-user-activity';
@@ -108,8 +108,8 @@ describe('Omnibar user activity', () => {
       return Promise.resolve(expirationDate);
     });
 
-    myDomain = spyOn(BBAuthGetDomain, 'getSTSDomain').and
-    .returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+    myDomain = spyOn(BBAuthDomain, 'getSTSDomain').and
+      .returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
 
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
       switch (url.substr('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/'.length)) {

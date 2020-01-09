@@ -1,4 +1,4 @@
-import { BBAuthGetDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-get-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 let ttlCache: {
@@ -14,7 +14,7 @@ function getExpirationFromAuthTtl(refreshId: string, allowAnonymous: boolean): P
 
   const promise = new Promise<number>((resolve, reject) => {
     BBCsrfXhr.request(
-      BBAuthGetDomain.getSTSDomain() + '/session/ttl',
+      BBAuthDomain.getSTSDomain() + '/session/ttl',
       undefined,
       allowAnonymous
     )
