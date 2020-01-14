@@ -1,3 +1,4 @@
+import { BBAuthDomain } from '../auth/auth-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 let ttlCache: {
@@ -13,7 +14,7 @@ function getExpirationFromAuthTtl(refreshId: string, allowAnonymous: boolean): P
 
   const promise = new Promise<number>((resolve, reject) => {
     BBCsrfXhr.request(
-      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/ttl',
+      BBAuthDomain.getSTSDomain() + '/session/ttl',
       undefined,
       allowAnonymous
     )
