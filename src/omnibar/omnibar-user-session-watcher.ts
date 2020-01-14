@@ -4,7 +4,7 @@ import { BBAuthInterop } from '../shared/interop';
 
 import { BBAuthNavigator } from '../shared/navigator';
 
-import { BBAuthDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-domain';
 
 let isWatching: boolean;
 let currentLegacyKeepAliveUrl: string;

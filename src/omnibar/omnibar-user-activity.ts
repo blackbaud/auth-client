@@ -1,4 +1,4 @@
-import { BBAuthDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
 import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';

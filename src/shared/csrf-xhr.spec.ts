@@ -8,7 +8,7 @@ import {
 
 import {
   BBAuthDomain
-} from '../auth/auth-get-domain';
+} from '../auth/auth-domain';
 
 import 'jasmine-ajax';
 

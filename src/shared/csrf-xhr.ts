@@ -3,7 +3,7 @@ import {
   BBAuthTokenErrorCode
 } from '../auth';
 
-import { BBAuthDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-domain';
 import { BBAuthNavigator } from './navigator';
 
 function post(

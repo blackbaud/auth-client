@@ -1,4 +1,4 @@
-import { BBAuthDomain } from '../auth/auth-get-domain';
+import { BBAuthDomain } from '../auth/auth-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 let ttlCache: {

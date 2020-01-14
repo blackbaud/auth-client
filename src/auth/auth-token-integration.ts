@@ -10,7 +10,7 @@ import {
 
 import {
   BBAuthDomain
-} from './auth-get-domain';
+} from './auth-domain';
 
 //#endregion
 

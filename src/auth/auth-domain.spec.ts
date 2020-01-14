@@ -1,4 +1,4 @@
-import { BBAuthDomain } from './auth-get-domain';
+import { BBAuthDomain } from './auth-domain';
 
 describe('Auth Get Domain', () => {
 

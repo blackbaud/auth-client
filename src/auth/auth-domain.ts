@@ -1,4 +1,3 @@
-
 const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
   'bbk12.com': 'https://sts-sso.bbk12.com'
 };
@@ -9,17 +8,12 @@ export class BBAuthDomain {
   public static CURRENT_DOMAIN = window.location.hostname;
 
   public static getRegisteredDomain(): string {
-    let domain;
 
-    Object.keys(thirdPartyDomainSTSUrlMappings).forEach((d) => {
+    return Object.keys(thirdPartyDomainSTSUrlMappings).find((d) => {
       const domainEndCompare = `.${d}`;
 
-      if (this.CURRENT_DOMAIN === d || this.CURRENT_DOMAIN.substr(-domainEndCompare.length) === domainEndCompare) {
-        domain = d;
-      }
+      return this.CURRENT_DOMAIN === d || this.CURRENT_DOMAIN.substr(-domainEndCompare.length) === domainEndCompare;
     });
-
-    return domain;
   }
 
   public static getSTSDomain(): string {
