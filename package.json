@@ -1,11 +1,12 @@
 {
   "name": "@blackbaud/auth-client",
-  "version": "2.17.2",
+  "version": "2.21.0",
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
   "main": "dist/bundles/auth-client.umd.js",
   "module": "index.ts",
   "pipelineSettings": {
-    "publishToCDN": true
+    "publishToCDN": true,
+    "publishToNPM": true
   },
   "scripts": {
     "ci": "npm run test:ci && npm run build",
@@ -13,7 +14,7 @@
     "test:ci": "npm run test:unit:ci",
     "test:unit": "npm run test:unit:base -- config/karma/local.karma.conf.js",
     "test:unit:ci": "npm run test:unit:base -- config/karma/ci.karma.conf.js",
-    "test:unit:base": "node --max-old-space-size=4096 node_modules/karma/bin/karma start",
+    "test:unit:base": "node node_modules/karma/bin/karma start",
     "pretest": "npm run lint",
     "build": "rimraf dist && tsc && webpack --config config/webpack/webpack.prod.config.js",
     "watch": "npm run test:unit -- --auto-watch --no-single-run",
@@ -59,5 +60,9 @@
     "typescript": "3.5.2",
     "webpack": "4.35.0",
     "webpack-cli": "3.3.5"
+  },
+  "dependencies": {
+    "@types/jwt-decode": "2.2.1",
+    "jwt-decode": "2.2.0"
   }
 }

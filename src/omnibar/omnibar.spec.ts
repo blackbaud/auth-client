@@ -52,12 +52,30 @@ import {
   BBOmnibarUserActivityPromptShowArgs
 } from './omnibar-user-activity-prompt-show-args';
 
+import {
+  BBOmnibarPushNotifications
+} from './omnibar-push-notifications';
+
+import {
+  BBOmnibarToastContainer
+} from './omnibar-toast-container';
+
+import {
+  BBOmnibarToastContainerInitArgs
+} from './omnibar-toast-container-init-args';
+
 //#endregion
 
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
 
-  function loadOmnibar(config?: BBOmnibarConfig) {
+  // tslint:disable-next-line:max-line-length
+  const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
+
+  // tslint:disable-next-line:max-line-length
+  const testTokenWithNotificationEntitlement = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjpbIm5vdGlmIiwiZm9vIl19.XskU9eHmCxzkRq0GIgmZd3MtFHZ9xaWJUWeuUkDjPb0';
+
+  function loadOmnibar(config?: BBOmnibarConfig): void {
     config = config || {};
     config.url = BASE_URL;
 
@@ -78,7 +96,7 @@ describe('Omnibar', () => {
     ) as HTMLDivElement;
   }
 
-  function fireMessageEvent(data: any, includeSource = true) {
+  function fireMessageEvent(data: any, includeSource = true): void {
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
     }
@@ -90,11 +108,11 @@ describe('Omnibar', () => {
     );
   }
 
-  function validateExpanded(expanded: boolean) {
+  function validateExpanded(expanded: boolean): void {
     expect(getIframeEl().classList.contains('sky-omnibar-iframe-expanded')).toBe(expanded);
   }
 
-  function destroyOmnibar() {
+  function destroyOmnibar(): void {
     BBOmnibar.destroy();
   }
 
@@ -103,6 +121,12 @@ describe('Omnibar', () => {
   let messageIsFromOmnibarSpy: jasmine.Spy;
   let getTokenSpy: jasmine.Spy;
   let startTrackingSpy: jasmine.Spy;
+  let pushNotificationsConnectSpy: jasmine.Spy;
+  let pushNotificationsDisconnectSpy: jasmine.Spy;
+  let toastContainerInitSpy: jasmine.Spy;
+  let toastContainerUpdateUrlSpy: jasmine.Spy;
+  let toastContainerShowNewSpy: jasmine.Spy;
+  let toastContainerDestroySpy: jasmine.Spy;
 
   let messageIsFromOmnibarReturnValue = true;
   let getTokenFake: () => Promise<string>;
@@ -125,6 +149,36 @@ describe('Omnibar', () => {
       return getTokenFake();
     });
 
+    pushNotificationsConnectSpy = spyOn(
+      BBOmnibarPushNotifications,
+      'connect'
+    ).and.returnValue(Promise.resolve());
+
+    pushNotificationsDisconnectSpy = spyOn(
+      BBOmnibarPushNotifications,
+      'disconnect'
+    ).and.returnValue(Promise.resolve());
+
+    toastContainerInitSpy = spyOn(
+      BBOmnibarToastContainer,
+      'init'
+    ).and.returnValue(Promise.resolve());
+
+    toastContainerUpdateUrlSpy = spyOn(
+      BBOmnibarToastContainer,
+      'updateUrl'
+    );
+
+    toastContainerShowNewSpy = spyOn(
+      BBOmnibarToastContainer,
+      'showNewNotifications'
+    );
+
+    toastContainerDestroySpy = spyOn(
+      BBOmnibarToastContainer,
+      'destroy'
+    );
+
     // This effectively disables activity tracking.  Without this, the test page could potentially redirect to
     // the login page during the test run when it detects no activity.
     startTrackingSpy = spyOn(BBOmnibarUserActivity, 'startTracking');
@@ -140,13 +194,17 @@ describe('Omnibar', () => {
   beforeEach(() => {
     delete (window as any).BBHELP;
 
-    getTokenFake = () => Promise.resolve('some_token');
+    getTokenFake = () => Promise.resolve(testToken);
 
     navigateSpy.calls.reset();
     postOmnibarMessageSpy.calls.reset();
     messageIsFromOmnibarSpy.calls.reset();
     getTokenSpy.calls.reset();
     startTrackingSpy.calls.reset();
+    pushNotificationsConnectSpy.calls.reset();
+    toastContainerInitSpy.calls.reset();
+    toastContainerShowNewSpy.calls.reset();
+    toastContainerDestroySpy.calls.reset();
 
     postOmnibarMessageSpy.and.stub();
     startTrackingSpy.and.stub();
@@ -538,6 +596,78 @@ describe('Omnibar', () => {
       );
     });
 
+    it('should set the document title with the service name if setTitle has been called with empty title parts', () => {
+      loadOmnibar();
+
+      const serviceName = 'test service';
+
+      BBOmnibar.setTitle({
+        titleParts: []
+      });
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      expect(document.title).toBe(serviceName);
+    });
+
+    it('should not set the document title with the service name if setTitle has not been called', () => {
+      loadOmnibar();
+
+      const serviceName = 'test service 2';
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      expect(document.title).not.toBe(serviceName);
+    });
+
+    it('should set the document title with the number of unread notifications', (done) => {
+      pushNotificationsConnectSpy.and.callFake((envId, leId, cb) => {
+        expect(document.title).toBe('with notifications - test service');
+
+        cb(
+          {
+            notifications: [
+              {
+                notificationId: '1',
+                shortMessage: 'Hello world'
+              }
+            ]
+          }
+        );
+
+        expect(document.title).toBe('(1) with notifications - test service');
+
+        done();
+      });
+
+      getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'ready'
+      });
+
+      const serviceName = 'test service';
+
+      BBOmnibar.setTitle({
+        titleParts: [
+          'with notifications'
+        ]
+      });
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+    });
+
     it('should show the inactivity prompt', (done) => {
       const showSpy = spyOn(BBOmnibarUserActivityPrompt, 'show');
 
@@ -607,6 +737,26 @@ describe('Omnibar', () => {
       fireMessageEvent({
         messageType: 'get-token'
       });
+    });
+
+    it('should handle updates to push notifications', () => {
+      const testNotifications = [
+        {
+          isRead: true,
+          notificationId: '1'
+        }
+      ];
+
+      const updateNotificationsSpy = spyOn(BBOmnibarPushNotifications, 'updateNotifications');
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'push-notifications-change',
+        notifications: testNotifications
+      });
+
+      expect(updateNotificationsSpy).toHaveBeenCalledWith(testNotifications);
     });
 
   });
@@ -785,7 +935,7 @@ describe('Omnibar', () => {
           getIframeEl(),
           {
             messageType: 'token',
-            token: 'some_token',
+            token: testToken,
             tokenRequestId: 123
           }
         );
@@ -838,7 +988,7 @@ describe('Omnibar', () => {
               getIframeEl(),
               {
                 messageType: 'refresh-user',
-                token: 'some_token'
+                token: testToken
               }
             );
 
@@ -957,6 +1107,187 @@ describe('Omnibar', () => {
       loadOmnibar();
 
       BBOmnibar.update(updateArgs);
+    });
+
+    it('should update the document title when setTitle() is called', () => {
+      const serviceName = 'Test Service';
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'selected-service-update',
+        serviceName
+      });
+
+      BBOmnibar.setTitle({titleParts: ['Dropdown', 'Components']});
+
+      expect(document.title).toBe('Dropdown - Components - Test Service');
+    });
+
+    it('should notify the omnibar and the toast container when new push notifications arrive', (done) => {
+      let notificationsUpdatePosted: boolean;
+
+      const testNotifications = {
+        notifications: [
+          {
+            notificationId: '1',
+            shortMessage: 'Hello world'
+          }
+        ]
+      };
+
+      postOmnibarMessageSpy.and.callFake(
+        (iframeEl: HTMLIFrameElement, data: any) => {
+          if (data.messageType === 'push-notifications-update') {
+            expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+              getIframeEl(),
+              {
+                messageType: 'push-notifications-update',
+                pushNotifications: testNotifications
+              }
+            );
+
+            notificationsUpdatePosted = true;
+          }
+        }
+      );
+
+      toastContainerShowNewSpy.and.callFake(() => {
+        expect(notificationsUpdatePosted).toBe(true);
+        expect(toastContainerShowNewSpy).toHaveBeenCalledWith(testNotifications);
+
+        done();
+      });
+
+      pushNotificationsConnectSpy.and.callFake((envId, leId, cb) => {
+        cb(testNotifications);
+      });
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'ready'
+      });
+    });
+
+    it('should disconnect push notifications when the user logs out', (done) => {
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+      });
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+
+      pushNotificationsConnectSpy.and.callFake(() => {
+        pushNotificationsDisconnectSpy.and.callFake(() => {
+          expect(toastContainerDestroySpy).toHaveBeenCalled();
+          done();
+        });
+
+        getTokenFake = () => Promise.reject('The user is not logged in');
+
+        fireMessageEvent({
+          messageType: 'get-token',
+          tokenRequestId: 124
+        });
+      });
+    });
+
+    it('should not connect to push notifications again when the user session changes', (done) => {
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+        refreshUserCallback();
+
+        // There's no great way to test that the toast container init method has only been called once
+        // since there's nothing that happens the second time, hence the setTimeout().
+        setTimeout(() => {
+          expect(toastContainerInitSpy).toHaveBeenCalledTimes(1);
+
+          done();
+        });
+      });
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
+
+    it('should notify the omnibar to open the push notifications menu', (done) => {
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+      });
+
+      toastContainerInitSpy.and.callFake((args: BBOmnibarToastContainerInitArgs) => {
+        args.openMenuCallback();
+
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'push-notifications-open'
+          }
+        );
+
+        done();
+      });
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
+
+    it('should not connect to push notifications if the required entitlement is missing', (done) => {
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+
+        setTimeout(() => {
+          expect(toastContainerInitSpy).not.toHaveBeenCalled();
+
+          done();
+        });
+      });
+
+      // tslint:disable-next-line:max-line-length
+      getTokenFake = () => Promise.resolve('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
+
+    it('should connect to push notifications if the required entitlement is in an array in the JWT', (done) => {
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+
+        setTimeout(() => {
+          expect(toastContainerInitSpy).toHaveBeenCalled();
+
+          expect(toastContainerUpdateUrlSpy).toHaveBeenCalledWith(location.href);
+
+          done();
+        });
+      });
+
+      getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
+
+      loadOmnibar();
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
     });
 
   });
