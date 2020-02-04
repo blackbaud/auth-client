@@ -75,6 +75,9 @@ describe('Omnibar', () => {
   // tslint:disable-next-line:max-line-length
   const testTokenWithNotificationEntitlement = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjpbIm5vdGlmIiwiZm9vIl19.XskU9eHmCxzkRq0GIgmZd3MtFHZ9xaWJUWeuUkDjPb0';
 
+  // tslint:disable-next-line:max-line-length
+  const testTokenWithoutNotificationEntitlement = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+
   function loadOmnibar(config?: BBOmnibarConfig): void {
     config = config || {};
     config.url = BASE_URL;
@@ -1256,8 +1259,7 @@ describe('Omnibar', () => {
         });
       });
 
-      // tslint:disable-next-line:max-line-length
-      getTokenFake = () => Promise.resolve('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c');
+      getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
 
       loadOmnibar();
 
@@ -1288,6 +1290,49 @@ describe('Omnibar', () => {
         messageType: 'get-token',
         tokenRequestId: 123
       });
+    });
+
+  });
+
+  describe('pushNotificationsEnabled() method', () => {
+
+    it('should return false if the omnibar has not been initialized', (done) => {
+      BBOmnibar.pushNotificationsEnabled()
+        .then((enabled) => {
+          expect(enabled).toBe(false);
+          done();
+        });
+    });
+
+    it('should check the token for the notif entitlement', (done) => {
+      loadOmnibar();
+
+      getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
+
+      BBOmnibar.pushNotificationsEnabled()
+        .then((enabledWithoutNotif) => {
+          expect(enabledWithoutNotif).toBe(false);
+
+          getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
+
+          BBOmnibar.pushNotificationsEnabled()
+            .then((enabledWithNotif) => {
+              expect(enabledWithNotif).toBe(true);
+              done();
+            });
+        });
+    });
+
+    it('should return false if retrieving a token fails', (done) => {
+      loadOmnibar();
+
+      getTokenFake = () => Promise.reject('The user is not logged in');
+
+      BBOmnibar.pushNotificationsEnabled()
+        .then((enabled) => {
+          expect(enabled).toBe(false);
+          done();
+        });
     });
 
   });
