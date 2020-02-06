@@ -1,3 +1,7 @@
+# 2.22.0 (2020-02-04)
+
+- Added a `pushNotificationsEnabled()` method to `BBOmnibar` to determine whether push notifications are enabled for the current user. [#126](https://github.com/blackbaud/auth-client/pull/126)
+
 # 2.21.0 (2019-11-26)
 
 - Added a `setTitle()` method to `BBOmnibar` to enable setting the window title while preserving the omnibar's selected service name and unread notification count in the title. [#116](https://github.com/blackbaud/auth-client/pull/116)
