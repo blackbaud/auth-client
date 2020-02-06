@@ -567,7 +567,7 @@ function messageHandler(event: MessageEvent): void {
 function buildOmnibarUrl(): string {
   const omnibarUrl = omnibarConfig.url ||
     /* istanbul ignore next */
-    'https://host.nxt.blackbaud.com/omnibar/';
+    'https://app.blackbaud.com/omnibar/';
 
   return omnibarUrl;
 }

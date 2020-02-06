@@ -192,7 +192,7 @@ function messageHandler(event: MessageEvent): void {
 
 export class BBOmnibarToastContainer {
 
-  public static readonly CONTAINER_URL = 'https://host.nxt.blackbaud.com/omnibar/toast';
+  public static readonly CONTAINER_URL = 'https://app.blackbaud.com/omnibar/toast';
 
   public static init(args: BBOmnibarToastContainerInitArgs): Promise<void> {
     initArgs = args;
