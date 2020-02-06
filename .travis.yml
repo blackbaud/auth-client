@@ -1,7 +1,7 @@
 language: node_js
 
 addons:
-  firefox: "52.0.2"
+  firefox: "latest"
 
 services:
   - xvfb
