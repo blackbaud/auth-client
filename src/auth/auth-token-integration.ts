@@ -32,7 +32,8 @@ export class BBAuthTokenIntegration {
         leId,
         true
       );
-    } else if (!this.hostNameEndsWith('blackbaud.com')) {
+
+    if (!this.hostNameEndsWith('blackbaud.com')) {
       return BBAuthCrossDomainIframe.getToken({
         disableRedirect,
         envId,
