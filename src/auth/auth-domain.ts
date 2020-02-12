@@ -1,5 +1,6 @@
 const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
-  'bbk12.com': 'https://sts-sso.bbk12.com'
+  'bbk12.com': 'https://sts-sso.bbk12.com',
+  'donorcentral.com': 'https://sts-dc.donorcentral.com'
 };
 const defaultSTSUrl = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
