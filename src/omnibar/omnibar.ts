@@ -234,66 +234,48 @@ function openPushNotificationsMenu(): void {
   );
 }
 
-function hasNotificationsEntitlement(token: string): boolean {
-  const decodedToken: any = jwtDecode(token);
-  let entitlements: string | string[] = decodedToken['1bb.entitlements'];
-
-  if (entitlements) {
-    entitlements = Array.isArray(entitlements) ? entitlements : [entitlements];
-    return (entitlements as string[]).indexOf('notif') > -1;
-  }
-
-  return false;
-}
-
 function connectPushNotifications(): void {
   if (!pushNotificationsConnected) {
     pushNotificationsConnected = true;
 
-    BBAuth.getToken({
-      disableRedirect: true,
-      envId: omnibarConfig.envId,
-      leId: omnibarConfig.leId,
-      permissionScope: 'Notifications'
-    }).then((token: string) => {
-      if (hasNotificationsEntitlement(token)) {
-        BBOmnibarToastContainer.init({
-          envId: omnibarConfig.envId,
-          leId: omnibarConfig.leId,
-          navigateCallback: handleNavigate,
-          navigateUrlCallback: handleNavigateUrl,
-          openMenuCallback: openPushNotificationsMenu,
-          svcId: omnibarConfig.svcId,
-          url: document.location.href
-        })
-          .then(() => {
-            BBOmnibarPushNotifications.connect(
-              omnibarConfig.leId,
-              omnibarConfig.envId,
-              (notifications) => {
-                BBAuthInterop.postOmnibarMessage(
-                  iframeEl,
-                  {
-                    messageType: 'push-notifications-update',
-                    pushNotifications: notifications
-                  }
-                );
+    BBOmnibar.pushNotificationsEnabled()
+      .then((enabled) => {
+        if (enabled) {
+          BBOmnibarToastContainer.init({
+            envId: omnibarConfig.envId,
+            leId: omnibarConfig.leId,
+            navigateCallback: handleNavigate,
+            navigateUrlCallback: handleNavigateUrl,
+            openMenuCallback: openPushNotificationsMenu,
+            svcId: omnibarConfig.svcId,
+            url: document.location.href
+          })
+            .then(() => {
+              BBOmnibarPushNotifications.connect(
+                omnibarConfig.leId,
+                omnibarConfig.envId,
+                (notifications) => {
+                  BBAuthInterop.postOmnibarMessage(
+                    iframeEl,
+                    {
+                      messageType: 'push-notifications-update',
+                      pushNotifications: notifications
+                    }
+                  );
 
-                BBOmnibarToastContainer.showNewNotifications(notifications);
+                  BBOmnibarToastContainer.showNewNotifications(notifications);
 
-                unreadNotificationCount = notifications &&
-                  notifications.notifications &&
-                  notifications.notifications.filter((notification: any) => !notification.isRead).length;
+                  unreadNotificationCount = notifications &&
+                    notifications.notifications &&
+                    notifications.notifications.filter((notification: any) => !notification.isRead).length;
 
-                updateTitle();
+                  updateTitle();
+                });
               });
-            });
-      } else {
-        pushNotificationsConnected = false;
-      }
-    }).catch(() => {
-      pushNotificationsConnected = false;
-    });
+        } else {
+          pushNotificationsConnected = false;
+        }
+      });
   }
 }
 
@@ -644,6 +626,33 @@ export class BBOmnibar {
   public static setTitle(args: BBOmnibarSetTitleArgs): void {
     currentTitleParts = args && args.titleParts;
     updateTitle();
+  }
+
+  public static async pushNotificationsEnabled(): Promise<boolean> {
+    if (!omnibarConfig) {
+      return Promise.resolve(false);
+    }
+
+    return BBAuth.getToken({
+      disableRedirect: true,
+      envId: omnibarConfig.envId,
+      leId: omnibarConfig.leId,
+      permissionScope: 'Notifications'
+    }).then(
+      (token) => {
+        const decodedToken: any = jwtDecode(token);
+        let entitlements: string | string[] = decodedToken['1bb.entitlements'];
+
+        if (entitlements) {
+          entitlements = Array.isArray(entitlements) ? entitlements : [entitlements];
+          return (entitlements as string[]).indexOf('notif') > -1;
+        }
+
+        return false;
+      }
+    ).catch(() => {
+      return false;
+    });
   }
 
   public static destroy(): void {
