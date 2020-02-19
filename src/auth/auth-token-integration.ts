@@ -22,19 +22,7 @@ export class BBAuthTokenIntegration {
     leId?: string
   ): Promise<any> {
 
-    if (BBAuthDomain.getRegisteredDomain() !== undefined) {
-      return BBCsrfXhr.request(
-        BBAuthDomain.getSTSDomain() + '/oauth2/token',
-        undefined,
-        disableRedirect,
-        envId,
-        permissionScope,
-        leId,
-        true
-      );
-    }
-
-    if (!this.hostNameEndsWith('blackbaud.com')) {
+    if (BBAuthDomain.getRegisteredDomain() === undefined && !this.hostNameEndsWith('blackbaud.com')) {
       return BBAuthCrossDomainIframe.getToken({
         disableRedirect,
         envId,
