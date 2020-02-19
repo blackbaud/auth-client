@@ -5,7 +5,8 @@
   "main": "dist/bundles/auth-client.umd.js",
   "module": "index.ts",
   "pipelineSettings": {
-    "publishToCDN": true
+    "publishToCDN": true,
+    "publishToNPM": true
   },
   "scripts": {
     "ci": "npm run test:ci && npm run build",
