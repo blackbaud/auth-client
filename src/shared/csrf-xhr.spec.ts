@@ -6,15 +6,21 @@ import {
   BBAuthTokenErrorCode
 } from '../auth';
 
+import {
+  BBAuthDomain
+} from '../auth/auth-domain';
+
 import 'jasmine-ajax';
 
 describe('Auth token integration', () => {
   let navigateSpy: jasmine.Spy;
+  let domainSpy: jasmine.Spy;
 
   beforeAll(() => {
     jasmine.Ajax.install();
 
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
+    domainSpy = spyOn(BBAuthDomain, 'getSTSDomain');
   });
 
   beforeEach(() => {
@@ -24,6 +30,7 @@ describe('Auth token integration', () => {
   });
 
   afterAll(() => {
+    expect(domainSpy).toHaveBeenCalled();
     jasmine.Ajax.uninstall();
   });
 
@@ -40,6 +47,7 @@ describe('Auth token integration', () => {
       responseText: undefined,
       status: 401
     });
+    expect(domainSpy).toHaveBeenCalled();
   });
 
   it('should not redirect to the signin page when redirecting is disabled', (done) => {

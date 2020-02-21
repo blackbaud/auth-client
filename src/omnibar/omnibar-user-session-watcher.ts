@@ -4,6 +4,8 @@ import { BBAuthInterop } from '../shared/interop';
 
 import { BBAuthNavigator } from '../shared/navigator';
 
+import { BBAuthDomain } from '../auth/auth-domain';
+
 let isWatching: boolean;
 let currentLegacyKeepAliveUrl: string;
 let currentRefreshUserCallback: () => void;
@@ -142,7 +144,7 @@ function messageListener(event: MessageEvent) {
 }
 
 export class BBOmnibarUserSessionWatcher {
-  public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
+  public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = BBAuthDomain.getSTSDomain();
 
   public static start(
     allowAnonymous: boolean,

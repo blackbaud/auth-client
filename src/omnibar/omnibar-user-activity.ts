@@ -1,8 +1,8 @@
+import { BBAuthDomain } from '../auth/auth-domain';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
 import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
 import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
-
-import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 import { BBAuthNavigator } from '../shared/navigator';
 
@@ -44,7 +44,7 @@ function renewSession() {
     lastRenewal = now;
 
     BBCsrfXhr.request(
-      'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/renew',
+      BBAuthDomain.getSTSDomain() + '/session/renew',
       {
         inactivity: 1
       }
@@ -128,8 +128,6 @@ export class BBOmnibarUserActivity {
   // session is determined by calls to auth's TTL endpoint, this value is used to determine when to start renewing
   // the session by calculating the difference between the max session age and the min renewal age.
   public static MAX_SESSION_AGE = 90 * 60 * 1000;
-
-  public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
   public static startTracking(
     refreshUserCallback: () => void,
