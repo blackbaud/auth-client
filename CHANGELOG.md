@@ -1,6 +1,6 @@
 # 2.23.0 (2020-02-21)
 
-- Updated the authentication service to call a different service URL depending on the caller's domain. This resolves the infinite redirect loop experienced by some Safari users by assigning cooikes on Blackbaud-owned domains which are not `blackbaud.com`. [#134](https://github.com/blackbaud/auth-client/pull/134) (Thanks @Acoulter18!)
+- Updated the authentication service to call a different service URL depending on the caller's domain. This resolves the infinite redirect loop experienced by some Safari users by assigning cookies on Blackbaud-owned domains that are not `blackbaud.com`. [#134](https://github.com/blackbaud/auth-client/pull/134) (Thanks @Acoulter18!)
 
 # 2.22.0 (2020-02-04)
 
