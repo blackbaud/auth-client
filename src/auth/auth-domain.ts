@@ -14,12 +14,13 @@ export class BBAuthDomain {
   public static CURRENT_DOMAIN = window.location.hostname;
 
   public static getRegisteredDomain(): string {
-
-    return Object.keys(thirdPartyDomainSTSUrlMappings).find((d) => {
+    for (const d of Object.keys(thirdPartyDomainSTSUrlMappings)) {
       const domainEndCompare = `.${d}`;
 
-      return this.CURRENT_DOMAIN === d || this.CURRENT_DOMAIN.substr(-domainEndCompare.length) === domainEndCompare;
-    });
+      if (this.CURRENT_DOMAIN === d || this.CURRENT_DOMAIN.substr(-domainEndCompare.length) === domainEndCompare) {
+        return d;
+      }
+    }
   }
 
   public static getSTSDomain(): string {
