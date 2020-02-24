@@ -1,3 +1,7 @@
+# 2.23.1 (2020-02-24)
+
+- Fixed an error in IE when retrieving a token. [#137](https://github.com/blackbaud/auth-client/pull/137)
+
 # 2.23.0 (2020-02-21)
 
 - Updated the authentication service to call a different service URL depending on the caller's domain. This resolves the infinite redirect loop experienced by some Safari users by assigning cookies on Blackbaud-owned domains that are not `blackbaud.com`. [#134](https://github.com/blackbaud/auth-client/pull/134) (Thanks @Acoulter18!)
