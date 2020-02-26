@@ -1,6 +1,6 @@
 # 2.24.0 (2020-02-26)
 
-- Added additional domains to the auth domain whitelist. [#136](https://github.com/blackbaud/auth-client/pull/136)
+- Added additional domains to the auth domain whitelist. [#136](https://github.com/blackbaud/auth-client/pull/136) (Thanks @Acoulter18!)
 
 # 2.23.1 (2020-02-24)
 
