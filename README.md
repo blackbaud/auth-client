@@ -68,7 +68,16 @@ BBAuthClient.BBOmnibar.load({
 });
 ```
 
-If you're using no module loader at all, then you can load the `dist/bundles/auth-client.umd.js` file onto your page via a `<script>` element or concatenated with the rest of your page's JavaScript and access it via the global `BBAuthClient` variable:
+If you're using no module loader at all or prefer to reference the file via CDN, you can load the file onto your page via `<script>` tag.
+
+If using NPM, add a reference to `dist/bundles/auth-client.umd.js` or concatenate that file with the rest of your page's JavaScript.
+
+If using the SKY UX CDN, add a reference to `https://sky.blackbaudcdn.net/static/auth-client/[VERSION]/auth-client.global.min.js`, where `[VERSION]` is the version you'd like to use.  All versions published to NPM are also available through the CDN.  You can also reference the latest major version. Example versions:
+
+- `https://sky.blackbaudcdn.net/static/auth-client/2.24.0/auth-client.global.min.js`
+- `https://sky.blackbaudcdn.net/static/auth-client/2/auth-client.global.min.js`
+
+You can now access it via the global `BBAuthClient` variable:
 
 ```
 // BBAuthClient is global here.
