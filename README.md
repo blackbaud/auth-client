@@ -68,7 +68,7 @@ BBAuthClient.BBOmnibar.load({
 });
 ```
 
-If you're using no module loader at all or prefer to reference the file via CDN, you can load the file onto your page via `<script>` tag.
+If you're not using a module loader or prefer to reference the file via CDN, you can load the file onto your page via `<script>` tag.
 
 If using NPM, add a reference to `dist/bundles/auth-client.umd.js` or concatenate that file with the rest of your page's JavaScript.
 
