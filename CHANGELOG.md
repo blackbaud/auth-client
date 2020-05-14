@@ -1,3 +1,19 @@
+# 2.24.0 (2020-02-26)
+
+- Added additional domains to the auth domain whitelist. [#136](https://github.com/blackbaud/auth-client/pull/136) (Thanks @Acoulter18!)
+
+# 2.23.1 (2020-02-24)
+
+- Fixed an error in IE when retrieving a token. [#137](https://github.com/blackbaud/auth-client/pull/137)
+
+# 2.23.0 (2020-02-21)
+
+- Updated the authentication service to call a different service URL depending on the caller's domain. This resolves the infinite redirect loop experienced by some Safari users by assigning cookies on Blackbaud-owned domains that are not `blackbaud.com`. [#134](https://github.com/blackbaud/auth-client/pull/134) (Thanks @Acoulter18!)
+
+# 2.22.0 (2020-02-04)
+
+- Added a `pushNotificationsEnabled()` method to `BBOmnibar` to determine whether push notifications are enabled for the current user. [#126](https://github.com/blackbaud/auth-client/pull/126)
+
 # 2.21.0 (2019-11-26)
 
 - Added a `setTitle()` method to `BBOmnibar` to enable setting the window title while preserving the omnibar's selected service name and unread notification count in the title. [#116](https://github.com/blackbaud/auth-client/pull/116)
