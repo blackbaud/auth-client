@@ -68,6 +68,8 @@ const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 
 let envEl: HTMLDivElement;
+let envNameEl: HTMLDivElement;
+let envInfoEl: HTMLDivElement;
 let placeholderEl: HTMLDivElement;
 let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
@@ -90,6 +92,14 @@ function addIframeEl(): void {
 function addEnvironmentEl(): void {
   envEl = document.createElement('div');
   envEl.className = 'sky-omnibar-environment';
+
+  envInfoEl = document.createElement('div');
+  envInfoEl.className = 'sky-omnibar-environment-info';
+  envEl.appendChild(envInfoEl);
+
+  envNameEl = document.createElement('div');
+  envNameEl.className = 'sky-omnibar-environment-name';
+  envEl.appendChild(envNameEl);
 
   BBAuthDomUtility.addElToBodyTop(envEl);
 }
@@ -171,9 +181,23 @@ body {
   line-height: 24px;
   overflow: hidden;
   padding: 0 15px;
-  text-align: right;
+  position: relative;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sky-omnibar-environment-info {
+  text-align: center;
+}
+
+.sky-omnibar-environment-name {
+  position: absolute;
+  right: 15px;
+  top: 0;
+}
+
+.sky-omnibar-environment-sandbox {
+  background-color: #b7da9b
 }
 
 .sky-omnibar-environment-visible .sky-omnibar-environment {
@@ -392,13 +416,28 @@ function handlePushNotificationsChange(notifications: any[]): void {
   BBOmnibarPushNotifications.updateNotifications(notifications);
 }
 
-function handleEnvironmentUpdate(name: string) {
+function handleEnvironmentUpdate(name: string, isSandbox: boolean, isTest: boolean, managementUrl: string) {
   const bodyCls = 'sky-omnibar-environment-visible';
   const bodyClassList = document.body.classList;
+  const sandboxCls = 'sky-omnibar-environment-sandbox';
 
   name = name || '';
 
-  envEl.innerText = name;
+  envNameEl.innerText = name;
+
+  if (isSandbox) {
+    envEl.classList.add(sandboxCls);
+    envInfoEl.innerText = 'Sandbox';
+
+    if (managementUrl) {
+      const a = document.createElement('a');
+      a.href = managementUrl;
+      a.innerText = "Manage environments";
+      envInfoEl.appendChild(a);
+    }
+  } else {
+    envEl.classList.remove(sandboxCls);
+  }
 
   if (name) {
     bodyClassList.add(bodyCls);
@@ -551,7 +590,7 @@ function messageHandler(event: MessageEvent): void {
       BBOmnibarUserActivity.userRenewedSession();
       break;
     case 'environment-update':
-      handleEnvironmentUpdate(message.name);
+      handleEnvironmentUpdate(message.name, message.isSandbox, message.isTest, message.managementUrl);
       break;
     case 'legacy-keep-alive-url-change':
       currentLegacyKeepAliveUrl = message.url;
@@ -672,6 +711,8 @@ export class BBOmnibar {
       placeholderEl =
       iframeEl =
       envEl =
+      envInfoEl =
+      envNameEl =
       promiseResolve =
       pushNotificationsConnected =
       unreadNotificationCount =
