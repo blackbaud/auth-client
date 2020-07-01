@@ -1,6 +1,6 @@
 # 2.27.0 (2020-07-01)
 
-- Removed the recently added auth domains in the whitelist. (Thanks @Blackbaud-VeehaKhanna)
+- Removed the recently added auth domains in the whitelist. [#146](https://github.com/blackbaud/auth-client/pull/146) (Thanks @Blackbaud-VeehaKhanna)
 
 # 2.26.0 (2020-06-30)
 
