@@ -1,9 +1,7 @@
 const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
   'bbk12.com': 'https://sts-sso.bbk12.com',
   'blackbaudfaith.com': 'https://sts.blackbaudfaith.com',
-  'blackbaudhosting.com': 'https://sts.blackbaudhosting.com',
   'donorcentral.com': 'https://sts-dc.donorcentral.com',
-  'etapestry.com': 'https://sts.etapestry.com',
   'mycampus-app.com': 'https://sts-sso.mycampus-app.com',
   'myschoolapp.com': 'https://sts-sso.myschoolapp.com',
   'myschoolautomation.com': 'https://sts-sso.myschoolautomation.com',
