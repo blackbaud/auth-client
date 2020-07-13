@@ -1,3 +1,7 @@
+# 2.28.0 (2020-07-10)
+
+- Added additional domain to the auth domain whitelist. [#148](https://github.com/blackbaud/auth-client/pull/148) (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.27.0 (2020-07-01)
 
 - Removed the recently added auth domains in the whitelist. [#146](https://github.com/blackbaud/auth-client/pull/146) (Thanks @Blackbaud-VeehaKhanna)
