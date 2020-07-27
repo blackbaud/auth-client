@@ -85,6 +85,12 @@ describe('Omnibar', () => {
     BBOmnibar.load(config);
   }
 
+  function loadOmnibarWithNotifications(): void {
+    loadOmnibar({
+      svcId: 'renxt'
+    });
+  }
+
   function getIframeEl(): HTMLIFrameElement {
     return document.querySelector('.sky-omnibar-iframe') as HTMLIFrameElement;
   }
@@ -651,7 +657,7 @@ describe('Omnibar', () => {
 
       getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'ready'
@@ -1166,7 +1172,7 @@ describe('Omnibar', () => {
         cb(testNotifications);
       });
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'ready'
@@ -1178,7 +1184,7 @@ describe('Omnibar', () => {
         refreshUserCallback();
       });
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1214,7 +1220,7 @@ describe('Omnibar', () => {
         });
       });
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1240,7 +1246,7 @@ describe('Omnibar', () => {
         done();
       });
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1261,7 +1267,7 @@ describe('Omnibar', () => {
 
       getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1284,12 +1290,64 @@ describe('Omnibar', () => {
 
       getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
         tokenRequestId: 123
       });
+    });
+
+    describe('handle notifications per svcid', () => {
+
+      function testSvcId(
+        svcId: string,
+        tokenSpyCalled: boolean,
+        notificationsInitialized: boolean,
+        done: DoneFn
+      ): void {
+        startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+          refreshUserCallback();
+
+          setTimeout(() => {
+            expect(getTokenSpy).toHaveBeenCalledTimes(tokenSpyCalled ? 3 : 2);
+
+            if (notificationsInitialized) {
+              expect(toastContainerInitSpy).toHaveBeenCalled();
+            } else {
+              expect(toastContainerInitSpy).not.toHaveBeenCalled();
+            }
+
+            done();
+          });
+        });
+
+        loadOmnibar({
+          svcId
+        });
+
+        fireMessageEvent({
+          messageType: 'get-token',
+          tokenRequestId: 123
+        });
+      }
+
+      it('renxt', (done) => {
+        testSvcId('renxt', true, true, done);
+      });
+
+      it('fenxt', (done) => {
+        testSvcId('fenxt', true, true, done);
+      });
+
+      it('skydev', (done) => {
+        testSvcId('skydev', false, true, done);
+      });
+
+      it('skyux', (done) => {
+        testSvcId('skyux', false, false, done);
+      });
+
     });
 
   });
@@ -1305,7 +1363,7 @@ describe('Omnibar', () => {
     });
 
     it('should check the token for the notif entitlement', (done) => {
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
 

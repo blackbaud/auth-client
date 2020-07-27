@@ -1,5 +1,3 @@
-//#region imports
-
 import * as jwtDecode from 'jwt-decode';
 
 import {
@@ -62,10 +60,20 @@ import {
   BBOmnibarThemeAccent
 } from './theming';
 
-//#endregion
-
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
+
+const notificationSvcIds: any = {
+  fenxt: {
+    requiresNotif: true
+  },
+  renxt: {
+    requiresNotif: true
+  },
+  skydev: {
+    requiresNotif: false
+  }
+};
 
 let envEl: HTMLDivElement;
 let placeholderEl: HTMLDivElement;
@@ -633,26 +641,34 @@ export class BBOmnibar {
       return Promise.resolve(false);
     }
 
-    return BBAuth.getToken({
-      disableRedirect: true,
-      envId: omnibarConfig.envId,
-      leId: omnibarConfig.leId,
-      permissionScope: 'Notifications'
-    }).then(
-      (token) => {
-        const decodedToken: any = jwtDecode(token);
-        let entitlements: string | string[] = decodedToken['1bb.entitlements'];
+    if (notificationSvcIds[omnibarConfig.svcId]) {
+      if (notificationSvcIds[omnibarConfig.svcId].requiresNotif) {
+        return BBAuth.getToken({
+          disableRedirect: true,
+          envId: omnibarConfig.envId,
+          leId: omnibarConfig.leId,
+          permissionScope: 'Notifications'
+        }).then(
+          (token) => {
+            const decodedToken: any = jwtDecode(token);
+            let entitlements: string | string[] = decodedToken['1bb.entitlements'];
 
-        if (entitlements) {
-          entitlements = Array.isArray(entitlements) ? entitlements : [entitlements];
-          return (entitlements as string[]).indexOf('notif') > -1;
-        }
+            if (entitlements) {
+              entitlements = Array.isArray(entitlements) ? entitlements : [entitlements];
+              return (entitlements as string[]).indexOf('notif') > -1;
+            }
 
-        return false;
+            return false;
+          }
+          ).catch(() => {
+            return false;
+          });
+      } else {
+        return Promise.resolve(true);
       }
-    ).catch(() => {
-      return false;
-    });
+    }
+
+    return Promise.resolve(false);
   }
 
   public static destroy(): void {
