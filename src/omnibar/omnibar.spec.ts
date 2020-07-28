@@ -1,5 +1,3 @@
-//#region imports
-
 import {
   BBOmnibar
 } from './omnibar';
@@ -63,8 +61,6 @@ import {
 import {
   BBOmnibarToastContainerInitArgs
 } from './omnibar-toast-container-init-args';
-
-//#endregion
 
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
@@ -1310,19 +1306,32 @@ describe('Omnibar', () => {
           refreshUserCallback();
 
           setTimeout(() => {
-            expect(getTokenSpy).toHaveBeenCalledTimes(tokenSpyCalled ? 3 : 2);
-
-            if (notificationsInitialized) {
-              expect(toastContainerInitSpy).toHaveBeenCalled();
-            } else {
-              expect(toastContainerInitSpy).not.toHaveBeenCalled();
+            let allArgsExpectation = expect(getTokenSpy.calls.allArgs());
+            if (!tokenSpyCalled) {
+              allArgsExpectation = allArgsExpectation.not;
             }
+            allArgsExpectation.toContain(
+              [{
+                disableRedirect: true,
+                envId: 'envid',
+                leId: 'leid',
+                permissionScope: 'Notifications'
+              }]
+            );
+
+            let toastContainerExpectation = expect(toastContainerInitSpy);
+            if (!notificationsInitialized) {
+              toastContainerExpectation = toastContainerExpectation.not;
+            }
+            toastContainerExpectation.toHaveBeenCalled();
 
             done();
           });
         });
 
         loadOmnibar({
+          envId: 'envid',
+          leId: 'leid',
           svcId
         });
 
