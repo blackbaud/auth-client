@@ -1294,67 +1294,63 @@ describe('Omnibar', () => {
       });
     });
 
-    describe('handle notifications per svcid', () => {
+    describe('when connecting to notifications', () => {
 
       function testSvcId(
         svcId: string,
         tokenSpyCalled: boolean,
-        notificationsInitialized: boolean,
-        done: DoneFn
-      ): void {
-        startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
-          refreshUserCallback();
+        notificationsInitialized: boolean
+      ): Promise<void> {
+        return new Promise((resolve) => {
+          startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+            refreshUserCallback();
 
-          setTimeout(() => {
-            let allArgsExpectation = expect(getTokenSpy.calls.allArgs());
-            if (!tokenSpyCalled) {
-              allArgsExpectation = allArgsExpectation.not;
-            }
-            allArgsExpectation.toContain(
-              [{
-                disableRedirect: true,
-                envId: 'envid',
-                leId: 'leid',
-                permissionScope: 'Notifications'
-              }]
-            );
+            setTimeout(() => {
+              let allArgsExpectation = expect(getTokenSpy.calls.allArgs());
+              if (!tokenSpyCalled) {
+                allArgsExpectation = allArgsExpectation.not;
+              }
+              allArgsExpectation.toContain(
+                [{
+                  disableRedirect: true,
+                  envId: 'envid',
+                  leId: 'leid',
+                  permissionScope: 'Notifications'
+                }]
+              );
 
-            let toastContainerExpectation = expect(toastContainerInitSpy);
-            if (!notificationsInitialized) {
-              toastContainerExpectation = toastContainerExpectation.not;
-            }
-            toastContainerExpectation.toHaveBeenCalled();
+              let toastContainerExpectation = expect(toastContainerInitSpy);
+              if (!notificationsInitialized) {
+                toastContainerExpectation = toastContainerExpectation.not;
+              }
+              toastContainerExpectation.toHaveBeenCalled();
 
-            done();
+              getTokenSpy.calls.reset();
+              toastContainerInitSpy.calls.reset();
+              destroyOmnibar();
+
+              resolve();
+            });
           });
-        });
 
-        loadOmnibar({
-          envId: 'envid',
-          leId: 'leid',
-          svcId
-        });
+          loadOmnibar({
+            envId: 'envid',
+            leId: 'leid',
+            svcId
+          });
 
-        fireMessageEvent({
-          messageType: 'get-token',
-          tokenRequestId: 123
+          fireMessageEvent({
+            messageType: 'get-token',
+            tokenRequestId: 123
+          });
         });
       }
 
-      it('renxt', (done) => {
-        testSvcId('renxt', true, true, done);
-      });
-
-      it('fenxt', (done) => {
-        testSvcId('fenxt', true, true, done);
-      });
-
-      it('skydev', (done) => {
-        testSvcId('skydev', false, true, done);
-      });
-
-      it('skyux', (done) => {
-        testSvcId('skyux', false, false, done);
+      it('should respect the notification settings for a given service ID', async () => {
+        await testSvcId('renxt', true, true);
+        await testSvcId('fenxt', true, true);
+        await testSvcId('skydev', false, true);
+        await testSvcId('skyux', false, false);
       });
 
     });

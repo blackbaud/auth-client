@@ -63,7 +63,11 @@ import {
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 
-const notificationSvcIds: any = {
+const notificationSvcIds: {
+  [key: string]: {
+    requiresNotif: boolean
+  }
+} = {
   fenxt: {
     requiresNotif: true
   },
