@@ -1391,7 +1391,7 @@ describe('Omnibar', () => {
     });
 
     it('should return false if retrieving a token fails', (done) => {
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       getTokenFake = () => Promise.reject('The user is not logged in');
 

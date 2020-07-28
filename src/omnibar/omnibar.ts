@@ -660,9 +660,9 @@ export class BBOmnibar {
 
             return false;
           }
-          ).catch(() => {
-            return false;
-          });
+        ).catch(() => {
+          return false;
+        });
       } else {
         return Promise.resolve(true);
       }
