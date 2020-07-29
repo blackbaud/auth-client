@@ -79,6 +79,9 @@ const notificationSvcIds: {
   },
   skydevhome: {
     requiresNotif: false
+  },
+  skyux: {
+    requiresNotif: false
   }
 };
 
