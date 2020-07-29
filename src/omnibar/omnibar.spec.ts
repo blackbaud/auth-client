@@ -1350,6 +1350,7 @@ describe('Omnibar', () => {
         await testSvcId('renxt', true, true);
         await testSvcId('fenxt', true, true);
         await testSvcId('skydev', false, true);
+        await testSvcId('skydevhome', false, true);
         await testSvcId('skyux', false, false);
       });
 

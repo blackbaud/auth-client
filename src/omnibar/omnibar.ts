@@ -76,6 +76,9 @@ const notificationSvcIds: {
   },
   skydev: {
     requiresNotif: false
+  },
+  skydevhome: {
+    requiresNotif: false
   }
 };
 
