@@ -1,6 +1,6 @@
 # 2.29.0 (2020-07-30)
 
-- Added notification bell restrictions based on `svcid` [#152](https://github.com/blackbaud/auth-client/pull/152)
+- Added notification bell restrictions based on `svcid`. [#152](https://github.com/blackbaud/auth-client/pull/152)
 
 # 2.28.0 (2020-07-10)
 
