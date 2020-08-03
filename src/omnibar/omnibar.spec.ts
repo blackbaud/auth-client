@@ -1,5 +1,3 @@
-//#region imports
-
 import {
   BBOmnibar
 } from './omnibar';
@@ -64,8 +62,6 @@ import {
   BBOmnibarToastContainerInitArgs
 } from './omnibar-toast-container-init-args';
 
-//#endregion
-
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
 
@@ -83,6 +79,12 @@ describe('Omnibar', () => {
     config.url = BASE_URL;
 
     BBOmnibar.load(config);
+  }
+
+  function loadOmnibarWithNotifications(): void {
+    loadOmnibar({
+      svcId: 'renxt'
+    });
   }
 
   function getIframeEl(): HTMLIFrameElement {
@@ -651,7 +653,7 @@ describe('Omnibar', () => {
 
       getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'ready'
@@ -1166,7 +1168,7 @@ describe('Omnibar', () => {
         cb(testNotifications);
       });
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'ready'
@@ -1178,7 +1180,7 @@ describe('Omnibar', () => {
         refreshUserCallback();
       });
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1214,7 +1216,7 @@ describe('Omnibar', () => {
         });
       });
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1240,7 +1242,7 @@ describe('Omnibar', () => {
         done();
       });
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1261,7 +1263,7 @@ describe('Omnibar', () => {
 
       getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1284,12 +1286,75 @@ describe('Omnibar', () => {
 
       getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
 
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       fireMessageEvent({
         messageType: 'get-token',
         tokenRequestId: 123
       });
+    });
+
+    describe('when connecting to notifications', () => {
+
+      function testSvcId(
+        svcId: string,
+        tokenSpyCalled: boolean,
+        notificationsInitialized: boolean
+      ): Promise<void> {
+        return new Promise((resolve) => {
+          startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+            refreshUserCallback();
+
+            setTimeout(() => {
+              let allArgsExpectation = expect(getTokenSpy.calls.allArgs());
+              if (!tokenSpyCalled) {
+                allArgsExpectation = allArgsExpectation.not;
+              }
+              allArgsExpectation.toContain(
+                [{
+                  disableRedirect: true,
+                  envId: 'envid',
+                  leId: 'leid',
+                  permissionScope: 'Notifications'
+                }]
+              );
+
+              let toastContainerExpectation = expect(toastContainerInitSpy);
+              if (!notificationsInitialized) {
+                toastContainerExpectation = toastContainerExpectation.not;
+              }
+              toastContainerExpectation.toHaveBeenCalled();
+
+              getTokenSpy.calls.reset();
+              toastContainerInitSpy.calls.reset();
+              destroyOmnibar();
+
+              resolve();
+            });
+          });
+
+          loadOmnibar({
+            envId: 'envid',
+            leId: 'leid',
+            svcId
+          });
+
+          fireMessageEvent({
+            messageType: 'get-token',
+            tokenRequestId: 123
+          });
+        });
+      }
+
+      it('should respect the notification settings for a given service ID', async () => {
+        await testSvcId('renxt', true, true);
+        await testSvcId('fenxt', true, true);
+        await testSvcId('skydev', false, true);
+        await testSvcId('skydevhome', false, true);
+        await testSvcId('skyux', false, true);
+        await testSvcId('other', false, false);
+      });
+
     });
 
   });
@@ -1305,7 +1370,7 @@ describe('Omnibar', () => {
     });
 
     it('should check the token for the notif entitlement', (done) => {
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
 
@@ -1324,7 +1389,7 @@ describe('Omnibar', () => {
     });
 
     it('should return false if retrieving a token fails', (done) => {
-      loadOmnibar();
+      loadOmnibarWithNotifications();
 
       getTokenFake = () => Promise.reject('The user is not logged in');
 
