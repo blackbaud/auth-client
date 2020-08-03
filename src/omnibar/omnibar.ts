@@ -205,17 +205,21 @@ body {
 }
 
 .sky-omnibar-environment-info {
-  text-align: center;
+  float: right;
+  padding-left: 15px;
+  font-weight: bold;
 }
 
 .sky-omnibar-environment-name {
-  position: absolute;
-  right: 15px;
-  top: 0;
+  float: right;
 }
 
 .sky-omnibar-environment-sandbox {
-  background-color: #b7da9b
+  background-color: #b7da9b;
+}
+
+.sky-omnibar-environment-test {
+  background-color: #ffeccf;
 }
 
 .sky-omnibar-environment-visible .sky-omnibar-environment {
@@ -438,6 +442,7 @@ function handleEnvironmentUpdate(name: string, isSandbox: boolean, isTest: boole
   const bodyCls = 'sky-omnibar-environment-visible';
   const bodyClassList = document.body.classList;
   const sandboxCls = 'sky-omnibar-environment-sandbox';
+  const testCls = 'sky-omnibar-environment-test';
 
   name = name || '';
 
@@ -445,16 +450,32 @@ function handleEnvironmentUpdate(name: string, isSandbox: boolean, isTest: boole
 
   if (isSandbox) {
     envEl.classList.add(sandboxCls);
-    envInfoEl.innerText = 'Sandbox';
 
     if (managementUrl) {
       const a = document.createElement('a');
       a.href = managementUrl;
-      a.innerText = "Manage environments";
+      a.innerText = 'Sandbox environment';
       envInfoEl.appendChild(a);
+    } else {
+      envInfoEl.innerText = 'Sandbox environment';
     }
   } else {
     envEl.classList.remove(sandboxCls);
+  }
+  
+  if (isTest) {
+    envEl.classList.add(testCls);
+
+    if (managementUrl) {
+      const a = document.createElement('a');
+      a.href = managementUrl;
+      a.innerText = 'Test environment';
+      envInfoEl.appendChild(a);
+    } else {
+      envInfoEl.innerText = 'Test environment';
+    }
+  } else {
+    envEl.classList.remove(testCls);
   }
 
   if (name) {
