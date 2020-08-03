@@ -438,48 +438,51 @@ function handlePushNotificationsChange(notifications: any[]): void {
   BBOmnibarPushNotifications.updateNotifications(notifications);
 }
 
-function handleEnvironmentUpdate(name: string, isSandbox: boolean, isTest: boolean, managementUrl: string) {
+function handleEnvironmentUpdate(
+  name: string,
+  isSandbox: boolean,
+  isTest: boolean,
+  managementUrl: string,
+  envInfo: string
+): void {
   const bodyCls = 'sky-omnibar-environment-visible';
-  const bodyClassList = document.body.classList;
   const sandboxCls = 'sky-omnibar-environment-sandbox';
-  const testCls = 'sky-omnibar-environment-test';
+  const testCls = 'sky-omnibar-environment-test';  
+  const bodyClassList = document.body.classList;
+
+  let addClass: string;
 
   name = name || '';
 
   envNameEl.innerText = name;
 
-  if (isSandbox) {
-    envEl.classList.add(sandboxCls);
-
-    if (managementUrl) {
-      const a = document.createElement('a');
-      a.href = managementUrl;
-      a.innerText = 'Sandbox environment';
-      envInfoEl.appendChild(a);
-    } else {
-      envInfoEl.innerText = 'Sandbox environment';
-    }
-  } else {
-    envEl.classList.remove(sandboxCls);
-  }
-  
-  if (isTest) {
-    envEl.classList.add(testCls);
-
-    if (managementUrl) {
-      const a = document.createElement('a');
-      a.href = managementUrl;
-      a.innerText = 'Test environment';
-      envInfoEl.appendChild(a);
-    } else {
-      envInfoEl.innerText = 'Test environment';
-    }
-  } else {
-    envEl.classList.remove(testCls);
-  }
-
   if (name) {
     bodyClassList.add(bodyCls);
+
+    if (isSandbox) {
+      addClass = sandboxCls;
+    } else {
+      envEl.classList.remove(sandboxCls);
+    }
+    
+    if (isTest) {
+      addClass = testCls;
+    } else {
+      envEl.classList.remove(testCls);
+    }
+
+    if (addClass) {
+      envEl.classList.add(addClass);
+
+      if (managementUrl) {
+        const a = document.createElement('a');
+        a.href = managementUrl;
+        a.innerText = envInfo;
+        envInfoEl.appendChild(a);
+      } else {
+        envInfoEl.innerText = envInfo;
+      }
+    }
   } else {
     bodyClassList.remove(bodyCls);
   }
@@ -629,7 +632,7 @@ function messageHandler(event: MessageEvent): void {
       BBOmnibarUserActivity.userRenewedSession();
       break;
     case 'environment-update':
-      handleEnvironmentUpdate(message.name, message.isSandbox, message.isTest, message.managementUrl);
+      handleEnvironmentUpdate(message.name, message.isSandbox, message.isTest, message.managementUrl, message.envInfo);
       break;
     case 'legacy-keep-alive-url-change':
       currentLegacyKeepAliveUrl = message.url;
