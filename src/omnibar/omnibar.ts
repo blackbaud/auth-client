@@ -214,12 +214,9 @@ body {
   float: right;
 }
 
-.sky-omnibar-environment-sandbox {
-  background-color: #b7da9b;
-}
-
-.sky-omnibar-environment-test {
+.sky-omnibar-environment-additional-info {
   background-color: #ffeccf;
+  border-bottom: 2px solid #fbb034
 }
 
 .sky-omnibar-environment-visible .sky-omnibar-environment {
@@ -440,17 +437,12 @@ function handlePushNotificationsChange(notifications: any[]): void {
 
 function handleEnvironmentUpdate(
   name: string,
-  isSandbox: boolean,
-  isTest: boolean,
-  managementUrl: string,
-  envInfo: string
+  additionalInfo: string,
+  url: string,
 ): void {
   const bodyCls = 'sky-omnibar-environment-visible';
-  const sandboxCls = 'sky-omnibar-environment-sandbox';
-  const testCls = 'sky-omnibar-environment-test';  
+  const addInfoCls = 'sky-omnibar-environment-additional-info';
   const bodyClassList = document.body.classList;
-
-  let addClass: string;
 
   name = name || '';
 
@@ -459,29 +451,19 @@ function handleEnvironmentUpdate(
   if (name) {
     bodyClassList.add(bodyCls);
 
-    if (isSandbox) {
-      addClass = sandboxCls;
-    } else {
-      envEl.classList.remove(sandboxCls);
-    }
-    
-    if (isTest) {
-      addClass = testCls;
-    } else {
-      envEl.classList.remove(testCls);
-    }
+    if (additionalInfo) {
+      envEl.classList.add(addInfoCls);
 
-    if (addClass) {
-      envEl.classList.add(addClass);
-
-      if (managementUrl) {
+      if (url) {
         const a = document.createElement('a');
-        a.href = managementUrl;
-        a.innerText = envInfo;
+        a.href = url;
+        a.innerText = additionalInfo;
         envInfoEl.appendChild(a);
       } else {
-        envInfoEl.innerText = envInfo;
-      }
+        envInfoEl.innerText = additionalInfo;
+      }      
+    } else {
+      envEl.classList.remove(addInfoCls);
     }
   } else {
     bodyClassList.remove(bodyCls);
@@ -632,7 +614,7 @@ function messageHandler(event: MessageEvent): void {
       BBOmnibarUserActivity.userRenewedSession();
       break;
     case 'environment-update':
-      handleEnvironmentUpdate(message.name, message.isSandbox, message.isTest, message.managementUrl, message.envInfo);
+      handleEnvironmentUpdate(message.name, message.additionalInfo, message.url);
       break;
     case 'legacy-keep-alive-url-change':
       currentLegacyKeepAliveUrl = message.url;
