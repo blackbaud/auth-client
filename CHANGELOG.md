@@ -1,3 +1,7 @@
+# 2.30.0 (2020-08-03)
+
+- Added additional domain to auth domain whitelist. [#154](https://github.com/blackbaud/auth-client/pull/154)
+
 # 2.29.0 (2020-07-30)
 
 - Added notification bell restrictions based on `svcid`. [#152](https://github.com/blackbaud/auth-client/pull/152)
