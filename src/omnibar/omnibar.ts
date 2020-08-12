@@ -438,7 +438,7 @@ function handlePushNotificationsChange(notifications: any[]): void {
 function handleEnvironmentUpdate(
   name: string,
   additionalInfo: string,
-  url: string,
+  url: string
 ): void {
   const bodyCls = 'sky-omnibar-environment-visible';
   const addInfoCls = 'sky-omnibar-environment-additional-info';
@@ -461,7 +461,7 @@ function handleEnvironmentUpdate(
         envInfoEl.appendChild(a);
       } else {
         envInfoEl.innerText = additionalInfo;
-      }      
+      }
     } else {
       envEl.classList.remove(addInfoCls);
     }
