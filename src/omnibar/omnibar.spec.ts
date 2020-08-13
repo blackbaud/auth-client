@@ -320,6 +320,27 @@ describe('Omnibar', () => {
     expect(placeholderAccentStyle.display).toBe('none');
   });
 
+  it('should apply pre-defined styles when the theme name is "modern"', () => {
+    loadOmnibar({
+      theme: {
+        name: 'modern'
+      }
+    });
+
+    const placeholderEl = getPlaceholderEl();
+    const placeholderStyle = getComputedStyle(placeholderEl);
+
+    const placeholderAccentEl = getPlaceholderAccentEl();
+    const placeholderAccentStyle = getComputedStyle(placeholderAccentEl);
+
+    expect(placeholderStyle.backgroundColor).toBe('rgb(255, 255, 255)');
+    expect(placeholderStyle.borderBottomColor).toBe('rgb(226, 227, 228)');
+    expect(placeholderStyle.borderBottomStyle).toBe('solid');
+    expect(placeholderStyle.borderBottomWidth).toBe('1px');
+
+    expect(placeholderAccentStyle.height).toBe('4px');
+  });
+
   it('should disable redirect when the session ends and allow anonymous is true', (done) => {
     postOmnibarMessageSpy.and.callFake(
       (iframeEl: HTMLIFrameElement, data: any) => {
