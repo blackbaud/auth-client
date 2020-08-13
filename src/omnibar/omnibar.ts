@@ -118,11 +118,19 @@ function collapseIframe(): void {
 
 function addStyleEl(): void {
   let accentCss = 'background: linear-gradient(to right, #71bf44 0, #31b986 50%, #00b2ec 100%);';
+  let accentHeight = '5px';
   let backgroundColor = '#4d5259';
+  let borderBottom = 'none';
 
   const theme = omnibarConfig.theme;
 
   if (theme) {
+    if (theme.name === 'modern') {
+      accentHeight = '4px';
+      backgroundColor = '#fff';
+      borderBottom = 'solid 1px #e2e3e4';
+    }
+
     const accent = theme.accent;
 
     backgroundColor = theme.backgroundColor || backgroundColor;
@@ -159,11 +167,12 @@ body {
 
 .sky-omnibar-placeholder {
   background-color: ${backgroundColor};
+  border-bottom: ${borderBottom};
   display: none;
 }
 
 .sky-omnibar-placeholder-accent {
-  height: 5px;
+  height: ${accentHeight};
   ${accentCss}
 }
 
