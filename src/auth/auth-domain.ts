@@ -8,7 +8,8 @@ const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
   'myschoolapp.com': 'https://sts-sso.myschoolapp.com',
   'myschoolautomation.com': 'https://sts-sso.myschoolautomation.com',
   'myschooldemo.com': 'https://sts-sso.myschooldemo.com',
-  'myschooltraining.com': 'https://sts-sso.myschooltraining.com'
+  'myschooltraining.com': 'https://sts-sso.myschooltraining.com',
+  'smartaidforparents.com': 'https://account.smartaidforparents.com'
 };
 const defaultSTSUrl = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
