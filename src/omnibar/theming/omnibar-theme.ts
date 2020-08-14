@@ -18,4 +18,8 @@ export interface BBOmnibarTheme {
 
   iconColor?: string;
 
+  name?: string;
+
+  mode?: string;
+
 }

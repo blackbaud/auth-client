@@ -1,3 +1,7 @@
+# 2.31.0 (2020-08-13)
+
+- Added `theme` and `mode` properties to the omnibar theme configuration. [#155](https://github.com/blackbaud/auth-client/pull/155)
+
 # 2.30.0 (2020-08-03)
 
 - Added additional domain to auth domain whitelist. [#154](https://github.com/blackbaud/auth-client/pull/154)
