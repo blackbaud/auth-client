@@ -86,8 +86,8 @@ const notificationSvcIds: {
 };
 
 let envEl: HTMLDivElement;
-let envNameEl: HTMLDivElement;
-let envInfoEl: HTMLDivElement;
+let envNameEl: HTMLSpanElement;
+let envDescEl: HTMLSpanElement;
 let placeholderEl: HTMLDivElement;
 let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
@@ -111,13 +111,13 @@ function addEnvironmentEl(): void {
   envEl = document.createElement('div');
   envEl.className = 'sky-omnibar-environment';
 
-  envInfoEl = document.createElement('div');
-  envInfoEl.className = 'sky-omnibar-environment-info';
-  envEl.appendChild(envInfoEl);
-
-  envNameEl = document.createElement('div');
+  envNameEl = document.createElement('span');
   envNameEl.className = 'sky-omnibar-environment-name';
   envEl.appendChild(envNameEl);
+
+  envDescEl = document.createElement('span');
+  envDescEl.className = 'sky-omnibar-environment-description';
+  envEl.appendChild(envDescEl);
 
   BBAuthDomUtility.addElToBodyTop(envEl);
 }
@@ -208,22 +208,17 @@ body {
   line-height: 24px;
   overflow: hidden;
   padding: 0 15px;
-  position: relative;
+  text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.sky-omnibar-environment-info {
-  float: right;
-  padding-left: 15px;
+.sky-omnibar-environment-description {
+  margin-left: 15px;
   font-weight: bold;
 }
 
-.sky-omnibar-environment-name {
-  float: right;
-}
-
-.sky-omnibar-environment-additional-info {
+.sky-omnibar-environment-description-present {
   background-color: #ffeccf;
   border-bottom: 2px solid #fbb034
 }
@@ -446,11 +441,11 @@ function handlePushNotificationsChange(notifications: any[]): void {
 
 function handleEnvironmentUpdate(
   name: string,
-  additionalInfo: string,
+  description: string,
   url: string
 ): void {
   const bodyCls = 'sky-omnibar-environment-visible';
-  const addInfoCls = 'sky-omnibar-environment-additional-info';
+  const descCls = 'sky-omnibar-environment-description-present';
   const bodyClassList = document.body.classList;
 
   name = name || '';
@@ -460,19 +455,19 @@ function handleEnvironmentUpdate(
   if (name) {
     bodyClassList.add(bodyCls);
 
-    if (additionalInfo) {
-      envEl.classList.add(addInfoCls);
+    if (description) {
+      envEl.classList.add(descCls);
 
       if (url) {
         const a = document.createElement('a');
         a.href = url;
-        a.innerText = additionalInfo;
-        envInfoEl.appendChild(a);
+        a.innerText = description;
+        envDescEl.appendChild(a);
       } else {
-        envInfoEl.innerText = additionalInfo;
+        envDescEl.innerText = description;
       }
     } else {
-      envEl.classList.remove(addInfoCls);
+      envEl.classList.remove(descCls);
     }
   } else {
     bodyClassList.remove(bodyCls);
@@ -623,7 +618,7 @@ function messageHandler(event: MessageEvent): void {
       BBOmnibarUserActivity.userRenewedSession();
       break;
     case 'environment-update':
-      handleEnvironmentUpdate(message.name, message.additionalInfo, message.url);
+      handleEnvironmentUpdate(message.name, message.description, message.url);
       break;
     case 'legacy-keep-alive-url-change':
       currentLegacyKeepAliveUrl = message.url;
@@ -752,7 +747,7 @@ export class BBOmnibar {
       placeholderEl =
       iframeEl =
       envEl =
-      envInfoEl =
+      envDescEl =
       envNameEl =
       promiseResolve =
       pushNotificationsConnected =

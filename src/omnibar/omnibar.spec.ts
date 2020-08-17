@@ -580,7 +580,7 @@ describe('Omnibar', () => {
 
       const environmentEl = document.querySelector('.sky-omnibar-environment') as any;
       const environmentNameEl = document.querySelector('.sky-omnibar-environment-name') as any;
-      const environmentInfoEl = document.querySelector('.sky-omnibar-environment-info') as any;
+      const environmentInfoEl = document.querySelector('.sky-omnibar-environment-description') as any;
       let environmentInfoLinkEl: any;
 
       const validateVisible = (visible: boolean) => {
@@ -589,8 +589,8 @@ describe('Omnibar', () => {
         expect(environmentNameEl.innerText.trim()).toBe(visible ? 'Environment name' : '');
       };
 
-      const validateAdditionalInfo = (visible: boolean, url?: boolean) => {
-        expect(environmentEl.classList.contains('sky-omnibar-environment-additional-info')).toBe(visible);
+      const validateDescription = (visible: boolean, url?: boolean) => {
+        expect(environmentEl.classList.contains('sky-omnibar-environment-description-present')).toBe(visible);
 
         environmentInfoLinkEl = environmentInfoEl.querySelector('a');
 
@@ -604,7 +604,7 @@ describe('Omnibar', () => {
       };
 
       validateVisible(false);
-      validateAdditionalInfo(false);
+      validateDescription(false);
 
       fireMessageEvent({
         messageType: 'environment-update',
@@ -612,7 +612,7 @@ describe('Omnibar', () => {
       });
 
       validateVisible(true);
-      validateAdditionalInfo(false);
+      validateDescription(false);
 
       fireMessageEvent({
         messageType: 'environment-update',
@@ -620,26 +620,26 @@ describe('Omnibar', () => {
       });
 
       validateVisible(false);
-      validateAdditionalInfo(false);
+      validateDescription(false);
 
       fireMessageEvent({
-        additionalInfo: 'Test environment',
+        description: 'Test environment',
         messageType: 'environment-update',
         name: 'Environment name'
       });
 
       validateVisible(true);
-      validateAdditionalInfo(true);
+      validateDescription(true);
 
       fireMessageEvent({
-        additionalInfo: 'Test environment',
+        description: 'Test environment',
         messageType: 'environment-update',
         name: 'Environment name',
         url: 'https://app.blackbaud.com/auth-client-env-url'
       });
 
       validateVisible(true);
-      validateAdditionalInfo(true, true);
+      validateDescription(true, true);
     });
 
     it('should restart activity tracking when the legacy session keep-alive URL changes', () => {
