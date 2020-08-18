@@ -1,3 +1,7 @@
+# 2.32.0 (2020-08-18)
+
+- Updated the environment bar styling for sandbox and test environments. [#158](https://github.com/blackbaud/auth-client/pull/158)
+
 # 2.31.0 (2020-08-13)
 
 - Added `theme` and `mode` properties to the omnibar theme configuration. [#155](https://github.com/blackbaud/auth-client/pull/155)
