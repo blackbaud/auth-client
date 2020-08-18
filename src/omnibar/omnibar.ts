@@ -86,6 +86,8 @@ const notificationSvcIds: {
 };
 
 let envEl: HTMLDivElement;
+let envNameEl: HTMLSpanElement;
+let envDescEl: HTMLSpanElement;
 let placeholderEl: HTMLDivElement;
 let styleEl: HTMLStyleElement;
 let iframeEl: HTMLIFrameElement;
@@ -108,6 +110,14 @@ function addIframeEl(): void {
 function addEnvironmentEl(): void {
   envEl = document.createElement('div');
   envEl.className = 'sky-omnibar-environment';
+
+  envNameEl = document.createElement('span');
+  envNameEl.className = 'sky-omnibar-environment-name';
+  envEl.appendChild(envNameEl);
+
+  envDescEl = document.createElement('span');
+  envDescEl.className = 'sky-omnibar-environment-description';
+  envEl.appendChild(envDescEl);
 
   BBAuthDomUtility.addElToBodyTop(envEl);
 }
@@ -201,6 +211,16 @@ body {
   text-align: right;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.sky-omnibar-environment-description {
+  margin-left: 15px;
+  font-weight: bold;
+}
+
+.sky-omnibar-environment-description-present {
+  background-color: #ffeccf;
+  border-bottom: 2px solid #fbb034
 }
 
 .sky-omnibar-environment-visible .sky-omnibar-environment {
@@ -419,16 +439,36 @@ function handlePushNotificationsChange(notifications: any[]): void {
   BBOmnibarPushNotifications.updateNotifications(notifications);
 }
 
-function handleEnvironmentUpdate(name: string) {
+function handleEnvironmentUpdate(
+  name: string,
+  description: string,
+  url: string
+): void {
   const bodyCls = 'sky-omnibar-environment-visible';
+  const descCls = 'sky-omnibar-environment-description-present';
   const bodyClassList = document.body.classList;
 
   name = name || '';
 
-  envEl.innerText = name;
+  envNameEl.innerText = name;
 
   if (name) {
     bodyClassList.add(bodyCls);
+
+    if (description) {
+      envEl.classList.add(descCls);
+
+      if (url) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.innerText = description;
+        envDescEl.appendChild(a);
+      } else {
+        envDescEl.innerText = description;
+      }
+    } else {
+      envEl.classList.remove(descCls);
+    }
   } else {
     bodyClassList.remove(bodyCls);
   }
@@ -578,7 +618,7 @@ function messageHandler(event: MessageEvent): void {
       BBOmnibarUserActivity.userRenewedSession();
       break;
     case 'environment-update':
-      handleEnvironmentUpdate(message.name);
+      handleEnvironmentUpdate(message.name, message.description, message.url);
       break;
     case 'legacy-keep-alive-url-change':
       currentLegacyKeepAliveUrl = message.url;
@@ -707,6 +747,8 @@ export class BBOmnibar {
       placeholderEl =
       iframeEl =
       envEl =
+      envDescEl =
+      envNameEl =
       promiseResolve =
       pushNotificationsConnected =
       unreadNotificationCount =

@@ -579,14 +579,32 @@ describe('Omnibar', () => {
       loadOmnibar();
 
       const environmentEl = document.querySelector('.sky-omnibar-environment') as any;
+      const environmentNameEl = document.querySelector('.sky-omnibar-environment-name') as any;
+      const environmentInfoEl = document.querySelector('.sky-omnibar-environment-description') as any;
+      let environmentInfoLinkEl: any;
 
       const validateVisible = (visible: boolean) => {
         expect(document.body.classList.contains('sky-omnibar-environment-visible')).toBe(visible);
         expect(getComputedStyle(environmentEl).height).toBe(visible ? '24px' : '0px');
-        expect(environmentEl.innerText.trim()).toBe(visible ? 'Environment name' : '');
+        expect(environmentNameEl.innerText.trim()).toBe(visible ? 'Environment name' : '');
+      };
+
+      const validateDescription = (visible: boolean, url?: boolean) => {
+        expect(environmentEl.classList.contains('sky-omnibar-environment-description-present')).toBe(visible);
+
+        environmentInfoLinkEl = environmentInfoEl.querySelector('a');
+
+        if (visible && url) {
+          expect(environmentInfoLinkEl.innerText.trim()).toBe('Test environment');
+          expect(environmentInfoLinkEl.href).toBe('https://app.blackbaud.com/auth-client-env-url');
+        } else {
+          expect(environmentInfoLinkEl).toBe(null);
+          expect(environmentInfoEl.innerText.trim()).toBe(visible ? 'Test environment' : '');
+        }
       };
 
       validateVisible(false);
+      validateDescription(false);
 
       fireMessageEvent({
         messageType: 'environment-update',
@@ -594,6 +612,7 @@ describe('Omnibar', () => {
       });
 
       validateVisible(true);
+      validateDescription(false);
 
       fireMessageEvent({
         messageType: 'environment-update',
@@ -601,6 +620,26 @@ describe('Omnibar', () => {
       });
 
       validateVisible(false);
+      validateDescription(false);
+
+      fireMessageEvent({
+        description: 'Test environment',
+        messageType: 'environment-update',
+        name: 'Environment name'
+      });
+
+      validateVisible(true);
+      validateDescription(true);
+
+      fireMessageEvent({
+        description: 'Test environment',
+        messageType: 'environment-update',
+        name: 'Environment name',
+        url: 'https://app.blackbaud.com/auth-client-env-url'
+      });
+
+      validateVisible(true);
+      validateDescription(true, true);
     });
 
     it('should restart activity tracking when the legacy session keep-alive URL changes', () => {
