@@ -68,6 +68,9 @@ const notificationSvcIds: {
     requiresNotif: boolean
   }
 } = {
+  faith: {
+    requiresNotif: true
+  },
   fenxt: {
     requiresNotif: true
   },
@@ -82,6 +85,9 @@ const notificationSvcIds: {
   },
   skyux: {
     requiresNotif: false
+  },
+  tcs: {
+    requiresNotif: true
   }
 };
 
