@@ -1,3 +1,7 @@
+# 2.33.0 (2020-08-28)
+
+- Added additional valid `svcid`s for notifications. [#160](https://github.com/blackbaud/auth-client/pull/160)
+
 # 2.32.0 (2020-08-18)
 
 - Updated the environment bar styling for sandbox and test environments. [#158](https://github.com/blackbaud/auth-client/pull/158)
