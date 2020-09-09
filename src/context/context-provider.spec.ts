@@ -199,6 +199,31 @@ describe('Context provider', () => {
     });
   });
 
+  it(
+    'should call invalidContextHandler if present and environment ID is required but the user is not in an environment',
+    async (done) => {
+      const invalidContextHandler = jasmine.createSpy('invalidContextHandler');
+
+      replyWithDestinations(
+        'abc',
+        '',
+        {
+          context: {},
+          items: []
+        }
+      );
+
+      await BBContextProvider.ensureContext({
+        envIdRequired: true,
+        invalidContextHandler,
+        svcId: 'abc'
+      });
+
+      expect(invalidContextHandler).toHaveBeenCalled();
+      done();
+    }
+  );
+
   it('should redirect to an error page if environment ID is required but service ID is not specified', () => {
     replyWithDestinations(
       'abc',

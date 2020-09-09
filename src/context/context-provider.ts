@@ -211,6 +211,9 @@ export class BBContextProvider {
               } else if (itemCount > 1) {
                 // Let the user pick a context.
                 showPicker(args, destinations, resolve, reject);
+              } else if (args.invalidContextHandler) {
+                // The user does not have a valid context, but consumer provided a handler.
+                resolve(args.invalidContextHandler());
               } else {
                 // The user does not have a valid context.  Redirect to the error page.
                 redirectToError();

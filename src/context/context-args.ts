@@ -14,4 +14,6 @@ export interface BBContextArgs {
 
   svcIdRequired?: boolean;
 
+  invalidContextHandler?: () => {};
+
 }
