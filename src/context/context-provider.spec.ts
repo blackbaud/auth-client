@@ -18,6 +18,10 @@ import {
 } from '../shared/navigator';
 
 import {
+  BBContextArgs
+} from './context-args';
+
+import {
   BBContextProvider
 } from './context-provider';
 
@@ -202,7 +206,13 @@ describe('Context provider', () => {
   it(
     'should call invalidContextHandler if present and environment ID is required but the user is not in an environment',
     async (done) => {
-      const invalidContextHandler = jasmine.createSpy('invalidContextHandler');
+      const expectedArgs: BBContextArgs = {
+        url: 'custom-url'
+      };
+
+      const invalidContextHandler = jasmine.createSpy('invalidContextHandler')
+        .and
+        .returnValue(expectedArgs);
 
       replyWithDestinations(
         'abc',
@@ -213,13 +223,14 @@ describe('Context provider', () => {
         }
       );
 
-      await BBContextProvider.ensureContext({
+      const args = await BBContextProvider.ensureContext({
         envIdRequired: true,
         invalidContextHandler,
         svcId: 'abc'
       });
 
       expect(invalidContextHandler).toHaveBeenCalled();
+      expect(args).toEqual(expectedArgs);
       done();
     }
   );
