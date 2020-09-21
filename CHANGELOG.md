@@ -1,3 +1,7 @@
+# 2.34.0 (2020-09-21)
+
+- Added support for the `disableRedirect` option in `BBContextProvider.ensureContext`. [#162](https://github.com/blackbaud/auth-client/pull/162)
+
 # 2.33.0 (2020-08-28)
 
 - Added additional valid `svcid`s for notifications. [#160](https://github.com/blackbaud/auth-client/pull/160)
