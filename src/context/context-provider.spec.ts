@@ -204,7 +204,7 @@ describe('Context provider', () => {
   });
 
   it(
-    'should call invalidContextHandler if present and environment ID is required but the user is not in an environment',
+    'should not redirect if disableRedirect and environment ID is required but the user is not in an environment',
     async (done) => {
       const expectedArgs: BBContextArgs = {
         url: 'custom-url'
@@ -223,14 +223,16 @@ describe('Context provider', () => {
         }
       );
 
-      const args = await BBContextProvider.ensureContext({
+      const args = {
+        disableRedirect: true,
         envIdRequired: true,
-        invalidContextHandler,
         svcId: 'abc'
-      });
+      };
 
-      expect(invalidContextHandler).toHaveBeenCalled();
-      expect(args).toEqual(expectedArgs);
+      expectAsync(BBContextProvider.ensureContext(args)).toBeRejectedWith(
+        BBAuthTokenErrorCode.InvalidEnvironment
+      );
+
       done();
     }
   );

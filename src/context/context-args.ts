@@ -14,6 +14,6 @@ export interface BBContextArgs {
 
   svcIdRequired?: boolean;
 
-  invalidContextHandler?: () => {};
+  disableRedirect?: boolean;
 
 }
