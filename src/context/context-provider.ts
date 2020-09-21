@@ -211,8 +211,12 @@ export class BBContextProvider {
               } else if (itemCount > 1) {
                 // Let the user pick a context.
                 showPicker(args, destinations, resolve, reject);
+              } else if (args.disableRedirect) {
+                // The user does not have a valid context but client has set disableRedirect.
+                reject(BBAuthTokenErrorCode.InvalidEnvironment);
               } else {
-                // The user does not have a valid context.  Redirect to the error page.
+                // The user does not have a valid context and client has not set disableRedirect.
+                // Redirect to the error page.
                 redirectToError();
               }
             });

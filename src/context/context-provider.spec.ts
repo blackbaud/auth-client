@@ -18,6 +18,10 @@ import {
 } from '../shared/navigator';
 
 import {
+  BBContextArgs
+} from './context-args';
+
+import {
   BBContextProvider
 } from './context-provider';
 
@@ -198,6 +202,36 @@ describe('Context provider', () => {
       done();
     });
   });
+
+  it(
+    'should not redirect if disableRedirect and environment ID is required but the user is not in an environment',
+    async (done) => {
+      const expectedArgs: BBContextArgs = {
+        url: 'custom-url'
+      };
+
+      replyWithDestinations(
+        'abc',
+        '',
+        {
+          context: {},
+          items: []
+        }
+      );
+
+      const args = {
+        disableRedirect: true,
+        envIdRequired: true,
+        svcId: 'abc'
+      };
+
+      expectAsync(BBContextProvider.ensureContext(args)).toBeRejectedWith(
+        BBAuthTokenErrorCode.InvalidEnvironment
+      );
+
+      done();
+    }
+  );
 
   it('should redirect to an error page if environment ID is required but service ID is not specified', () => {
     replyWithDestinations(
