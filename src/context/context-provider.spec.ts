@@ -210,10 +210,6 @@ describe('Context provider', () => {
         url: 'custom-url'
       };
 
-      const invalidContextHandler = jasmine.createSpy('invalidContextHandler')
-        .and
-        .returnValue(expectedArgs);
-
       replyWithDestinations(
         'abc',
         '',
