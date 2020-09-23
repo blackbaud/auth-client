@@ -62,6 +62,7 @@ import {
 
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
+const HOST_ID = 'omnibar';
 
 const notificationSvcIds: {
   [key: string]: {
@@ -540,6 +541,11 @@ function messageHandler(event: MessageEvent): void {
   }
 
   const message = event.data;
+
+  if (message.messageType !== 'ready' && message.hostId !== HOST_ID) {
+    return;
+  }
+
   const nav = omnibarConfig.nav;
 
   switch (message.messageType) {
@@ -552,7 +558,8 @@ function messageHandler(event: MessageEvent): void {
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
-          messageType: 'host-ready'
+          messageType: 'host-ready',
+          hostId: HOST_ID
         }
       );
 

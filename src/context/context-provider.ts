@@ -1,5 +1,3 @@
-//#region imports
-
 import {
   BBAuth,
   BBAuthTokenErrorCode
@@ -29,7 +27,7 @@ import {
   BBContextDestinations
 } from './context-destinations';
 
-//#endregion
+const HOST_ID = 'context-provider';
 
 function showPicker(
   args: BBContextArgs,
@@ -119,12 +117,17 @@ function showPicker(
 
     const message = event.data;
 
+    if (message.messageType !== 'ready' && message.hostId !== HOST_ID) {
+      return;
+    }
+
     switch (message.messageType) {
       case 'ready':
         BBAuthInterop.postOmnibarMessage(
           iframeEl,
           {
-            messageType: 'host-ready'
+            messageType: 'host-ready',
+            hostId: HOST_ID
           }
         );
 
