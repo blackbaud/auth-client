@@ -102,6 +102,8 @@ describe('Omnibar', () => {
   }
 
   function fireMessageEvent(data: any, includeSource = true): void {
+    data.hostId = 'omnibar';
+
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
     }
@@ -881,6 +883,7 @@ describe('Omnibar', () => {
       expect(postOmnibarMessageSpy.calls.argsFor(0)).toEqual([
         getIframeEl(),
         {
+          hostId: 'omnibar',
           messageType: 'host-ready'
         }
       ]);

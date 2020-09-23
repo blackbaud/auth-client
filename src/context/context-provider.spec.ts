@@ -49,6 +49,8 @@ describe('Context provider', () => {
   }
 
   function fireMessageEvent(data: any, includeSource = true) {
+    data.hostId = 'context-provider';
+
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
     }

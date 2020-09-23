@@ -558,8 +558,8 @@ function messageHandler(event: MessageEvent): void {
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
-          messageType: 'host-ready',
-          hostId: HOST_ID
+          hostId: HOST_ID,
+          messageType: 'host-ready'
         }
       );
 
