@@ -58,6 +58,7 @@ function showPicker(
     const iframeUrl =
       BBContextProvider.url +
       '?hosted=1&svcid=' + encodeURIComponent(args.svcId) +
+      `&hostid=${HOST_ID}` +
       '&url=' + encodeURIComponent(args.url);
 
     iframeEl = BBAuthDomUtility.addIframe(
@@ -111,13 +112,9 @@ function showPicker(
   }
 
   function messageHandler(event: MessageEvent) {
-    if (!BBAuthInterop.messageIsFromOmnibar(event)) {
-      return;
-    }
-
     const message = event.data;
 
-    if (message.messageType !== 'ready' && message.hostId !== HOST_ID) {
+    if (!BBAuthInterop.messageIsFromOmnibar(event) || (message.hostId !== HOST_ID)) {
       return;
     }
 
@@ -126,7 +123,6 @@ function showPicker(
         BBAuthInterop.postOmnibarMessage(
           iframeEl,
           {
-            hostId: HOST_ID,
             messageType: 'host-ready'
           }
         );

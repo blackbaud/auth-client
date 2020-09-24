@@ -536,13 +536,9 @@ function initLocalNotifications(): void {
 }
 
 function messageHandler(event: MessageEvent): void {
-  if (!BBAuthInterop.messageIsFromOmnibar(event)) {
-    return;
-  }
-
   const message = event.data;
 
-  if (message.messageType !== 'ready' && message.hostId !== HOST_ID) {
+  if (!BBAuthInterop.messageIsFromOmnibar(event) || (message.hostId !== HOST_ID)) {
     return;
   }
 
@@ -558,7 +554,6 @@ function messageHandler(event: MessageEvent): void {
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
-          hostId: HOST_ID,
           messageType: 'host-ready'
         }
       );
@@ -649,7 +644,9 @@ function buildOmnibarUrl(): string {
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/';
 
-  return omnibarUrl;
+  return omnibarUrl +
+    (omnibarUrl.indexOf('?') < 0 ? '?' : '&') +
+    `hostid=${HOST_ID}`;
 }
 
 function updateTitle(): void {
