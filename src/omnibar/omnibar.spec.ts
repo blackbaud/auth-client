@@ -76,7 +76,7 @@ describe('Omnibar', () => {
 
   function loadOmnibar(config?: BBOmnibarConfig): void {
     config = config || {};
-    config.url = BASE_URL;
+    config.url = config.url || BASE_URL;
 
     BBOmnibar.load(config);
   }
@@ -242,6 +242,23 @@ describe('Omnibar', () => {
     expect(document.body.firstChild).toBe(iframeEl);
 
     expect(iframeEl.src).toBe(BASE_URL + '?hostid=omnibar');
+    expect(iframeEl.title).toBe('Navigation');
+  });
+
+  it('should load omnibar with query parameters correctly', () => {
+    loadOmnibar({
+      url: BASE_URL + '?test=value'
+    });
+
+    const iframeEl = getIframeEl();
+
+    expect(iframeEl).not.toBeNull();
+
+    // The IFRAME should be inserted at the very top of the DOM to enforce the correct
+    // tab order between the omnibar and the host page's content.
+    expect(document.body.firstChild).toBe(iframeEl);
+
+    expect(iframeEl.src).toBe(BASE_URL + '?test=value&hostid=omnibar');
     expect(iframeEl.title).toBe('Navigation');
   });
 
