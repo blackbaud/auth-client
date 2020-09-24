@@ -282,7 +282,7 @@ describe('Context provider', () => {
 
     const iframeEl = await whenIframeLoaded();
 
-    expect(iframeEl.src).toBe('about:blank?hosted=1&svcid=abc&url=https%3A%2F%2Fexample.com');
+    expect(iframeEl.src).toBe('about:blank?hosted=1&svcid=abc&hostid=context-provider&url=https%3A%2F%2Fexample.com');
 
     fireMessageEvent({
       messageType: 'ready'
@@ -435,45 +435,6 @@ describe('Context provider', () => {
     expect(postOmnibarMessageSpy).not.toHaveBeenCalled();
 
     done();
-  });
-
-  it('should include hostId with the \'ready\' message', async (done) => {
-    replyWithDestinations(
-      'abc',
-      'https://example.com',
-      testDestinationsMultiple
-    );
-
-    BBContextProvider.ensureContext({
-      envIdRequired: true,
-      svcId: 'abc',
-      url: 'https://example.com'
-    });
-
-    await whenIframeLoaded();
-
-    fireMessageEvent({
-      messageType: 'ready'
-    });
-
-    expect(postOmnibarMessageSpy.calls.argsFor(0)).toEqual([
-      getIframeEl(),
-      {
-        hostId: 'context-provider',
-        messageType: 'host-ready'
-      }
-    ]);
-
-    expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
-      getIframeEl(),
-      {
-        contextDestinations: testDestinationsMultiple,
-        messageType: 'context-provide'
-      }
-    ]);
-
-    done();
-
   });
 
   it('should ignore messages that do not originate from this hostId', async (done) => {
