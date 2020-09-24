@@ -48,8 +48,8 @@ describe('Context provider', () => {
     return document.querySelector('.sky-omnibar-welcome-iframe') as HTMLIFrameElement;
   }
 
-  function fireMessageEvent(data: any, includeSource = true) {
-    data.hostId = 'context-provider';
+  function fireMessageEvent(data: any, includeSource = true, hostId = 'context-provider') {
+    data.hostId = hostId;
 
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
@@ -100,6 +100,8 @@ describe('Context provider', () => {
     BBContextProvider.url = 'about:blank';
 
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
+
+    messageIsFromOmnibarReturnValue = true;
 
     messageIsFromOmnibarSpy = spyOn(
       BBAuthInterop,
@@ -154,8 +156,6 @@ describe('Context provider', () => {
     messageIsFromOmnibarSpy.calls.reset();
     redirectToErrorSpy.calls.reset();
     postOmnibarMessageSpy.calls.reset();
-
-    messageIsFromOmnibarReturnValue = true;
 
     fireMessageEvent({
       messageType: 'welcome-cancel'
@@ -437,4 +437,76 @@ describe('Context provider', () => {
     done();
   });
 
+  it('should include hostId with the \'ready\' message', async (done) => {
+    replyWithDestinations(
+      'abc',
+      'https://example.com',
+      testDestinationsMultiple
+    );
+
+    BBContextProvider.ensureContext({
+      envIdRequired: true,
+      svcId: 'abc',
+      url: 'https://example.com'
+    });
+
+    await whenIframeLoaded();
+
+    fireMessageEvent({
+      messageType: 'ready'
+    });
+
+    expect(postOmnibarMessageSpy.calls.argsFor(0)).toEqual([
+      getIframeEl(),
+      {
+        hostId: 'context-provider',
+        messageType: 'host-ready'
+      }
+    ]);
+
+    expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
+      getIframeEl(),
+      {
+        contextDestinations: testDestinationsMultiple,
+        messageType: 'context-provide'
+      }
+    ]);
+
+    done();
+
+  });
+
+  it('should ignore messages that do not originate from this hostId', async (done) => {
+    replyWithDestinations(
+      'abc',
+      'https://example.com',
+      testDestinationsMultiple
+    );
+
+    BBContextProvider.ensureContext({
+      envIdRequired: true,
+      svcId: 'abc',
+      url: 'https://example.com'
+    });
+
+    await whenIframeLoaded();
+
+    fireMessageEvent({
+      messageType: 'ready'
+    });
+
+    postOmnibarMessageSpy.calls.reset();
+
+    fireMessageEvent(
+      {
+        messageType: 'get-token'
+      },
+      true,
+      'omnibar'
+    );
+
+    expect(postOmnibarMessageSpy).not.toHaveBeenCalled();
+
+    done();
+  });
 });

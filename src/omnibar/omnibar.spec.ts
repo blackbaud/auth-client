@@ -101,8 +101,8 @@ describe('Omnibar', () => {
     ) as HTMLDivElement;
   }
 
-  function fireMessageEvent(data: any, includeSource = true): void {
-    data.hostId = 'omnibar';
+  function fireMessageEvent(data: any, includeSource = true, hostId = 'omnibar'): void {
+    data.hostId = hostId;
 
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
@@ -383,6 +383,20 @@ describe('Omnibar', () => {
       );
 
       validateExpanded(false);
+    });
+
+    it('should ignore messages that do not originate from this hostId', () => {
+      loadOmnibar();
+
+      fireMessageEvent(
+        {
+          messageType: 'get-token'
+        },
+        true,
+        'context-provider'
+      );
+
+      expect(getTokenSpy).not.toHaveBeenCalled();
     });
 
     it('should expand and collapse', () => {
