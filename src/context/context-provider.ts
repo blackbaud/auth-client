@@ -1,5 +1,3 @@
-//#region imports
-
 import {
   BBAuth,
   BBAuthTokenErrorCode
@@ -29,7 +27,7 @@ import {
   BBContextDestinations
 } from './context-destinations';
 
-//#endregion
+const HOST_ID = 'context-provider';
 
 function showPicker(
   args: BBContextArgs,
@@ -60,6 +58,7 @@ function showPicker(
     const iframeUrl =
       BBContextProvider.url +
       '?hosted=1&svcid=' + encodeURIComponent(args.svcId) +
+      `&hostid=${HOST_ID}` +
       '&url=' + encodeURIComponent(args.url);
 
     iframeEl = BBAuthDomUtility.addIframe(
@@ -113,11 +112,11 @@ function showPicker(
   }
 
   function messageHandler(event: MessageEvent) {
-    if (!BBAuthInterop.messageIsFromOmnibar(event)) {
+    const message = event.data;
+
+    if (!BBAuthInterop.messageIsFromOmnibar(event) || (message.hostId !== HOST_ID)) {
       return;
     }
-
-    const message = event.data;
 
     switch (message.messageType) {
       case 'ready':

@@ -76,7 +76,7 @@ describe('Omnibar', () => {
 
   function loadOmnibar(config?: BBOmnibarConfig): void {
     config = config || {};
-    config.url = BASE_URL;
+    config.url = config.url || BASE_URL;
 
     BBOmnibar.load(config);
   }
@@ -101,7 +101,9 @@ describe('Omnibar', () => {
     ) as HTMLDivElement;
   }
 
-  function fireMessageEvent(data: any, includeSource = true): void {
+  function fireMessageEvent(data: any, includeSource = true, hostId = 'omnibar'): void {
+    data.hostId = hostId;
+
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
     }
@@ -239,7 +241,24 @@ describe('Omnibar', () => {
     // tab order between the omnibar and the host page's content.
     expect(document.body.firstChild).toBe(iframeEl);
 
-    expect(iframeEl.src).toBe(BASE_URL);
+    expect(iframeEl.src).toBe(BASE_URL + '?hostid=omnibar');
+    expect(iframeEl.title).toBe('Navigation');
+  });
+
+  it('should load omnibar with query parameters correctly', () => {
+    loadOmnibar({
+      url: BASE_URL + '?test=value'
+    });
+
+    const iframeEl = getIframeEl();
+
+    expect(iframeEl).not.toBeNull();
+
+    // The IFRAME should be inserted at the very top of the DOM to enforce the correct
+    // tab order between the omnibar and the host page's content.
+    expect(document.body.firstChild).toBe(iframeEl);
+
+    expect(iframeEl.src).toBe(BASE_URL + '?test=value&hostid=omnibar');
     expect(iframeEl.title).toBe('Navigation');
   });
 
@@ -381,6 +400,20 @@ describe('Omnibar', () => {
       );
 
       validateExpanded(false);
+    });
+
+    it('should ignore messages that do not originate from this hostId', () => {
+      loadOmnibar();
+
+      fireMessageEvent(
+        {
+          messageType: 'get-token'
+        },
+        true,
+        'context-provider'
+      );
+
+      expect(getTokenSpy).not.toHaveBeenCalled();
     });
 
     it('should expand and collapse', () => {

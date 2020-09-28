@@ -62,6 +62,7 @@ import {
 
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
+const HOST_ID = 'omnibar';
 
 const notificationSvcIds: {
   [key: string]: {
@@ -535,11 +536,12 @@ function initLocalNotifications(): void {
 }
 
 function messageHandler(event: MessageEvent): void {
-  if (!BBAuthInterop.messageIsFromOmnibar(event)) {
+  const message = event.data;
+
+  if (!BBAuthInterop.messageIsFromOmnibar(event) || (message.hostId !== HOST_ID)) {
     return;
   }
 
-  const message = event.data;
   const nav = omnibarConfig.nav;
 
   switch (message.messageType) {
@@ -642,7 +644,9 @@ function buildOmnibarUrl(): string {
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/';
 
-  return omnibarUrl;
+  return omnibarUrl +
+    (omnibarUrl.indexOf('?') < 0 ? '?' : '&') +
+    `hostid=${HOST_ID}`;
 }
 
 function updateTitle(): void {
