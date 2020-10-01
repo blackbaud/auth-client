@@ -23,7 +23,7 @@ There are two classes available in this package: `BBAuth` and `BBOmnibar`.  `BBA
 
 You can use these in combination to integrate your application with Blackbaud authentication.
 
-```
+```ts
 import { BBAuth, BBOmnibar } from '@blackbaud/auth-client';
 
 // Make an initial attempt to get an auth token.  If the user is not currently logged in,
@@ -41,7 +41,7 @@ BBAuth.getToken()
 
 To make authorized requests to your web service endpoints you will also use the `BBAuth.getToken()` method to retrieve a token that can be added as a header to your request.  Since retrieving a token is an asynchronous operation, this method returns a `Promise`, so you should wait until the Promise is resolved before making your web request.
 
-```
+```ts
 import { BBAuth } from '@blackbaud/auth-client';
 
 BBAuth.getToken()
@@ -60,7 +60,7 @@ BBAuth.getToken()
 
 Auth client is also distributed as a UMD bundle.  If you're using ES5 with Node or a tool like Browserify you can `require()` it:
 
-```
+```js
 var BBAuthClient = require('@blackbaud/auth-client');
 
 BBAuthClient.BBOmnibar.load({
@@ -79,7 +79,7 @@ If using the SKY UX CDN, add a reference to `https://sky.blackbaudcdn.net/static
 
 You can now access it via the global `BBAuthClient` variable:
 
-```
+```js
 // BBAuthClient is global here.
 BBAuthClient.BBOmnibar.load({
   serviceName: 'Some service name'
