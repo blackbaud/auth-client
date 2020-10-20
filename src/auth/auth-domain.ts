@@ -10,8 +10,8 @@ const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
   'myschooldemo.com': 'https://sts-sso.myschooldemo.com',
   'myschooltraining.com': 'https://sts-sso.myschooltraining.com',
   'smartaidforparents.com': 'https://account.smartaidforparents.com',
-  'smarttuition.com': 'https://account.smarttuition.com',
-  'smartaidforparents-com-stage.smarttuition.net': 'https://account.smartaidforparents-com-stage.smarttuition.net'
+  'smartaidforparents-com-stage.smarttuition.net': 'https://account.smartaidforparents-com-stage.smarttuition.net',
+  'smarttuition.com': 'https://account.smarttuition.com'
 };
 const defaultSTSUrl = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
 
