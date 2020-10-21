@@ -1,3 +1,7 @@
+# 2.36.0 (2020-10-16)
+
+- Added Smart Tution domains to auth domain whitelist. [#167](https://github.com/blackbaud/auth-client/pull/167)
+
 # 2.35.0 (2020-09-28)
 
 - Updated omnibar iframes to provide `hostid` to ensure messages are handled appropriately per iframe. [#164](https://github.com/blackbaud/auth-client/pull/164)
