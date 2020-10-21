@@ -1,3 +1,7 @@
+# 2.37.0 (2020-10-21)
+
+- Added `chrch` to the list of valid service IDs for notifications. [#168](https://github.com/blackbaud/auth-client/pull/168)
+
 # 2.36.0 (2020-10-16)
 
 - Added Smart Tution domains to auth domain whitelist. [#167](https://github.com/blackbaud/auth-client/pull/167)
