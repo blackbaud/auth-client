@@ -69,6 +69,9 @@ const notificationSvcIds: {
     requiresNotif: boolean
   }
 } = {
+  chrch: {
+    requiresNotif: true
+  },
   faith: {
     requiresNotif: true
   },
