@@ -70,7 +70,7 @@ const notificationSvcIds: {
   }
 } = {
   chrch: {
-    requiresNotif: true
+    requiresNotif: false
   },
   faith: {
     requiresNotif: true
@@ -79,7 +79,7 @@ const notificationSvcIds: {
     requiresNotif: true
   },
   renxt: {
-    requiresNotif: true
+    requiresNotif: false
   },
   skydev: {
     requiresNotif: false
