@@ -87,6 +87,12 @@ describe('Omnibar', () => {
     });
   }
 
+  function loadOmnibarWithNotificationsCheck(): void {
+    loadOmnibar({
+      svcId: 'fenxt'
+    });
+  }
+
   function getIframeEl(): HTMLIFrameElement {
     return document.querySelector('.sky-omnibar-iframe') as HTMLIFrameElement;
   }
@@ -1356,7 +1362,7 @@ describe('Omnibar', () => {
 
       getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
 
-      loadOmnibarWithNotifications();
+      loadOmnibarWithNotificationsCheck();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1440,7 +1446,7 @@ describe('Omnibar', () => {
       }
 
       it('should respect the notification settings for a given service ID', async () => {
-        await testSvcId('renxt', true, true);
+        await testSvcId('renxt', false, true);
         await testSvcId('fenxt', true, true);
         await testSvcId('skydev', false, true);
         await testSvcId('skydevhome', false, true);
@@ -1448,7 +1454,7 @@ describe('Omnibar', () => {
         await testSvcId('other', false, false);
         await testSvcId('faith', true, true);
         await testSvcId('tcs', true, true);
-        await testSvcId('chrch', true, true);
+        await testSvcId('chrch', false, true);
       });
 
     });
@@ -1466,7 +1472,7 @@ describe('Omnibar', () => {
     });
 
     it('should check the token for the notif entitlement', (done) => {
-      loadOmnibarWithNotifications();
+      loadOmnibarWithNotificationsCheck();
 
       getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
 
@@ -1485,7 +1491,7 @@ describe('Omnibar', () => {
     });
 
     it('should return false if retrieving a token fails', (done) => {
-      loadOmnibarWithNotifications();
+      loadOmnibarWithNotificationsCheck();
 
       getTokenFake = () => Promise.reject('The user is not logged in');
 
