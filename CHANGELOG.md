@@ -1,3 +1,7 @@
+# 2.38.0 (2020-11-16)
+
+- Removed the `notif` entitlement restriction for `renxt` and `chrch` `svcid`s. [#170](https://github.com/blackbaud/auth-client/pull/170)
+
 # 2.37.0 (2020-10-21)
 
 - Added `chrch` to the list of valid service IDs for notifications. [#168](https://github.com/blackbaud/auth-client/pull/168)
