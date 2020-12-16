@@ -1,3 +1,7 @@
+# 2.39.0 (2020-12-17)
+
+- Added `merchservices` to the list of valid service IDs for notifications. [#175](https://github.com/blackbaud/auth-client/pull/175)
+
 # 2.38.1 (2020-11-30)
 
 - Updated the z-index for the toast container so it is never hidden by the omnibar or menu items. [#172](https://github.com/blackbaud/auth-client/pull/172)
