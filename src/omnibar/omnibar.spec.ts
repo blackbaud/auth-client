@@ -1455,6 +1455,7 @@ describe('Omnibar', () => {
         await testSvcId('faith', true, true);
         await testSvcId('tcs', true, true);
         await testSvcId('chrch', false, true);
+        await testSvcId('merchservices', false, true);
       });
 
     });

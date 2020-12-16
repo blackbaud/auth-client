@@ -78,6 +78,9 @@ const notificationSvcIds: {
   fenxt: {
     requiresNotif: true
   },
+  merchservices: {
+    requiresNotif: false
+  },
   renxt: {
     requiresNotif: false
   },
