@@ -189,7 +189,7 @@ export class BBContextProvider {
       if (svcId) {
         BBAuth.getToken()
           .then((token) => {
-            let url = 'https://nav-tusa01.app.blackbaud.net/navaf/user/destinations?svcid=' +
+            let url = 'https://nav-pusa01.app.blackbaud.net/navaf/user/destinations?svcid=' +
               encodeURIComponent(svcId);
 
             if (args.url) {
