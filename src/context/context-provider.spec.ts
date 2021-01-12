@@ -67,7 +67,7 @@ describe('Context provider', () => {
 
     spyOn(BBCsrfXhr, 'requestWithToken').and.callFake(
       (url: string, token: string): Promise<BBContextDestinations> => {
-        let expectedUrl = 'https://s21anavnavaf00blkbapp01.sky.blackbaud.com/user/destinations?svcid=' +
+        let expectedUrl = 'https://nav-tusa01.app.blackbaud.net/navaf/user/destinations?svcid=' +
           encodeURIComponent(svcId);
 
         if (referringUrl) {
