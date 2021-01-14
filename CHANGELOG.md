@@ -1,3 +1,7 @@
+# 2.40.0 (2021-01-14)
+
+- Updated nav reader references to point to the migrated AKS instance. [#177](https://github.com/blackbaud/auth-client/pull/177)
+
 # 2.39.0 (2020-12-17)
 
 - Added `merchservices` to the list of valid service IDs for notifications. [#175](https://github.com/blackbaud/auth-client/pull/175)
