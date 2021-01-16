@@ -44,7 +44,7 @@ function messageHandler(event: MessageEvent) {
 
 export class BBOmnibarUserActivityPrompt {
 
-  public static url = 'https://host.nxt.blackbaud.com/omnibar/inactivity';
+  public static url = 'https://app.blackbaud.com/omnibar/inactivity';
 
   public static show(args: BBOmnibarUserActivityPromptShowArgs) {
     function addStyleEl() {

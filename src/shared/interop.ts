@@ -1,4 +1,4 @@
-const HOST_ORIGIN = 'https://host.nxt.blackbaud.com';
+const HOST_ORIGIN = 'https://app.blackbaud.com';
 
 function messageIsFromSource(event: {origin: string, data: any}, source: string): boolean {
   if (event.origin === HOST_ORIGIN) {

@@ -1,7 +1,7 @@
 import { BBAuthTokenErrorCode } from '../auth';
 
 const SIGNIN_BASE_URL = 'https://signin.blackbaud.com/signin/';
-const ERROR_BASE_URL = 'https://host.nxt.blackbaud.com/errors/';
+const ERROR_BASE_URL = 'https://app.blackbaud.com/errors/';
 
 const euc = encodeURIComponent;
 

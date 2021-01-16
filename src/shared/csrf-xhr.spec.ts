@@ -85,7 +85,7 @@ describe('Auth token integration', () => {
   it('should redirect when the user is not a member of the specified environment', (done) => {
     navigateSpy.and.callFake((url: string) => {
       expect(url).toBe(
-        'https://host.nxt.blackbaud.com/errors/security?source=auth-client&url=' +
+        'https://app.blackbaud.com/errors/security?source=auth-client&url=' +
         encodeURIComponent(location.href) +
         '&code=invalid_env'
       );
@@ -106,7 +106,7 @@ describe('Auth token integration', () => {
   it('should redirect when an unknown error occurs', (done) => {
     navigateSpy.and.callFake((url: string) => {
       expect(url).toBe(
-        'https://host.nxt.blackbaud.com/errors/broken?source=auth-client&url=' +
+        'https://app.blackbaud.com/errors/broken?source=auth-client&url=' +
         encodeURIComponent(location.href)
       );
 
