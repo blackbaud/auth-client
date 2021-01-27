@@ -1,8 +1,15 @@
 import {
   BBAuth
 } from '../auth';
-import { BBOmnibarNavigation, BBOmnibarNavigationItem } from '../omnibar';
-import { BBAuthNavigator } from './navigator';
+
+import {
+  BBOmnibarNavigation,
+  BBOmnibarNavigationItem
+} from '../omnibar';
+
+import {
+  BBAuthNavigator
+} from './navigator';
 
 const HOST_ORIGIN = 'https://host.nxt.blackbaud.com';
 
