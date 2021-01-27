@@ -62,6 +62,10 @@ import {
   BBOmnibarToastContainerInitArgs
 } from './omnibar-toast-container-init-args';
 
+import {
+  BBOmnibarVertical
+} from './omnibar-vertical';
+
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
 
@@ -1503,6 +1507,76 @@ describe('Omnibar', () => {
         });
     });
 
+  });
+
+  describe('vertical navigation', () => {
+
+    it('should be loaded when the theme is modern and the URL contains a flag', () => {
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?leftnav=1');
+      spyOn(BBOmnibarVertical, 'load');
+
+      const config = {
+        theme: {
+          name: 'modern'
+        }
+      };
+
+      loadOmnibar(config);
+
+      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(config, getIframeEl());
+
+      fireMessageEvent({
+        messageType: 'ready'
+      });
+
+      expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
+        getIframeEl(),
+        jasmine.objectContaining({
+          compactNavOnly: true
+        })
+      ]);
+    });
+
+    it('should ignore the anchor portion of the URL if present', () => {
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?foo=bar#leftnav=1');
+      spyOn(BBOmnibarVertical, 'load');
+
+      const config = {
+        theme: {
+          name: 'modern'
+        }
+      };
+
+      loadOmnibar(config);
+
+      expect(BBOmnibarVertical.load).not.toHaveBeenCalled();
+    });
+
+    it('should notify the vertical omnibar when the current user data should be refreshed', (done) => {
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?leftnav=1');
+      spyOn(BBOmnibarVertical, 'load');
+
+      spyOn(BBOmnibarVertical, 'refreshUser').and.callFake(() => {
+        done();
+      });
+
+      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
+        refreshUserCallback();
+      });
+
+      loadOmnibar(
+        {
+          theme: {
+            name: 'modern'
+          }
+        }
+      );
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123
+      });
+    });
   });
 
 });

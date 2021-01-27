@@ -57,6 +57,10 @@ import {
 } from './omnibar-toast-container';
 
 import {
+  BBOmnibarVertical
+} from './omnibar-vertical';
+
+import {
   BBOmnibarThemeAccent
 } from './theming';
 
@@ -139,6 +143,27 @@ function collapseIframe(): void {
   iframeEl.classList.remove(CLS_EXPANDED);
 }
 
+function isModernTheme(): boolean {
+  const theme = omnibarConfig.theme;
+  return theme && theme.name === 'modern';
+}
+
+function showVerticalNav(): boolean {
+  if (isModernTheme()) {
+    let qs = BBAuthInterop.getCurrentUrl().split('?')[1];
+
+    if (qs) {
+      if (qs.indexOf('#') >= 0) {
+        qs = qs.split('#')[0];
+      }
+
+      return qs.split('&').indexOf('leftnav=1') >= 0;
+    }
+  }
+
+  return false;
+}
+
 function addStyleEl(): void {
   let accentCss = 'background: linear-gradient(to right, #71bf44 0, #31b986 50%, #00b2ec 100%);';
   let accentHeight = '5px';
@@ -148,7 +173,7 @@ function addStyleEl(): void {
   const theme = omnibarConfig.theme;
 
   if (theme) {
-    if (theme.name === 'modern') {
+    if (isModernTheme()) {
       accentHeight = '4px';
       backgroundColor = '#fff';
       borderBottom = 'solid 1px #e2e3e4';
@@ -256,17 +281,12 @@ function expandIframe(): void {
 }
 
 function handleStateChange(): void {
-  const url = document.location.href;
+  const url = BBAuthInterop.getCurrentUrl();
 
-  BBAuthInterop.postOmnibarMessage(
-    iframeEl,
-    {
-      href: url,
-      messageType: 'location-change'
-    }
-  );
+  BBAuthInterop.postLocationChangeMessage(iframeEl, url);
 
   BBOmnibarToastContainer.updateUrl(url);
+  BBOmnibarVertical.updateUrl(url);
 }
 
 function handleSearch(searchArgs: BBOmnibarSearchArgs): void {
@@ -308,7 +328,7 @@ function connectPushNotifications(): void {
             navigateUrlCallback: handleNavigateUrl,
             openMenuCallback: openPushNotificationsMenu,
             svcId: omnibarConfig.svcId,
-            url: document.location.href
+            url: BBAuthInterop.getCurrentUrl()
           })
             .then(() => {
               BBOmnibarPushNotifications.connect(
@@ -358,6 +378,10 @@ function refreshUserCallback(): void {
       }
     );
 
+    if (showVerticalNav()) {
+      BBOmnibarVertical.refreshUser(token);
+    }
+
     if (token) {
       connectPushNotifications();
     } else {
@@ -395,41 +419,6 @@ function startActivityTracking(): void {
     omnibarConfig.allowAnonymous,
     currentLegacyKeepAliveUrl
   );
-}
-
-function handleGetToken(
-  tokenRequestId: any,
-  disableRedirect: boolean
-): void {
-  BBAuth.getToken({
-    disableRedirect
-  })
-    .then(
-      (token: string) => {
-        startActivityTracking();
-
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            messageType: 'token',
-            token,
-            tokenRequestId
-          }
-        );
-      },
-      (reason: any) => {
-        startActivityTracking();
-
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            messageType: 'token-fail',
-            reason,
-            tokenRequestId
-          }
-        );
-      }
-    );
 }
 
 function handleHelp(): void {
@@ -488,11 +477,7 @@ function handleEnvironmentUpdate(
 }
 
 function handleNavigate(navItem: BBOmnibarNavigationItem): void {
-  const nav = omnibarConfig.nav;
-
-  if (!nav || !nav.beforeNavCallback || nav.beforeNavCallback(navItem) !== false) {
-    BBAuthNavigator.navigate(navItem.url);
-  }
+  BBAuthInterop.handleNavigate(omnibarConfig.nav, navItem);
 }
 
 function handleNavigateUrl(url: string): void {
@@ -569,7 +554,7 @@ function messageHandler(event: MessageEvent): void {
       BBAuthInterop.postOmnibarMessage(
         iframeEl,
         {
-          compactNavOnly: omnibarConfig.compactNavOnly,
+          compactNavOnly: omnibarConfig.compactNavOnly || showVerticalNav(),
           enableHelp: omnibarConfig.enableHelp,
           envId: omnibarConfig.envId,
           hideResourceLinks: omnibarConfig.hideResourceLinks,
@@ -612,9 +597,11 @@ function messageHandler(event: MessageEvent): void {
       handleSearch(message.searchArgs);
       break;
     case 'get-token':
-      handleGetToken(
+      BBAuthInterop.handleGetToken(
+        iframeEl,
         message.tokenRequestId,
-        message.disableRedirect
+        message.disableRedirect,
+        startActivityTracking
       );
       break;
     case 'help-open':
@@ -638,10 +625,10 @@ function messageHandler(event: MessageEvent): void {
       currentLegacyKeepAliveUrl = message.url;
       startActivityTracking();
       break;
-
     case 'selected-service-update':
       serviceName = message.serviceName;
       updateTitle();
+      break;
   }
 }
 
@@ -691,6 +678,10 @@ export class BBOmnibar {
       // document; this will ensure the proper order in the DOM.
       addEnvironmentEl();
       addIframeEl();
+
+      if (showVerticalNav()) {
+        BBOmnibarVertical.load(config, iframeEl);
+      }
 
       window.addEventListener('message', messageHandler);
     });
