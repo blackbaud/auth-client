@@ -1,3 +1,19 @@
+# 2.40.0 (2021-01-14)
+
+- Updated nav reader references to point to the migrated AKS instance. [#177](https://github.com/blackbaud/auth-client/pull/177)
+
+# 2.39.0 (2020-12-17)
+
+- Added `merchservices` to the list of valid service IDs for notifications. [#175](https://github.com/blackbaud/auth-client/pull/175)
+
+# 2.38.1 (2020-11-30)
+
+- Updated the z-index for the toast container so it is never hidden by the omnibar or menu items. [#172](https://github.com/blackbaud/auth-client/pull/172)
+
+# 2.38.0 (2020-11-16)
+
+- Removed the `notif` entitlement restriction for `renxt` and `chrch` `svcid`s. [#170](https://github.com/blackbaud/auth-client/pull/170)
+
 # 2.37.0 (2020-10-21)
 
 - Added `chrch` to the list of valid service IDs for notifications. [#168](https://github.com/blackbaud/auth-client/pull/168)
