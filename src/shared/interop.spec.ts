@@ -1,49 +1,44 @@
-import { BBAuthInterop } from './interop';
+import {
+  BBAuthInterop
+} from './interop';
 
 describe('Interop', () => {
 
-  it('should validate that incoming messages originate from the omnibar', () => {
-    function validate(source: string, origin: string, valid: boolean) {
-      const isFromOmnibar = BBAuthInterop.messageIsFromOmnibar({
+  function validateMethod(
+    methodName: 'messageIsFromOmnibar' | 'messageIsFromOmnibarVertical' | 'messageIsFromToastContainer',
+    validSource: string
+  ) {
+    function validate(source: string, origin: string, expectedIsValid: boolean) {
+      const isValid = BBAuthInterop[methodName]({
         data: {
           source
         },
         origin
       });
 
-      expect(isFromOmnibar).toBe(valid);
+      expect(isValid).toBe(expectedIsValid);
     }
 
     // Valid source, invalid origin
-    validate('skyux-spa-omnibar', 'https://example.com', false);
+    validate(validSource, 'https://example.com', false);
 
     // Invalid source, valid origin
     validate('skyux-spa-foo', 'https://host.nxt.blackbaud.com', false);
 
     // Valid source, valid origin
-    validate('skyux-spa-omnibar', 'https://host.nxt.blackbaud.com', true);
+    validate(validSource, 'https://host.nxt.blackbaud.com', true);
+  }
+
+  it('should validate that incoming messages originate from the omnibar', () => {
+    validateMethod('messageIsFromOmnibar', 'skyux-spa-omnibar');
+  });
+
+  it('should validate that incoming messages originate from the vertical omnibar', () => {
+    validateMethod('messageIsFromOmnibarVertical', 'skyux-spa-omnibar-vertical');
   });
 
   it('should validate that incoming messages originate from the toast container', () => {
-    function validate(source: string, origin: string, valid: boolean) {
-      const isFromOmnibar = BBAuthInterop.messageIsFromToastContainer({
-        data: {
-          source
-        },
-        origin
-      });
-
-      expect(isFromOmnibar).toBe(valid);
-    }
-
-    // Valid source, invalid origin
-    validate('skyux-spa-omnibar-toast-container', 'https://example.com', false);
-
-    // Invalid source, valid origin
-    validate('skyux-spa-foo', 'https://host.nxt.blackbaud.com', false);
-
-    // Valid source, valid origin
-    validate('skyux-spa-omnibar-toast-container', 'https://host.nxt.blackbaud.com', true);
+    validateMethod('messageIsFromToastContainer', 'skyux-spa-omnibar-toast-container');
   });
 
 });

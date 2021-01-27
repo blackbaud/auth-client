@@ -10,15 +10,25 @@ export class BBAuthDomUtility {
     return styleEl;
   }
 
+  public static createIframe(
+    src: string,
+    className: string,
+    title: string
+  ) {
+    const iframeEl = document.createElement('iframe');
+    iframeEl.className = className;
+    iframeEl.title = title;
+    iframeEl.src = src;
+
+    return iframeEl;
+  }
+
   public static addIframe(
     src: string,
     className: string,
     title: string
   ): HTMLIFrameElement {
-    const iframeEl = document.createElement('iframe');
-    iframeEl.className = className;
-    iframeEl.title = title;
-    iframeEl.src = src;
+    const iframeEl = this.createIframe(src, className, title);
 
     this.addElToBodyTop(iframeEl);
 
