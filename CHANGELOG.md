@@ -1,3 +1,7 @@
+# 2.41.0 (2021-01-27)
+
+- Added ability to preview vertical navigation. [#179](https://github.com/blackbaud/auth-client/pull/179)
+
 # 2.40.0 (2021-01-14)
 
 - Updated nav reader references to point to the migrated AKS instance. [#177](https://github.com/blackbaud/auth-client/pull/177)
