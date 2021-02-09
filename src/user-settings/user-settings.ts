@@ -18,6 +18,8 @@ export class BBUserSettings {
 
   public static readonly UPDATE_DELAY = 1000;
 
+  public static readonly GET_SETTINGS_TIMEOUT = 5000;
+
   public static readonly LOCAL_STORAGE_KEY = 'auth-client-local-user-settings';
 
   public static getSettings(): Promise<BBUserConfig> {
@@ -26,11 +28,14 @@ export class BBUserSettings {
         disableRedirect: true
       }).then(
         (token) => {
+          const timeoutId = setTimeout(reject, this.GET_SETTINGS_TIMEOUT);
+
           BBCsrfXhr.requestWithToken(
             URL,
             token
           ).then(
             (value: { settings: BBUserConfig }) => {
+              clearTimeout(timeoutId);
               resolve(value.settings);
             },
             reject

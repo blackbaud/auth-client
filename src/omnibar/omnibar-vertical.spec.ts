@@ -99,7 +99,7 @@ describe('Omnibar vertical', () => {
   function validateMinimized(minimized: boolean): void {
     const wrapperEl = getIframeWrapperEl();
 
-    expect(getComputedStyle(wrapperEl).width).toBe(minimized ? '100px' : '300px');
+    expect(getComputedStyle(wrapperEl).width).toBe(minimized ? '90px' : '300px');
   }
 
   beforeEach(() => {

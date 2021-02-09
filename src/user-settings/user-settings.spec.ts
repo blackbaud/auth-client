@@ -16,9 +16,22 @@ import {
 
 describe('User settings', () => {
   let requestWithTokenSpy: jasmine.Spy;
+  let previousUpdateDelay: number;
+  let previousGetSettingsTimeout: number;
 
   beforeEach(() => {
     requestWithTokenSpy = spyOn(BBCsrfXhr, 'requestWithToken');
+
+    previousUpdateDelay = BBUserSettings.UPDATE_DELAY;
+    previousGetSettingsTimeout = BBUserSettings.GET_SETTINGS_TIMEOUT;
+
+    (BBUserSettings as any).UPDATE_DELAY = 100;
+    (BBUserSettings as any).GET_SETTINGS_TIMEOUT = 100;
+  });
+
+  afterEach(() => {
+    (BBUserSettings as any).UPDATE_DELAY = previousUpdateDelay;
+    (BBUserSettings as any).GET_SETTINGS_TIMEOUT = previousGetSettingsTimeout;
   });
 
   describe('when logged in', () => {
@@ -47,6 +60,19 @@ describe('User settings', () => {
       );
 
       expect(settings).toEqual(response.settings);
+    });
+
+    it('should give up on unresponsive requests to retrieve user settings', async (done) => {
+      requestWithTokenSpy.and.returnValue(new Promise(() => { /* */ }));
+
+      let timedOut = false;
+
+      BBUserSettings.getSettings().catch(() => timedOut = true);
+
+      setTimeout(() => {
+        expect(timedOut).toBe(true);
+        done();
+      }, BBUserSettings.GET_SETTINGS_TIMEOUT + 100);
     });
 
     it('should update user settings by calling the web service after a delay', (done) => {

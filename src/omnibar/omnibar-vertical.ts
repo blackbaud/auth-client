@@ -28,7 +28,7 @@ const CLS_BODY = 'sky-omnibar-vertical-body';
 const CLS_BODY_MINIMIZED = 'sky-omnibar-vertical-body-minimized';
 
 const WIDTH_MAX = 300;
-const WIDTH_MIN = 100;
+const WIDTH_MIN = 90;
 
 let currentSettings: BBUserConfig;
 let currentUrl: string;
