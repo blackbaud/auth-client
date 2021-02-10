@@ -1,5 +1,10 @@
-import { BBAuthNavigator } from '../shared/navigator';
-import { BBCsrfXhr } from './csrf-xhr';
+import {
+  BBAuthNavigator
+} from '../shared/navigator';
+
+import {
+  BBCsrfXhr
+} from './csrf-xhr';
 
 import {
   BBAuthTokenError,
@@ -30,7 +35,6 @@ describe('Auth token integration', () => {
   });
 
   afterAll(() => {
-    expect(domainSpy).toHaveBeenCalled();
     jasmine.Ajax.uninstall();
   });
 
@@ -47,6 +51,7 @@ describe('Auth token integration', () => {
       responseText: undefined,
       status: 401
     });
+
     expect(domainSpy).toHaveBeenCalled();
   });
 
@@ -361,54 +366,115 @@ describe('Auth token integration', () => {
     });
   });
 
-  it('should provide a method for making a request with a BBID token', (done) => {
-    BBCsrfXhr.requestWithToken(
-      'https://example.com/token',
-      'abc'
-    ).then((response) => {
-      expect(response).toEqual({
-        success: true
+  describe('requestWithToken()', () => {
+    function validateRequestWithToken(
+      done: DoneFn,
+      verb = 'GET',
+      data?: any
+    ): void {
+      BBCsrfXhr.requestWithToken(
+        'https://example.com/token',
+        'abc',
+        verb,
+        data
+      ).then((response) => {
+        expect(response).toEqual({
+          success: true
+        });
+
+        done();
       });
 
-      done();
-    });
+      const request = jasmine.Ajax.requests.mostRecent();
 
-    const request = jasmine.Ajax.requests.mostRecent();
+      expect(request.url).toBe('https://example.com/token');
+      expect(request.method).toBe(verb);
 
-    expect(request.url).toBe('https://example.com/token');
-    expect(request.method).toBe('GET');
-
-    expect(request.requestHeaders).toEqual({
-      Accept: 'application/json',
-      Authorization: 'Bearer abc'
-    });
-
-    request.respondWith({
-      responseText: JSON.stringify({
-        success: true
-      }),
-      status: 200
-    });
-  });
-
-  it('should handle errors when making a request with a BBID token', (done) => {
-    BBCsrfXhr.requestWithToken(
-      'https://example.com/token',
-      'abc'
-    ).then(
-      () => {
-        /* do nothing */
-      },
-      () => {
-        done();
+      if (data) {
+        expect(request.data()).toEqual(data);
       }
-    );
 
-    const request = jasmine.Ajax.requests.mostRecent();
+      const expectedHeaders: { [key: string]: string } = {
+        Accept: 'application/json',
+        Authorization: 'Bearer abc'
+      };
 
-    request.respondWith({
-      status: 401
+      if (data) {
+        expectedHeaders['Content-Type'] = 'application/json';
+      }
+
+      expect(request.requestHeaders).toEqual(expectedHeaders);
+
+      request.respondWith({
+        responseText: JSON.stringify({
+          success: true
+        }),
+        status: 200
+      });
+    }
+
+    it('should support GET', (done) => {
+      validateRequestWithToken(done, 'GET');
     });
+
+    it('should support PATCH', (done) => {
+      validateRequestWithToken(
+        done,
+        'PATCH',
+        {
+          foo: 'test'
+        }
+      );
+    });
+
+    it('should support POST', (done) => {
+      validateRequestWithToken(
+        done,
+        'POST',
+        {
+          foo: 'test'
+        }
+      );
+    });
+
+    it('should handle errors', (done) => {
+      BBCsrfXhr.requestWithToken(
+        'https://example.com/token',
+        'abc'
+      ).then(
+        () => {
+          /* do nothing */
+        },
+        () => {
+          done();
+        }
+      );
+
+      const request = jasmine.Ajax.requests.mostRecent();
+
+      request.respondWith({
+        status: 401
+      });
+    });
+
+    it('should handle empty response text', (done) => {
+      BBCsrfXhr.requestWithToken(
+        'https://example.com/token',
+        'abc'
+      ).then(() => {
+        done();
+      });
+
+      const request = jasmine.Ajax.requests.mostRecent();
+
+      expect(request.url).toBe('https://example.com/token');
+
+      request.respondWith({
+        responseText: undefined,
+        status: 200
+      });
+    });
+
   });
 
 });

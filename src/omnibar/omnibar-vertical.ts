@@ -1,4 +1,12 @@
 import {
+  BBUserSettings
+} from '../user-settings/user-settings';
+
+import {
+  BBUserConfig
+} from '../user-settings/user-config';
+
+import {
   BBAuthDomUtility
 } from '../shared/dom-utility';
 
@@ -20,15 +28,19 @@ const CLS_BODY = 'sky-omnibar-vertical-body';
 const CLS_BODY_MINIMIZED = 'sky-omnibar-vertical-body-minimized';
 
 const WIDTH_MAX = 300;
-const WIDTH_MIN = 100;
+const WIDTH_MIN = 90;
 
+let currentSettings: BBUserConfig;
 let currentUrl: string;
 let iframeEl: HTMLIFrameElement;
 let iframeWrapperEl: HTMLDivElement;
 let omnibarConfig: BBOmnibarConfig;
 let promiseResolve: (value?: any) => void;
 let styleEl: HTMLStyleElement;
-let minimized: boolean;
+
+function userSettingsMinimized(): boolean {
+  return currentSettings?.omnibar?.vMin;
+}
 
 function expandIframe(): void {
   iframeWrapperEl.classList.add(CLS_EXPANDED);
@@ -39,6 +51,10 @@ function collapseIframe(): void {
 }
 
 function addIframeEl(afterEl: HTMLElement): void {
+  if (userSettingsMinimized()) {
+    minimize();
+  }
+
   const omnibarVerticalUrl = omnibarConfig.verticalUrl ||
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/vertical';
@@ -116,13 +132,25 @@ function postLocationChangeMessage(): void {
 }
 
 function minimize(): void {
-  minimized = true;
   document.body.classList.add(CLS_BODY_MINIMIZED);
 }
 
 function maximize(): void {
-  minimized = false;
   document.body.classList.remove(CLS_BODY_MINIMIZED);
+}
+
+function updateMinimized(verticalNavMinimized: boolean): void {
+  BBUserSettings.updateSettings({
+    omnibar: {
+      vMin: verticalNavMinimized
+    }
+  });
+
+  if (verticalNavMinimized) {
+    minimize();
+  } else {
+    maximize();
+  }
 }
 
 function messageHandler(event: MessageEvent): void {
@@ -154,7 +182,7 @@ function messageHandler(event: MessageEvent): void {
           envId: omnibarConfig.envId,
           leId: omnibarConfig.leId,
           messageType: 'nav-ready',
-          minimized,
+          minimized: userSettingsMinimized(),
           navVersion: omnibarConfig.navVersion,
           services: nav && nav.services,
           svcId: omnibarConfig.svcId,
@@ -192,10 +220,10 @@ function messageHandler(event: MessageEvent): void {
       );
       break;
     case 'maximize':
-      maximize();
+      updateMinimized(false);
       break;
     case 'minimize':
-      minimize();
+      updateMinimized(true);
       break;
   }
 }
@@ -212,7 +240,15 @@ export class BBOmnibarVertical {
       promiseResolve = resolve;
 
       addStyleEl();
-      addIframeEl(afterEl);
+
+      BBUserSettings.getSettings().then(
+        (settings) => {
+          currentSettings = settings;
+          addIframeEl(afterEl);
+        },
+        () => {
+          addIframeEl(afterEl);
+        });
 
       window.addEventListener('message', messageHandler);
     });
@@ -244,10 +280,10 @@ export class BBOmnibarVertical {
 
     window.removeEventListener('message', messageHandler);
 
-    currentUrl =
+    currentSettings =
+      currentUrl =
       iframeEl =
       iframeWrapperEl =
-      minimized =
       omnibarConfig =
       promiseResolve =
       styleEl = undefined;

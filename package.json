@@ -39,7 +39,7 @@
     "fs-extra": "8.0.1",
     "istanbul": "0.4.5",
     "istanbul-instrumenter-loader": "0.1.0",
-    "jasmine": "3.4.0",
+    "jasmine": "3.6.4",
     "jasmine-ajax": "4.0.0",
     "karma": "4.1.0",
     "karma-browserstack-launcher": "1.5.1",
@@ -57,7 +57,7 @@
     "ts-loader": "6.0.4",
     "tslint": "5.18.0",
     "tslint-loader": "3.5.4",
-    "typescript": "3.5.2",
+    "typescript": "3.7.5",
     "webpack": "4.35.0",
     "webpack-cli": "3.3.5"
   },

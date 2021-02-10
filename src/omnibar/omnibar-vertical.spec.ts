@@ -11,6 +11,14 @@ import {
 } from '../shared/navigator';
 
 import {
+  BBUserConfig
+ } from '../user-settings/user-config';
+
+import {
+  BBUserSettings
+} from '../user-settings/user-settings';
+
+import {
   BBOmnibarConfig
 } from './omnibar-config';
 
@@ -28,10 +36,12 @@ describe('Omnibar vertical', () => {
   let messageIsFromOmnibarReturnValue: boolean;
   let navigateSpy: jasmine.Spy;
   let postOmnibarMessageSpy: jasmine.Spy;
+  let updateSettingsSpy: jasmine.Spy;
+  let userSettingsReturnValue: Promise<BBUserConfig>;
 
   let getTokenFake: () => Promise<string>;
 
-  function loadOmnibar(config?: BBOmnibarConfig): void {
+  function loadOmnibarVertical(config?: BBOmnibarConfig): Promise<void> {
     afterEl = document.createElement('div');
     document.body.appendChild(afterEl);
 
@@ -42,6 +52,16 @@ describe('Omnibar vertical', () => {
       config,
       afterEl
     );
+
+    return new Promise((resolve) => {
+      try {
+        BBUserSettings.getSettings();
+      } catch (err) {
+        // An error loading settings should still load the omnibar.
+      } finally {
+        resolve();
+      }
+    });
   }
 
   function getIframeEl(): HTMLIFrameElement {
@@ -76,8 +96,15 @@ describe('Omnibar vertical', () => {
     BBOmnibarVertical.destroy();
   }
 
+  function validateMinimized(minimized: boolean): void {
+    const wrapperEl = getIframeWrapperEl();
+
+    expect(getComputedStyle(wrapperEl).width).toBe(minimized ? '90px' : '300px');
+  }
+
   beforeEach(() => {
     messageIsFromOmnibarReturnValue = true;
+    userSettingsReturnValue = Promise.resolve(undefined);
 
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
@@ -97,14 +124,26 @@ describe('Omnibar vertical', () => {
     ).and.callFake(() => {
       return messageIsFromOmnibarReturnValue;
     });
+
+    spyOn(
+      BBUserSettings,
+      'getSettings'
+    ).and.callFake(() => {
+      return userSettingsReturnValue;
+    });
+
+    updateSettingsSpy = spyOn(
+      BBUserSettings,
+      'updateSettings'
+    );
   });
 
   afterEach(() => {
     destroyOmnibar();
   });
 
-  it('should load the vertical vomnibar IFRAME', () => {
-    loadOmnibar();
+  it('should load the vertical omnibar IFRAME', async () => {
+    await loadOmnibarVertical();
 
     const iframeEl = getIframeEl();
 
@@ -114,8 +153,8 @@ describe('Omnibar vertical', () => {
     expect(iframeEl.title).toBe('Vertical Navigation');
   });
 
-  it('should only display the wrapper element until the vertical omnibar is ready for display', () => {
-    loadOmnibar();
+  it('should only display the wrapper element until the vertical omnibar is ready for display', async () => {
+    await loadOmnibarVertical();
 
     const wrapperEl = getIframeWrapperEl();
     const iframeEl = getIframeEl();
@@ -131,35 +170,69 @@ describe('Omnibar vertical', () => {
     expect(getComputedStyle(iframeEl).visibility).toBe('visible');
   });
 
-  it('should be collapsible', () => {
-    loadOmnibar();
+  it('should be collapsible', async () => {
+    await loadOmnibarVertical();
 
-    const wrapperEl = getIframeWrapperEl();
+    validateMinimized(false);
 
-    expect(getComputedStyle(wrapperEl).width).toBe('300px');
+    updateSettingsSpy.calls.reset();
 
     fireMessageEvent({
       messageType: 'minimize'
     });
 
-    expect(getComputedStyle(wrapperEl).width).toBe('100px');
+    validateMinimized(true);
+
+    expect(updateSettingsSpy).toHaveBeenCalledWith({
+      omnibar: {
+        vMin: true
+      }
+    });
+
+    updateSettingsSpy.calls.reset();
 
     fireMessageEvent({
       messageType: 'maximize'
     });
 
-    expect(getComputedStyle(wrapperEl).width).toBe('300px');
+    validateMinimized(false);
+
+    expect(updateSettingsSpy).toHaveBeenCalledWith({
+      omnibar: {
+        vMin: false
+      }
+    });
+  });
+
+  it('should respect the user\'s global settings', async () => {
+    userSettingsReturnValue = Promise.resolve({
+      omnibar: {
+        vMin: true
+      }
+    });
+
+    await loadOmnibarVertical();
+
+    validateMinimized(true);
+  });
+
+  it('should load the left nav with default settings if the user\'s global settings fail to load', async () => {
+    userSettingsReturnValue = Promise.reject();
+
+    await loadOmnibarVertical();
+
+    validateMinimized(false);
   });
 
   describe('interop with omnibar', () => {
 
-    it('should notify the omnibar when navigation is ready to be loaded', () => {
+    it('should notify the omnibar when navigation is ready to be loaded', async () => {
       const envId = 'abc';
       const svcId = 'xyz';
       const leId = '123';
       const navVersion = 'test';
 
-      loadOmnibar({
+      await loadOmnibarVertical({
         envId,
         leId,
         nav: {
@@ -215,7 +288,7 @@ describe('Omnibar vertical', () => {
       ]);
     });
 
-    it('should notify the omnibar when a requested token is available', (done) => {
+    it('should notify the omnibar when a requested token is available', async (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
         expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
           getIframeEl(),
@@ -229,7 +302,7 @@ describe('Omnibar vertical', () => {
         done();
       });
 
-      loadOmnibar();
+      await loadOmnibarVertical();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -237,7 +310,7 @@ describe('Omnibar vertical', () => {
       });
     });
 
-    it('should notify the omnibar when a requested token is not available', (done) => {
+    it('should notify the omnibar when a requested token is not available', async (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
         expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
           getIframeEl(),
@@ -255,7 +328,7 @@ describe('Omnibar vertical', () => {
         return Promise.reject('The user is not logged in.');
       };
 
-      loadOmnibar();
+      await loadOmnibarVertical();
 
       fireMessageEvent({
         disableRedirect: false,
@@ -264,8 +337,8 @@ describe('Omnibar vertical', () => {
       });
     });
 
-    it('should notify the omnibar when the current user data should be refreshed', () => {
-      loadOmnibar();
+    it('should notify the omnibar when the current user data should be refreshed', async () => {
+      await loadOmnibarVertical();
 
       BBOmnibarVertical.refreshUser(testToken);
 
@@ -280,10 +353,10 @@ describe('Omnibar vertical', () => {
   });
 
   describe('interop with host page', () => {
-    it('should ignore messages that do not originate from omnibar', () => {
+    it('should ignore messages that do not originate from omnibar', async () => {
       messageIsFromOmnibarReturnValue = false;
 
-      loadOmnibar();
+      await loadOmnibarVertical();
 
       fireMessageEvent(
         {
@@ -295,8 +368,8 @@ describe('Omnibar vertical', () => {
       validateExpanded(false);
     });
 
-    it('should expand and collapse', () => {
-      loadOmnibar();
+    it('should expand and collapse', async () => {
+      await loadOmnibarVertical();
 
       fireMessageEvent({
         messageType: 'expand'
@@ -311,8 +384,8 @@ describe('Omnibar vertical', () => {
       validateExpanded(false);
     });
 
-    it('should navigate by URL', () => {
-      loadOmnibar();
+    it('should navigate by URL', async () => {
+      await loadOmnibarVertical();
 
       fireMessageEvent({
         messageType: 'navigate-url',
@@ -322,8 +395,8 @@ describe('Omnibar vertical', () => {
       expect(navigateSpy).toHaveBeenCalledWith('https://example.com/');
     });
 
-    it('should navigate by nav item', () => {
-      loadOmnibar();
+    it('should navigate by nav item', async () => {
+      await loadOmnibarVertical();
 
       fireMessageEvent({
         messageType: 'navigate',

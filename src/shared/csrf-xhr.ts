@@ -3,8 +3,13 @@ import {
   BBAuthTokenErrorCode
 } from '../auth';
 
-import { BBAuthDomain } from '../auth/auth-domain';
-import { BBAuthNavigator } from './navigator';
+import {
+  BBAuthDomain
+} from '../auth/auth-domain';
+
+import {
+  BBAuthNavigator
+} from './navigator';
 
 function post(
   url: string,
@@ -159,7 +164,9 @@ export class BBCsrfXhr {
 
   public static requestWithToken(
     url: string,
-    token: string
+    token: string,
+    verb = 'GET',
+    body?: any
   ) {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
@@ -168,21 +175,36 @@ export class BBCsrfXhr {
         if (xhr.readyState === 4) {
           switch (xhr.status) {
             case 200:
-              resolve(JSON.parse(xhr.responseText));
+              let result: any;
+
+              if (xhr.responseText) {
+                result = JSON.parse(xhr.responseText);
+              }
+
+              resolve(result);
               break;
             default:
-              reject();
+              reject(xhr);
               break;
           }
         }
       };
 
-      xhr.open('GET', url, true);
+      xhr.open(verb, url, true);
 
       xhr.setRequestHeader('Authorization', 'Bearer ' + token);
       xhr.setRequestHeader('Accept', 'application/json');
 
-      xhr.send();
+      switch (verb) {
+        case 'GET':
+          xhr.send();
+          break;
+        case 'PATCH':
+        case 'POST':
+          xhr.setRequestHeader('Content-Type', 'application/json');
+          xhr.send(JSON.stringify(body));
+          break;
+      }
     });
   }
 }
