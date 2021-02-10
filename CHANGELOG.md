@@ -1,3 +1,7 @@
+# 2.42.0 (2021-02-10)
+
+- Updated vertical navigation to persist its minimized state across sessions. [#181](https://github.com/blackbaud/auth-client/pull/181)
+
 # 2.41.0 (2021-01-27)
 
 - Added ability to preview vertical navigation. [#179](https://github.com/blackbaud/auth-client/pull/179)
