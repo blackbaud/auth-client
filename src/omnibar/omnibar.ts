@@ -484,11 +484,11 @@ function handleBrandingUpdate(branding: BBOmnibarBranding): void {
   const favIconUrl = branding?.images?.favIcon?.url;
   if (favIconUrl) {
     // Update the hrefs that we can support.
-    document.querySelectorAll<HTMLLinkElement>("link[rel='icon'], link[rel='apple-touch-icon']").forEach(linkEl => {
+    document.querySelectorAll<HTMLLinkElement>("link[rel='icon'], link[rel='apple-touch-icon']").forEach((linkEl) => {
       linkEl.href = favIconUrl;
     });
     // Remove the elements that we can't support so there's no lingering default logo anywhere.
-    document.querySelectorAll<HTMLLinkElement>("link[rel='mask-icon'], link[rel='manifest']").forEach(linkEl => {
+    document.querySelectorAll<HTMLLinkElement>("link[rel='mask-icon'], link[rel='manifest']").forEach((linkEl) => {
       linkEl.remove();
     });
   }
