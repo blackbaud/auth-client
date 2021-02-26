@@ -15,7 +15,7 @@ import {
 } from './user-settings';
 
 describe('User settings', () => {
-  let requestWithTokenSpy: jasmine.Spy;
+  let requestWithTokenSpy: jasmine.Spy<typeof BBCsrfXhr.requestWithToken>;
   let previousUpdateDelay: number;
   let previousGetSettingsTimeout: number;
 
@@ -75,6 +75,38 @@ describe('User settings', () => {
       }, BBUserSettings.GET_SETTINGS_TIMEOUT + 100);
     });
 
+    it('should handle errors from the UI config service when retrieving settings', async () => {
+      requestWithTokenSpy.and.callFake(() => Promise.reject());
+
+      let errorOccurred = false;
+
+      try {
+        await BBUserSettings.getSettings();
+      } catch (err) {
+        errorOccurred = true;
+      }
+
+      expect(errorOccurred).toBe(true);
+    });
+
+    it('should handle errors from the UI config service when updating settings', async () => {
+      requestWithTokenSpy.and.callFake(() => Promise.reject());
+
+      let errorOccurred = false;
+
+      try {
+        await BBUserSettings.updateSettings({
+          omnibar: {
+            vMin: true
+          }
+        });
+      } catch (err) {
+        errorOccurred = true;
+      }
+
+      expect(errorOccurred).toBe(true);
+    });
+
     it('should update user settings by calling the web service after a delay', (done) => {
       const config: BBUserConfig = {
         omnibar: {
@@ -110,13 +142,13 @@ describe('User settings', () => {
   });
 
   describe('when not logged in', () => {
-    let getItemSpy: jasmine.Spy;
-    let setItemSpy: jasmine.Spy;
+    let getItemSpy: jasmine.Spy<typeof localStorage.getItem>;
+    let setItemSpy: jasmine.Spy<typeof localStorage.setItem>;
 
     beforeEach(() => {
       spyOn(BBAuth, 'getToken')
         .and
-        .returnValue(Promise.reject());
+        .callFake(() => Promise.reject());
 
       getItemSpy = spyOn(localStorage, 'getItem');
       setItemSpy = spyOn(localStorage, 'setItem');

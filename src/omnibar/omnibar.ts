@@ -1,5 +1,3 @@
-import * as jwtDecode from 'jwt-decode';
-
 import {
   BBAuth
 } from '../auth';
@@ -68,40 +66,6 @@ const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 const HOST_ID = 'omnibar';
 
-const notificationSvcIds: {
-  [key: string]: {
-    requiresNotif: boolean
-  }
-} = {
-  chrch: {
-    requiresNotif: false
-  },
-  faith: {
-    requiresNotif: true
-  },
-  fenxt: {
-    requiresNotif: true
-  },
-  merchservices: {
-    requiresNotif: false
-  },
-  renxt: {
-    requiresNotif: false
-  },
-  skydev: {
-    requiresNotif: false
-  },
-  skydevhome: {
-    requiresNotif: false
-  },
-  skyux: {
-    requiresNotif: false
-  },
-  tcs: {
-    requiresNotif: true
-  }
-};
-
 let envEl: HTMLDivElement;
 let envNameEl: HTMLSpanElement;
 let envDescEl: HTMLSpanElement;
@@ -111,7 +75,6 @@ let iframeEl: HTMLIFrameElement;
 let omnibarConfig: BBOmnibarConfig;
 let currentLegacyKeepAliveUrl: string;
 let promiseResolve: () => void;
-let pushNotificationsConnected: boolean;
 let unreadNotificationCount: number;
 let serviceName: string;
 let currentTitleParts: string[];
@@ -289,19 +252,17 @@ function handleStateChange(): void {
   BBOmnibarVertical.updateUrl(url);
 }
 
-function handleSearch(searchArgs: BBOmnibarSearchArgs): void {
+async function handleSearch(searchArgs: BBOmnibarSearchArgs): Promise<void> {
   if (omnibarConfig.onSearch) {
-    omnibarConfig
-      .onSearch(searchArgs)
-      .then((results: any) => {
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            messageType: 'search-results',
-            results
-          }
-        );
-      });
+    const results = await omnibarConfig.onSearch(searchArgs);
+
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        messageType: 'search-results',
+        results
+      }
+    );
   }
 }
 
@@ -314,89 +275,89 @@ function openPushNotificationsMenu(): void {
   );
 }
 
-function connectPushNotifications(): void {
-  if (!pushNotificationsConnected) {
-    pushNotificationsConnected = true;
+function notificationsCallback(notifications: any): void {
+  BBAuthInterop.postOmnibarMessage(
+    iframeEl,
+    {
+      messageType: 'push-notifications-update',
+      pushNotifications: notifications
+    }
+  );
 
-    BBOmnibar.pushNotificationsEnabled()
-      .then((enabled) => {
-        if (enabled) {
-          BBOmnibarToastContainer.init({
-            envId: omnibarConfig.envId,
-            leId: omnibarConfig.leId,
-            navigateCallback: handleNavigate,
-            navigateUrlCallback: handleNavigateUrl,
-            openMenuCallback: openPushNotificationsMenu,
-            svcId: omnibarConfig.svcId,
-            url: BBAuthInterop.getCurrentUrl()
-          })
-            .then(() => {
-              BBOmnibarPushNotifications.connect(
-                omnibarConfig.leId,
-                omnibarConfig.envId,
-                (notifications) => {
-                  BBAuthInterop.postOmnibarMessage(
-                    iframeEl,
-                    {
-                      messageType: 'push-notifications-update',
-                      pushNotifications: notifications
-                    }
-                  );
+  BBOmnibarToastContainer.showNewNotifications(notifications);
 
-                  BBOmnibarToastContainer.showNewNotifications(notifications);
+  unreadNotificationCount = notifications &&
+    notifications.notifications &&
+    notifications.notifications.filter((notification: any) => !notification.isRead).length;
 
-                  unreadNotificationCount = notifications &&
-                    notifications.notifications &&
-                    notifications.notifications.filter((notification: any) => !notification.isRead).length;
+  updateTitle();
+}
 
-                  updateTitle();
-                });
-              });
-        } else {
-          pushNotificationsConnected = false;
-        }
+function customMessageCallback(): void {
+  BBOmnibarVertical.refreshSettings();
+}
+
+async function connectPushNotifications(checkLoggedIn?: boolean): Promise<void> {
+  if (checkLoggedIn) {
+    try {
+      await BBAuth.getToken({
+        disableRedirect: true
       });
+    } catch (err) {
+      return;
+    }
   }
+
+  await BBOmnibarPushNotifications.connect(
+    {
+      customMessageCallback,
+      envId: omnibarConfig.envId,
+      handleNavigate,
+      handleNavigateUrl,
+      leId: omnibarConfig.leId,
+      notificationsCallback,
+      openPushNotificationsMenu,
+      showVerticalNav: showVerticalNav(),
+      svcId: omnibarConfig.svcId
+    }
+  );
 }
 
 function disconnectPushNotifications(): void {
-  if (pushNotificationsConnected) {
-    BBOmnibarToastContainer.destroy();
-    BBOmnibarPushNotifications.disconnect();
-
-    pushNotificationsConnected = false;
-  }
+  BBOmnibarPushNotifications.disconnect();
 }
 
-function refreshUserCallback(): void {
-  function refreshUser(token: string) {
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        messageType: 'refresh-user',
-        token
-      }
-    );
-
-    if (showVerticalNav()) {
-      BBOmnibarVertical.refreshUser(token);
-    }
-
-    if (token) {
-      connectPushNotifications();
-    } else {
-      disconnectPushNotifications();
-    }
-  }
-
+async function refreshUserCallback(): Promise<void> {
   BBAuth.clearTokenCache();
 
-  BBAuth.getToken({
-    disableRedirect: true,
-    forceNewToken: true
-  })
-    .then(refreshUser)
-    .catch(() => refreshUser(undefined));
+  let token: string;
+
+  try {
+    token = await BBAuth.getToken({
+      disableRedirect: true,
+      forceNewToken: true
+    });
+  } catch (err) {
+    /* Let token remain undefined */
+  }
+
+  BBAuthInterop.postOmnibarMessage(
+    iframeEl,
+    {
+      messageType: 'refresh-user',
+      token
+    }
+  );
+
+  if (showVerticalNav()) {
+    BBOmnibarVertical.refreshUser(token);
+  }
+
+  if (token) {
+    connectPushNotifications();
+  } else {
+    disconnectPushNotifications();
+  }
 }
 
 function showInactivityCallback(): void {
@@ -571,7 +532,7 @@ function messageHandler(event: MessageEvent): void {
       );
 
       initLocalNotifications();
-      connectPushNotifications();
+      connectPushNotifications(true);
 
       handleStateChange();
 
@@ -707,34 +668,7 @@ export class BBOmnibar {
       return Promise.resolve(false);
     }
 
-    if (notificationSvcIds[omnibarConfig.svcId]) {
-      if (notificationSvcIds[omnibarConfig.svcId].requiresNotif) {
-        return BBAuth.getToken({
-          disableRedirect: true,
-          envId: omnibarConfig.envId,
-          leId: omnibarConfig.leId,
-          permissionScope: 'Notifications'
-        }).then(
-          (token) => {
-            const decodedToken: any = jwtDecode(token);
-            let entitlements: string | string[] = decodedToken['1bb.entitlements'];
-
-            if (entitlements) {
-              entitlements = Array.isArray(entitlements) ? entitlements : [entitlements];
-              return (entitlements as string[]).indexOf('notif') > -1;
-            }
-
-            return false;
-          }
-        ).catch(() => {
-          return false;
-        });
-      } else {
-        return Promise.resolve(true);
-      }
-    }
-
-    return Promise.resolve(false);
+    return BBOmnibarPushNotifications.pushNotificationsEnabled();
   }
 
   public static destroy(): void {
@@ -757,7 +691,6 @@ export class BBOmnibar {
       envDescEl =
       envNameEl =
       promiseResolve =
-      pushNotificationsConnected =
       unreadNotificationCount =
       currentTitleParts =
       serviceName =

@@ -22,84 +22,86 @@ export class BBUserSettings {
 
   public static readonly LOCAL_STORAGE_KEY = 'auth-client-local-user-settings';
 
-  public static getSettings(): Promise<BBUserConfig> {
-    return new Promise((resolve, reject) => {
-      BBAuth.getToken({
-        disableRedirect: true
-      }).then(
-        (token) => {
-          const timeoutId = setTimeout(reject, this.GET_SETTINGS_TIMEOUT);
+  public static async getSettings(): Promise<BBUserConfig> {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const token = await BBAuth.getToken({
+          disableRedirect: true
+        });
 
-          BBCsrfXhr.requestWithToken(
+        const timeoutId = setTimeout(reject, this.GET_SETTINGS_TIMEOUT);
+
+        try {
+          const value: { settings: BBUserConfig } = await BBCsrfXhr.requestWithToken(
             URL,
             token
-          ).then(
-            (value: { settings: BBUserConfig }) => {
-              clearTimeout(timeoutId);
-              resolve(value.settings);
-            },
-            reject
           );
-        },
-        () => {
-          // User is not logged in; return local settings.
-          try {
-            resolve(this.getLocalSettings());
-          } catch (err) {
-            reject();
-          }
+
+          clearTimeout(timeoutId);
+          resolve(value.settings);
+        } catch (err) {
+          reject();
         }
-      );
+      } catch (err) {
+        // User is not logged in; return local settings.
+        try {
+          resolve(this.getLocalSettings());
+        } catch (err) {
+          reject();
+        }
+      }
     });
   }
 
-  public static updateSettings(settings: BBUserConfig): Promise<void> {
+  public static async updateSettings(settings: BBUserConfig): Promise<void> {
     return new Promise((resolve, reject) => {
       if (updateTimeoutId) {
         clearTimeout(updateTimeoutId);
         updateTimeoutId = undefined;
       }
 
-      updateTimeoutId = setTimeout(() => {
+      updateTimeoutId = setTimeout(async () => {
         updateTimeoutId = undefined;
 
-        BBAuth.getToken({
-          disableRedirect: true
-        }).then(
-          (token) => {
-            BBCsrfXhr.requestWithToken(
+        try {
+          const token = await BBAuth.getToken({
+            disableRedirect: true
+          });
+
+          try {
+            const result = await BBCsrfXhr.requestWithToken(
               URL,
               token,
               'PATCH',
               {
                 settings
               }
-            ).then(
-              resolve,
-              reject
             );
-          },
-          () => {
-            // User is not logged in; save settings locally.
-            let existingSettings: BBUserConfig;
 
-            try {
-              existingSettings = this.getLocalSettings();
-            } catch (err) {
-              existingSettings = {};
-            }
-
-            try {
-              existingSettings.omnibar = existingSettings.omnibar || {};
-
-              Object.assign(existingSettings.omnibar, settings.omnibar);
-
-              localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(existingSettings));
-            } catch (err) {
-              reject();
-            }
+            resolve(result);
+          } catch (err) {
+            reject(err);
           }
-        );
+        } catch (err) {
+          // User is not logged in; save settings locally.
+          let existingSettings: BBUserConfig;
+
+          try {
+            existingSettings = this.getLocalSettings();
+          } catch (err) {
+            existingSettings = {};
+          }
+
+          try {
+            existingSettings.omnibar = existingSettings.omnibar || {};
+
+            Object.assign(existingSettings.omnibar, settings.omnibar);
+
+            localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(existingSettings));
+          } catch (err) {
+            reject();
+          }
+        }
       }, this.UPDATE_DELAY);
     });
   }
