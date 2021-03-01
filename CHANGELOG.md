@@ -1,6 +1,6 @@
 # 2.43.0 (2021-03-01)
 
-- Updated omnibar to always connect to the client notification service so consuming applications can receive custom messages. [#184](https://github.com/blackbaud/auth-client/pull/184)
+Updated omnibar to always connect to the client notification service if the user is logged in. This allows consuming applications to receive custom messages. [#184](https://github.com/blackbaud/auth-client/pull/184)
 
 # 2.42.0 (2021-02-10)
 
