@@ -55,12 +55,12 @@ import {
 } from './omnibar-push-notifications';
 
 import {
-  BBOmnibarToastContainer
-} from './omnibar-toast-container';
+  BBOmnibarPushNotificationsConnectArgs
+} from './omnibar-push-notifications-connect-args';
 
 import {
-  BBOmnibarToastContainerInitArgs
-} from './omnibar-toast-container-init-args';
+  BBOmnibarToastContainer
+} from './omnibar-toast-container';
 
 import {
   BBOmnibarVertical
@@ -72,29 +72,11 @@ describe('Omnibar', () => {
   // tslint:disable-next-line:max-line-length
   const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
 
-  // tslint:disable-next-line:max-line-length
-  const testTokenWithNotificationEntitlement = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjpbIm5vdGlmIiwiZm9vIl19.XskU9eHmCxzkRq0GIgmZd3MtFHZ9xaWJUWeuUkDjPb0';
-
-  // tslint:disable-next-line:max-line-length
-  const testTokenWithoutNotificationEntitlement = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
-
-  function loadOmnibar(config?: BBOmnibarConfig): void {
+  async function loadOmnibar(config?: BBOmnibarConfig): Promise<void> {
     config = config || {};
     config.url = config.url || BASE_URL;
 
-    BBOmnibar.load(config);
-  }
-
-  function loadOmnibarWithNotifications(): void {
-    loadOmnibar({
-      svcId: 'renxt'
-    });
-  }
-
-  function loadOmnibarWithNotificationsCheck(): void {
-    loadOmnibar({
-      svcId: 'fenxt'
-    });
+    await BBOmnibar.load(config);
   }
 
   function getIframeEl(): HTMLIFrameElement {
@@ -133,26 +115,23 @@ describe('Omnibar', () => {
     BBOmnibar.destroy();
   }
 
-  let navigateSpy: jasmine.Spy;
-  let postOmnibarMessageSpy: jasmine.Spy;
-  let messageIsFromOmnibarSpy: jasmine.Spy;
-  let getTokenSpy: jasmine.Spy;
-  let startTrackingSpy: jasmine.Spy;
-  let pushNotificationsConnectSpy: jasmine.Spy;
-  let pushNotificationsDisconnectSpy: jasmine.Spy;
-  let toastContainerInitSpy: jasmine.Spy;
-  let toastContainerUpdateUrlSpy: jasmine.Spy;
-  let toastContainerShowNewSpy: jasmine.Spy;
-  let toastContainerDestroySpy: jasmine.Spy;
+  let navigateSpy: jasmine.Spy<typeof BBAuthNavigator.navigate>;
+  let postOmnibarMessageSpy: jasmine.Spy<typeof BBAuthInterop.postOmnibarMessage>;
+  let getTokenSpy: jasmine.Spy<typeof BBAuth.getToken>;
+  let startTrackingSpy: jasmine.Spy<typeof BBOmnibarUserActivity.startTracking>;
+  let pushNotificationsConnectSpy: jasmine.Spy<typeof BBOmnibarPushNotifications.connect>;
+  let pushNotificationsDisconnectSpy: jasmine.Spy<typeof BBOmnibarPushNotifications.disconnect>;
+  let toastContainerShowNewSpy: jasmine.Spy<typeof BBOmnibarToastContainer.showNewNotifications>;
 
   let messageIsFromOmnibarReturnValue = true;
   let getTokenFake: () => Promise<string>;
+  let documentTitle: string;
 
-  beforeAll(() => {
+  beforeEach(() => {
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
 
-    messageIsFromOmnibarSpy = spyOn(
+    spyOn(
       BBAuthInterop,
       'messageIsFromOmnibar'
     ).and.callFake(() => {
@@ -169,31 +148,16 @@ describe('Omnibar', () => {
     pushNotificationsConnectSpy = spyOn(
       BBOmnibarPushNotifications,
       'connect'
-    ).and.returnValue(Promise.resolve());
+    );
 
     pushNotificationsDisconnectSpy = spyOn(
       BBOmnibarPushNotifications,
       'disconnect'
     ).and.returnValue(Promise.resolve());
 
-    toastContainerInitSpy = spyOn(
-      BBOmnibarToastContainer,
-      'init'
-    ).and.returnValue(Promise.resolve());
-
-    toastContainerUpdateUrlSpy = spyOn(
-      BBOmnibarToastContainer,
-      'updateUrl'
-    );
-
     toastContainerShowNewSpy = spyOn(
       BBOmnibarToastContainer,
       'showNewNotifications'
-    );
-
-    toastContainerDestroySpy = spyOn(
-      BBOmnibarToastContainer,
-      'destroy'
     );
 
     // This effectively disables activity tracking.  Without this, the test page could potentially redirect to
@@ -206,38 +170,20 @@ describe('Omnibar', () => {
     styleEl.appendChild(document.createTextNode('* { transition: none !important }'));
 
     document.head.appendChild(styleEl);
-  });
-
-  beforeEach(() => {
-    delete (window as any).BBHELP;
 
     getTokenFake = () => Promise.resolve(testToken);
 
-    navigateSpy.calls.reset();
-    postOmnibarMessageSpy.calls.reset();
-    messageIsFromOmnibarSpy.calls.reset();
-    getTokenSpy.calls.reset();
-    startTrackingSpy.calls.reset();
-    pushNotificationsConnectSpy.calls.reset();
-    toastContainerInitSpy.calls.reset();
-    toastContainerShowNewSpy.calls.reset();
-    toastContainerDestroySpy.calls.reset();
-
-    postOmnibarMessageSpy.and.stub();
-    startTrackingSpy.and.stub();
+    documentTitle = document.title;
   });
 
   afterEach(() => {
+    delete (window as any).BBHELP;
+
     messageIsFromOmnibarReturnValue = true;
 
-    navigateSpy.calls.reset();
-    postOmnibarMessageSpy.calls.reset();
-    messageIsFromOmnibarSpy.calls.reset();
-    getTokenSpy.calls.reset();
-
-    postOmnibarMessageSpy.and.stub();
-
     destroyOmnibar();
+
+    document.title = documentTitle;
   });
 
   it('should load the omnibar IFRAME', () => {
@@ -485,14 +431,18 @@ describe('Omnibar', () => {
       expect(navigateSpy).not.toHaveBeenCalled();
     });
 
-    it('should call the config\'s onSearch() callback when search is invoked', () => {
+    it('should call the config\'s onSearch() callback when search is invoked', (done) => {
       const config = {
-        onSearch: (searchArgs: BBOmnibarSearchArgs) => {
-          return Promise.resolve(undefined);
-        }
+        onSearch: jasmine.createSpy('onSearch').and.returnValue(Promise.resolve(undefined))
       };
 
-      const onSearchSpy = spyOn(config, 'onSearch').and.callThrough();
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(config.onSearch).toHaveBeenCalledWith({
+          searchText: 'abc'
+        });
+
+        done();
+      });
 
       loadOmnibar(config);
 
@@ -501,10 +451,6 @@ describe('Omnibar', () => {
         searchArgs: {
           searchText: 'abc'
         }
-      });
-
-      expect(onSearchSpy).toHaveBeenCalledWith({
-        searchText: 'abc'
       });
     });
 
@@ -735,57 +681,62 @@ describe('Omnibar', () => {
     });
 
     it('should set the document title with the number of unread notifications', (done) => {
-      pushNotificationsConnectSpy.and.callFake((envId, leId, cb) => {
-        expect(document.title).toBe('with notifications - test service');
+      pushNotificationsConnectSpy
+        .and
+        .callFake(
+          async (args: BBOmnibarPushNotificationsConnectArgs) => {
+            const serviceName = 'test service';
 
-        cb(
-          {
-            notifications: [
+            fireMessageEvent({
+              messageType: 'selected-service-update',
+              serviceName
+            });
+
+            BBOmnibar.setTitle({
+              titleParts: [
+                'with notifications'
+              ]
+            });
+
+            expect(document.title).toBe('with notifications - test service');
+
+            args.notificationsCallback(
               {
-                notificationId: '1',
-                shortMessage: 'Hello world'
+                notifications: [
+                  {
+                    notificationId: '1',
+                    shortMessage: 'Hello world'
+                  }
+                ]
               }
-            ]
+            );
+
+            expect(document.title).toBe('(1) with notifications - test service');
+
+            done();
           }
-        );
+      );
 
-        expect(document.title).toBe('(1) with notifications - test service');
-
-        done();
-      });
-
-      getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
-
-      loadOmnibarWithNotifications();
+      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'ready'
-      });
-
-      const serviceName = 'test service';
-
-      BBOmnibar.setTitle({
-        titleParts: [
-          'with notifications'
-        ]
-      });
-
-      fireMessageEvent({
-        messageType: 'selected-service-update',
-        serviceName
       });
     });
 
     it('should show the inactivity prompt', (done) => {
       const showSpy = spyOn(BBOmnibarUserActivityPrompt, 'show');
 
-      startTrackingSpy.and.callFake((
+      startTrackingSpy.and.callFake(async (
         refreshUserCallback: () => void,
         showInactivityCallback: () => void
       ) => {
         showInactivityCallback();
 
         expect(showSpy).toHaveBeenCalled();
+
+        // Ensure the asynchronous getToken() call has completed before ending the test.
+        await getTokenSpy();
 
         done();
       });
@@ -805,13 +756,16 @@ describe('Omnibar', () => {
 
       const userRenewedSessionSpy = spyOn(BBOmnibarUserActivity, 'userRenewedSession');
 
-      startTrackingSpy.and.callFake((
+      startTrackingSpy.and.callFake(async (
         refreshUserCallback: () => void,
         showInactivityCallback: () => void
       ) => {
         showInactivityCallback();
 
         expect(userRenewedSessionSpy).toHaveBeenCalled();
+
+        // Ensure the asynchronous getToken() call has completed before ending the test.
+        await getTokenSpy();
 
         done();
       });
@@ -827,7 +781,7 @@ describe('Omnibar', () => {
     it('should hide the inactivity prompt', (done) => {
       const hideSpy = spyOn(BBOmnibarUserActivityPrompt, 'hide');
 
-      startTrackingSpy.and.callFake((
+      startTrackingSpy.and.callFake(async (
         refreshUserCallback: () => void,
         showInactivityCallback: () => void,
         hideInactivityCallback: () => void
@@ -835,6 +789,9 @@ describe('Omnibar', () => {
         hideInactivityCallback();
 
         expect(hideSpy).toHaveBeenCalled();
+
+        // Ensure the asynchronous getToken() call has completed before ending the test.
+        await getTokenSpy();
 
         done();
       });
@@ -1087,26 +1044,18 @@ describe('Omnibar', () => {
     });
 
     it('should notify the omnibar when the current user data should be refreshed', (done) => {
-      postOmnibarMessageSpy.and.callFake(
-        (iframeEl: HTMLIFrameElement, data: any) => {
-          // The first call to this spy will be to return the requested token, so ignore that
-          // one and look for the refresh-user call.
-          if (data.messageType === 'refresh-user') {
-            expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-              getIframeEl(),
-              {
-                messageType: 'refresh-user',
-                token: testToken
-              }
-            );
+      startTrackingSpy.and.callFake(async (refreshUserCallback: () => Promise<void>) => {
+        await refreshUserCallback();
 
-            done();
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'refresh-user',
+            token: testToken
           }
-        }
-      );
+        );
 
-      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
-        refreshUserCallback();
+        done();
       });
 
       loadOmnibar();
@@ -1118,26 +1067,18 @@ describe('Omnibar', () => {
     });
 
     it('should notify the omnibar when the current user has logged out', (done) => {
-      postOmnibarMessageSpy.and.callFake(
-        (iframeEl: HTMLIFrameElement, data: any) => {
-          // The first call to this spy will be to return the requested token, so ignore that
-          // one and look for the refresh-user call.
-          if (data.messageType === 'refresh-user') {
-            expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-              getIframeEl(),
-              {
-                messageType: 'refresh-user',
-                token: undefined
-              }
-            );
+      startTrackingSpy.and.callFake(async (refreshUserCallback: () => Promise<void>) => {
+        await refreshUserCallback();
 
-            done();
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+          getIframeEl(),
+          {
+            messageType: 'refresh-user',
+            token: undefined
           }
-        }
-      );
+        );
 
-      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
-        refreshUserCallback();
+        done();
       });
 
       getTokenFake = () => {
@@ -1267,32 +1208,38 @@ describe('Omnibar', () => {
         done();
       });
 
-      pushNotificationsConnectSpy.and.callFake((envId, leId, cb) => {
-        cb(testNotifications);
-      });
+      pushNotificationsConnectSpy.and.callFake(
+        async (args: BBOmnibarPushNotificationsConnectArgs) => {
+          args.notificationsCallback(testNotifications);
+        }
+      );
 
-      loadOmnibarWithNotifications();
+      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'ready'
       });
     });
 
-    it('should disconnect push notifications when the user logs out', (done) => {
-      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
-        refreshUserCallback();
-      });
+    it('should not connect to push notifications if the user is not logged in', async () => {
+      getTokenFake = () => {
+        return Promise.reject('The user is not logged in.');
+      };
 
-      loadOmnibarWithNotifications();
+      const loadPromise = loadOmnibar();
 
       fireMessageEvent({
-        messageType: 'get-token',
-        tokenRequestId: 123
+        messageType: 'ready'
       });
 
-      pushNotificationsConnectSpy.and.callFake(() => {
-        pushNotificationsDisconnectSpy.and.callFake(() => {
-          expect(toastContainerDestroySpy).toHaveBeenCalled();
+      await loadPromise;
+
+      expect(pushNotificationsConnectSpy).not.toHaveBeenCalled();
+    });
+
+    it('should disconnect push notifications when the user logs out', (done) => {
+      pushNotificationsConnectSpy.and.callFake(async () => {
+        pushNotificationsDisconnectSpy.and.callFake(async () => {
           done();
         });
 
@@ -1303,23 +1250,12 @@ describe('Omnibar', () => {
           tokenRequestId: 124
         });
       });
-    });
 
-    it('should not connect to push notifications again when the user session changes', (done) => {
       startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
         refreshUserCallback();
-        refreshUserCallback();
-
-        // There's no great way to test that the toast container init method has only been called once
-        // since there's nothing that happens the second time, hence the setTimeout().
-        setTimeout(() => {
-          expect(toastContainerInitSpy).toHaveBeenCalledTimes(1);
-
-          done();
-        });
       });
 
-      loadOmnibarWithNotifications();
+      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'get-token',
@@ -1332,186 +1268,62 @@ describe('Omnibar', () => {
         refreshUserCallback();
       });
 
-      toastContainerInitSpy.and.callFake((args: BBOmnibarToastContainerInitArgs) => {
-        args.openMenuCallback();
+      pushNotificationsConnectSpy.and.callFake(
+        async (args: BBOmnibarPushNotificationsConnectArgs) => {
+          args.openPushNotificationsMenu();
 
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
-            messageType: 'push-notifications-open'
-          }
-        );
-
-        done();
-      });
-
-      loadOmnibarWithNotifications();
-
-      fireMessageEvent({
-        messageType: 'get-token',
-        tokenRequestId: 123
-      });
-    });
-
-    it('should not connect to push notifications if the required entitlement is missing', (done) => {
-      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
-        refreshUserCallback();
-
-        setTimeout(() => {
-          expect(toastContainerInitSpy).not.toHaveBeenCalled();
+          expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+            getIframeEl(),
+            {
+              messageType: 'push-notifications-open'
+            }
+          );
 
           done();
-        });
-      });
+        }
+      );
 
-      getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
-
-      loadOmnibarWithNotificationsCheck();
+      loadOmnibar();
 
       fireMessageEvent({
         messageType: 'get-token',
         tokenRequestId: 123
       });
-    });
-
-    it('should connect to push notifications if the required entitlement is in an array in the JWT', (done) => {
-      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
-        refreshUserCallback();
-
-        setTimeout(() => {
-          expect(toastContainerInitSpy).toHaveBeenCalled();
-
-          expect(toastContainerUpdateUrlSpy).toHaveBeenCalledWith(location.href);
-
-          done();
-        });
-      });
-
-      getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
-
-      loadOmnibarWithNotifications();
-
-      fireMessageEvent({
-        messageType: 'get-token',
-        tokenRequestId: 123
-      });
-    });
-
-    describe('when connecting to notifications', () => {
-
-      function testSvcId(
-        svcId: string,
-        tokenSpyCalled: boolean,
-        notificationsInitialized: boolean
-      ): Promise<void> {
-        return new Promise((resolve) => {
-          startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
-            refreshUserCallback();
-
-            setTimeout(() => {
-              let allArgsExpectation = expect(getTokenSpy.calls.allArgs());
-              if (!tokenSpyCalled) {
-                allArgsExpectation = allArgsExpectation.not;
-              }
-              allArgsExpectation.toContain(
-                [{
-                  disableRedirect: true,
-                  envId: 'envid',
-                  leId: 'leid',
-                  permissionScope: 'Notifications'
-                }]
-              );
-
-              let toastContainerExpectation = expect(toastContainerInitSpy);
-              if (!notificationsInitialized) {
-                toastContainerExpectation = toastContainerExpectation.not;
-              }
-              toastContainerExpectation.toHaveBeenCalled();
-
-              getTokenSpy.calls.reset();
-              toastContainerInitSpy.calls.reset();
-              destroyOmnibar();
-
-              resolve();
-            });
-          });
-
-          loadOmnibar({
-            envId: 'envid',
-            leId: 'leid',
-            svcId
-          });
-
-          fireMessageEvent({
-            messageType: 'get-token',
-            tokenRequestId: 123
-          });
-        });
-      }
-
-      it('should respect the notification settings for a given service ID', async () => {
-        await testSvcId('renxt', false, true);
-        await testSvcId('fenxt', true, true);
-        await testSvcId('skydev', false, true);
-        await testSvcId('skydevhome', false, true);
-        await testSvcId('skyux', false, true);
-        await testSvcId('other', false, false);
-        await testSvcId('faith', true, true);
-        await testSvcId('tcs', true, true);
-        await testSvcId('chrch', false, true);
-        await testSvcId('merchservices', false, true);
-      });
-
     });
 
   });
 
   describe('pushNotificationsEnabled() method', () => {
 
-    it('should return false if the omnibar has not been initialized', (done) => {
-      BBOmnibar.pushNotificationsEnabled()
-        .then((enabled) => {
-          expect(enabled).toBe(false);
-          done();
-        });
+    let pushNotificationsEnabledSpy: jasmine.Spy<typeof BBOmnibarPushNotifications.pushNotificationsEnabled>;
+
+    beforeEach(() => {
+      pushNotificationsEnabledSpy = spyOn(BBOmnibarPushNotifications, 'pushNotificationsEnabled');
     });
 
-    it('should check the token for the notif entitlement', (done) => {
-      loadOmnibarWithNotificationsCheck();
+    it('should call BBOmnibarPushNotifications.pushNotificationsEnabled() with no parameters', () => {
+      loadOmnibar({
+        envId: '123',
+        leId: 'xyz',
+        svcId: 'abc'
+      });
 
-      getTokenFake = () => Promise.resolve(testTokenWithoutNotificationEntitlement);
+      BBOmnibar.pushNotificationsEnabled();
 
-      BBOmnibar.pushNotificationsEnabled()
-        .then((enabledWithoutNotif) => {
-          expect(enabledWithoutNotif).toBe(false);
-
-          getTokenFake = () => Promise.resolve(testTokenWithNotificationEntitlement);
-
-          BBOmnibar.pushNotificationsEnabled()
-            .then((enabledWithNotif) => {
-              expect(enabledWithNotif).toBe(true);
-              done();
-            });
-        });
+      expect(pushNotificationsEnabledSpy).toHaveBeenCalledWith();
     });
 
-    it('should return false if retrieving a token fails', (done) => {
-      loadOmnibarWithNotificationsCheck();
+    it('should return false if the omnibar has not been loaded', async () => {
+      const enabled = await BBOmnibar.pushNotificationsEnabled();
 
-      getTokenFake = () => Promise.reject('The user is not logged in');
-
-      BBOmnibar.pushNotificationsEnabled()
-        .then((enabled) => {
-          expect(enabled).toBe(false);
-          done();
-        });
+      expect(enabled).toBe(false);
     });
 
   });
 
   describe('vertical navigation', () => {
 
-    it('should be loaded when the theme is modern and the URL contains a flag', () => {
+    it('should be loaded when the theme is modern and the URL contains a flag', async () => {
       spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?leftnav=1');
       spyOn(BBOmnibarVertical, 'load');
 
@@ -1521,7 +1333,7 @@ describe('Omnibar', () => {
         }
       };
 
-      loadOmnibar(config);
+      const loadPromise = loadOmnibar(config);
 
       expect(BBOmnibarVertical.load).toHaveBeenCalledWith(config, getIframeEl());
 
@@ -1529,12 +1341,20 @@ describe('Omnibar', () => {
         messageType: 'ready'
       });
 
+      await loadPromise;
+
       expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
         getIframeEl(),
         jasmine.objectContaining({
           compactNavOnly: true
         })
       ]);
+
+      expect(pushNotificationsConnectSpy).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          showVerticalNav: true
+        })
+      );
     });
 
     it('should ignore the anchor portion of the URL if present', () => {
@@ -1553,15 +1373,17 @@ describe('Omnibar', () => {
     });
 
     it('should notify the vertical omnibar when the current user data should be refreshed', (done) => {
+      const refreshUserSpy = spyOn(BBOmnibarVertical, 'refreshUser');
+
       spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?leftnav=1');
       spyOn(BBOmnibarVertical, 'load');
 
-      spyOn(BBOmnibarVertical, 'refreshUser').and.callFake(() => {
-        done();
-      });
+      startTrackingSpy.and.callFake(async (refreshUserCallback: () => Promise<void>) => {
+        await refreshUserCallback();
 
-      startTrackingSpy.and.callFake((refreshUserCallback: () => void) => {
-        refreshUserCallback();
+        expect(refreshUserSpy).toHaveBeenCalledWith(testToken);
+
+        done();
       });
 
       loadOmnibar(
@@ -1577,6 +1399,37 @@ describe('Omnibar', () => {
         tokenRequestId: 123
       });
     });
+
+    it('should update its minimized state when global settings change', (done) => {
+      const refreshSettingsSpy = spyOn(BBOmnibarVertical, 'refreshSettings');
+
+      pushNotificationsConnectSpy.and.callFake(async (args) => {
+        args.customMessageCallback({
+          customMessageType: 'test',
+          value: 'test'
+        });
+
+        expect(refreshSettingsSpy).toHaveBeenCalled();
+
+        done();
+      });
+
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?leftnav=1');
+      spyOn(BBOmnibarVertical, 'load');
+
+      const config = {
+        theme: {
+          name: 'modern'
+        }
+      };
+
+      loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'ready'
+      });
+    });
+
   });
 
 });

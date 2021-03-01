@@ -167,7 +167,7 @@ export class BBCsrfXhr {
     token: string,
     verb = 'GET',
     body?: any
-  ) {
+  ): Promise<any> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
 

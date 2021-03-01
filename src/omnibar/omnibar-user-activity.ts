@@ -1,10 +1,26 @@
-import { BBAuthDomain } from '../auth/auth-domain';
-import { BBCsrfXhr } from '../shared/csrf-xhr';
-import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
-import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
-import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
+import {
+  BBAuthDomain
+} from '../auth/auth-domain';
 
-import { BBAuthNavigator } from '../shared/navigator';
+import {
+  BBCsrfXhr
+} from '../shared/csrf-xhr';
+
+import {
+  BBAuthNavigator
+} from '../shared/navigator';
+
+import {
+  BBOmnibarUserActivityProcessor
+} from './omnibar-user-activity-processor';
+
+import {
+  BBOmnibarUserSessionExpiration
+} from './omnibar-user-session-expiration';
+
+import {
+  BBOmnibarUserSessionWatcher
+} from './omnibar-user-session-watcher';
 
 let isTracking: boolean;
 let clientX: number;
@@ -84,29 +100,29 @@ function startActivityTimer() {
     renewSession();
   }
 
-  intervalId = setInterval(() => {
-    BBOmnibarUserSessionExpiration.getSessionExpiration(
+  intervalId = setInterval(async () => {
+    const expirationDate = await BBOmnibarUserSessionExpiration.getSessionExpiration(
       lastRefreshId,
       legacyTtl,
       currentAllowAnonymous
-    ).then((expirationDate) => {
-      // Verify activity tracking didn't stop since session expiration retrieval began.
-      if (isTracking) {
-        BBOmnibarUserActivityProcessor.process({
-          allowAnonymous: currentAllowAnonymous,
-          closeInactivityPrompt,
-          expirationDate,
-          inactivityPromptDuration: BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION,
-          isShowingInactivityPrompt,
-          lastActivity,
-          maxSessionAge: BBOmnibarUserActivity.MAX_SESSION_AGE,
-          minRenewalAge: BBOmnibarUserActivity.MIN_RENEWAL_AGE,
-          redirectForInactivity,
-          renewSession,
-          showInactivityPrompt
-        });
-      }
-    });
+    );
+
+    // Verify activity tracking didn't stop since session expiration retrieval began.
+    if (isTracking) {
+      BBOmnibarUserActivityProcessor.process({
+        allowAnonymous: currentAllowAnonymous,
+        closeInactivityPrompt,
+        expirationDate,
+        inactivityPromptDuration: BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION,
+        isShowingInactivityPrompt,
+        lastActivity,
+        maxSessionAge: BBOmnibarUserActivity.MAX_SESSION_AGE,
+        minRenewalAge: BBOmnibarUserActivity.MIN_RENEWAL_AGE,
+        redirectForInactivity,
+        renewSession,
+        showInactivityPrompt
+      });
+    }
   }, BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL);
 }
 
@@ -130,7 +146,7 @@ export class BBOmnibarUserActivity {
   public static MAX_SESSION_AGE = 90 * 60 * 1000;
 
   public static startTracking(
-    refreshUserCallback: () => void,
+    refreshUserCallback: () => Promise<void>,
     showInactivityCallback: () => void,
     hideInactivityCallback: () => void,
     allowAnonymous: boolean,
