@@ -1,5 +1,3 @@
-//#region imports
-
 import {
   BBAuth,
   BBAuthTokenErrorCode
@@ -29,8 +27,6 @@ import {
   BBContextDestinations
 } from './context-destinations';
 
-//#endregion
-
 describe('Context provider', () => {
   let messageIsFromOmnibarReturnValue: boolean;
 
@@ -38,9 +34,9 @@ describe('Context provider', () => {
   let testDestinationsMultiple: BBContextDestinations;
   let testDestinationsNone: BBContextDestinations;
 
-  let postOmnibarMessageSpy: jasmine.Spy;
-  let messageIsFromOmnibarSpy: jasmine.Spy;
-  let redirectToErrorSpy: jasmine.Spy;
+  let postOmnibarMessageSpy: jasmine.Spy<typeof BBAuthInterop.postOmnibarMessage>;
+  let messageIsFromOmnibarSpy: jasmine.Spy<typeof BBAuthInterop.messageIsFromOmnibar>;
+  let redirectToErrorSpy: jasmine.Spy<typeof BBAuthNavigator.redirectToError>;
 
   let getTokenFake: () => Promise<string>;
 
@@ -94,6 +90,15 @@ describe('Context provider', () => {
         }
       }, 100);
     });
+  }
+
+  async function ensureContextWithCatch(args: BBContextArgs): Promise<BBContextArgs> {
+    try {
+      return await BBContextProvider.ensureContext(args);
+    } catch (err) {
+      // Handle the promise rejection that happens when canceling the welcome screen after each test run.
+      return undefined;
+    }
   }
 
   beforeEach(() => {
@@ -163,7 +168,7 @@ describe('Context provider', () => {
   });
 
   it('should automatically resolve if environment ID is not required', async (done) => {
-    const args = await BBContextProvider.ensureContext({
+    const args = await ensureContextWithCatch({
       envIdRequired: false
     });
 
@@ -172,7 +177,7 @@ describe('Context provider', () => {
   });
 
   it('should automatically resolve if environment ID is required but provided', async (done) => {
-    const args = await BBContextProvider.ensureContext({
+    const args = await ensureContextWithCatch({
       envId: '123',
       envIdRequired: true
     });
@@ -191,7 +196,7 @@ describe('Context provider', () => {
       }
     );
 
-    BBContextProvider.ensureContext({
+    ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc'
     });
@@ -208,10 +213,6 @@ describe('Context provider', () => {
   it(
     'should not redirect if disableRedirect and environment ID is required but the user is not in an environment',
     async (done) => {
-      const expectedArgs: BBContextArgs = {
-        url: 'custom-url'
-      };
-
       replyWithDestinations(
         'abc',
         '',
@@ -242,7 +243,7 @@ describe('Context provider', () => {
       testDestinationsNone
     );
 
-    BBContextProvider.ensureContext({
+    ensureContextWithCatch({
       envIdRequired: true
     });
 
@@ -258,7 +259,7 @@ describe('Context provider', () => {
       testDestinationsSingle
     );
 
-    const args = await BBContextProvider.ensureContext({
+    const args = await ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc'
     });
@@ -274,7 +275,7 @@ describe('Context provider', () => {
       testDestinationsMultiple
     );
 
-    const contextPromise = BBContextProvider.ensureContext({
+    const contextPromise = ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc',
       url: 'https://example.com'
@@ -339,7 +340,7 @@ describe('Context provider', () => {
       testDestinationsMultiple
     );
 
-    BBContextProvider.ensureContext({
+    ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc'
     });
@@ -376,7 +377,7 @@ describe('Context provider', () => {
       testDestinationsMultiple
     );
 
-    BBContextProvider.ensureContext({
+    ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc'
     });
@@ -420,7 +421,7 @@ describe('Context provider', () => {
       testDestinationsMultiple
     );
 
-    BBContextProvider.ensureContext({
+    ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc',
       url: 'https://example.com'
@@ -444,7 +445,7 @@ describe('Context provider', () => {
       testDestinationsMultiple
     );
 
-    BBContextProvider.ensureContext({
+    ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc',
       url: 'https://example.com'

@@ -139,12 +139,14 @@ function maximize(): void {
   document.body.classList.remove(CLS_BODY_MINIMIZED);
 }
 
-function updateMinimized(verticalNavMinimized: boolean): void {
-  BBUserSettings.updateSettings({
-    omnibar: {
-      vMin: verticalNavMinimized
-    }
-  });
+function updateMinimized(verticalNavMinimized: boolean, updateSettings: boolean): void {
+  if (updateSettings) {
+    BBUserSettings.updateSettings({
+      omnibar: {
+        vMin: verticalNavMinimized
+      }
+    });
+  }
 
   if (verticalNavMinimized) {
     minimize();
@@ -220,10 +222,10 @@ function messageHandler(event: MessageEvent): void {
       );
       break;
     case 'maximize':
-      updateMinimized(false);
+      updateMinimized(false, true);
       break;
     case 'minimize':
-      updateMinimized(true);
+      updateMinimized(true, true);
       break;
   }
 }
@@ -236,19 +238,18 @@ export class BBOmnibarVertical {
   ): Promise<void> {
     omnibarConfig = config;
 
-    return new Promise<any>((resolve) => {
+    return new Promise<any>(async (resolve) => {
       promiseResolve = resolve;
 
       addStyleEl();
 
-      BBUserSettings.getSettings().then(
-        (settings) => {
-          currentSettings = settings;
-          addIframeEl(afterEl);
-        },
-        () => {
-          addIframeEl(afterEl);
-        });
+      try {
+        currentSettings = await BBUserSettings.getSettings();
+      } catch (err) {
+        /* Let currentSettings remain undefined */
+      }
+
+      addIframeEl(afterEl);
 
       window.addEventListener('message', messageHandler);
     });
@@ -266,6 +267,22 @@ export class BBOmnibarVertical {
       {
         messageType: 'refresh-user',
         token
+      }
+    );
+  }
+
+  public static async refreshSettings(): Promise<void> {
+    currentSettings = await BBUserSettings.getSettings();
+
+    updateMinimized(currentSettings?.omnibar?.vMin, false);
+
+    BBAuthInterop.postOmnibarMessage(
+      iframeEl,
+      {
+        messageType: 'update-vertical',
+        updateArgs: {
+          minimized: currentSettings?.omnibar?.vMin
+        }
       }
     );
   }

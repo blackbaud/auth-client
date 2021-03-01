@@ -34,9 +34,9 @@ describe('Omnibar vertical', () => {
 
   let afterEl: HTMLElement;
   let messageIsFromOmnibarReturnValue: boolean;
-  let navigateSpy: jasmine.Spy;
-  let postOmnibarMessageSpy: jasmine.Spy;
-  let updateSettingsSpy: jasmine.Spy;
+  let navigateSpy: jasmine.Spy<typeof BBAuthNavigator.navigate>;
+  let postOmnibarMessageSpy: jasmine.Spy<typeof BBAuthInterop.postOmnibarMessage>;
+  let updateSettingsSpy: jasmine.Spy<typeof BBUserSettings.updateSettings>;
   let userSettingsReturnValue: Promise<BBUserConfig>;
 
   let getTokenFake: () => Promise<string>;
@@ -406,6 +406,32 @@ describe('Omnibar vertical', () => {
       });
 
       expect(navigateSpy).toHaveBeenCalledWith('https://example.com/');
+    });
+
+    it('should notify omnibar and update minimized state when the user\'s global settings have changed', async () => {
+      await loadOmnibarVertical();
+
+      validateMinimized(false);
+
+      userSettingsReturnValue = Promise.resolve({
+        omnibar: {
+          vMin: true
+        }
+      });
+
+      await BBOmnibarVertical.refreshSettings();
+
+      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
+        getIframeEl(),
+        {
+          messageType: 'update-vertical',
+          updateArgs: {
+            minimized: true
+          }
+        }
+      );
+
+      validateMinimized(true);
     });
   });
 
