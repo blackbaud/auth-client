@@ -53,7 +53,7 @@ export class BBUserSettings {
     });
   }
 
-  public static async updateSettings(settings: BBUserConfig): Promise<void> {
+  public static async updateSettings(correlationId: string, settings: BBUserConfig): Promise<void> {
     return new Promise((resolve, reject) => {
       if (updateTimeoutId) {
         clearTimeout(updateTimeoutId);
@@ -74,6 +74,7 @@ export class BBUserSettings {
               token,
               'PATCH',
               {
+                correlationId,
                 settings
               }
             );

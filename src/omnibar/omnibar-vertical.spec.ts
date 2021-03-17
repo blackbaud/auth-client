@@ -177,17 +177,22 @@ describe('Omnibar vertical', () => {
 
     updateSettingsSpy.calls.reset();
 
+    spyOn(Date, 'now').and.returnValue(123);
+
     fireMessageEvent({
       messageType: 'minimize'
     });
 
     validateMinimized(true);
 
-    expect(updateSettingsSpy).toHaveBeenCalledWith({
-      omnibar: {
-        vMin: true
+    expect(updateSettingsSpy).toHaveBeenCalledWith(
+      '123',
+      {
+        omnibar: {
+          vMin: true
+        }
       }
-    });
+    );
 
     updateSettingsSpy.calls.reset();
 
@@ -197,11 +202,14 @@ describe('Omnibar vertical', () => {
 
     validateMinimized(false);
 
-    expect(updateSettingsSpy).toHaveBeenCalledWith({
-      omnibar: {
-        vMin: false
+    expect(updateSettingsSpy).toHaveBeenCalledWith(
+      '123',
+      {
+        omnibar: {
+          vMin: false
+        }
       }
-    });
+    );
   });
 
   it('should respect the user\'s global settings', async () => {
@@ -419,7 +427,7 @@ describe('Omnibar vertical', () => {
         }
       });
 
-      await BBOmnibarVertical.refreshSettings();
+      await BBOmnibarVertical.refreshSettings('123');
 
       expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
         getIframeEl(),
@@ -430,6 +438,30 @@ describe('Omnibar vertical', () => {
           }
         }
       );
+
+      validateMinimized(true);
+    });
+
+    it('should ignore global settings updates that originated from itself', async () => {
+      await loadOmnibarVertical();
+
+      spyOn(Date, 'now').and.returnValue(123);
+
+      fireMessageEvent({
+        messageType: 'minimize'
+      });
+
+      validateMinimized(true);
+
+      userSettingsReturnValue = Promise.resolve({
+        omnibar: {
+          vMin: true
+        }
+      });
+
+      await BBOmnibarVertical.refreshSettings('123');
+
+      expect(postOmnibarMessageSpy).not.toHaveBeenCalled();
 
       validateMinimized(true);
     });
