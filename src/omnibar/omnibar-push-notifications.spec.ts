@@ -286,6 +286,7 @@ describe('Omnibar push notifications', () => {
     await testSvcId('fenxt', true, true);
     await testSvcId('skydev', false, true);
     await testSvcId('skydevhome', false, true);
+    await testSvcId('marketplace', false, true);
     await testSvcId('skyux', false, true);
     await testSvcId('other', false, false);
     await testSvcId('faith', true, true);
