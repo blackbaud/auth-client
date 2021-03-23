@@ -297,8 +297,8 @@ function notificationsCallback(notifications: any): void {
   updateTitle();
 }
 
-function customMessageCallback(): void {
-  BBOmnibarVertical.refreshSettings();
+function customMessageCallback(message: { value: string }): void {
+  BBOmnibarVertical.refreshSettings(message.value);
 }
 
 async function connectPushNotifications(checkLoggedIn?: boolean): Promise<void> {

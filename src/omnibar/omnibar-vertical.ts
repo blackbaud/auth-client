@@ -30,6 +30,8 @@ const CLS_BODY_MINIMIZED = 'sky-omnibar-vertical-body-minimized';
 const WIDTH_MAX = 300;
 const WIDTH_MIN = 90;
 
+const settingsUpdatesToIgnore = new Set<string>();
+
 let currentSettings: BBUserConfig;
 let currentUrl: string;
 let iframeEl: HTMLIFrameElement;
@@ -141,11 +143,20 @@ function maximize(): void {
 
 function updateMinimized(verticalNavMinimized: boolean, updateSettings: boolean): void {
   if (updateSettings) {
-    BBUserSettings.updateSettings({
-      omnibar: {
-        vMin: verticalNavMinimized
+    const correlationId = Date.now().toString();
+
+    // Ignore the custom message from the notifications service indicating this change has
+    // taken place.
+    settingsUpdatesToIgnore.add(correlationId);
+
+    BBUserSettings.updateSettings(
+      correlationId,
+      {
+        omnibar: {
+          vMin: verticalNavMinimized
+        }
       }
-    });
+    );
   }
 
   if (verticalNavMinimized) {
@@ -271,20 +282,25 @@ export class BBOmnibarVertical {
     );
   }
 
-  public static async refreshSettings(): Promise<void> {
-    currentSettings = await BBUserSettings.getSettings();
+  public static async refreshSettings(correlationId: string): Promise<void> {
+    // Ensure we're not responding to our own settings update.
+    if (settingsUpdatesToIgnore.has(correlationId)) {
+      settingsUpdatesToIgnore.delete(correlationId);
+    } else {
+      currentSettings = await BBUserSettings.getSettings();
 
-    updateMinimized(currentSettings?.omnibar?.vMin, false);
+      updateMinimized(currentSettings?.omnibar?.vMin, false);
 
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        messageType: 'update-vertical',
-        updateArgs: {
-          minimized: currentSettings?.omnibar?.vMin
+      BBAuthInterop.postOmnibarMessage(
+        iframeEl,
+        {
+          messageType: 'update-vertical',
+          updateArgs: {
+            minimized: currentSettings?.omnibar?.vMin
+          }
         }
-      }
-    );
+      );
+    }
   }
 
   public static destroy(): void {
@@ -296,6 +312,8 @@ export class BBOmnibarVertical {
     maximize();
 
     window.removeEventListener('message', messageHandler);
+
+    settingsUpdatesToIgnore.clear();
 
     currentSettings =
       currentUrl =

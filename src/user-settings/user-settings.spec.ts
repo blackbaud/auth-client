@@ -95,11 +95,14 @@ describe('User settings', () => {
       let errorOccurred = false;
 
       try {
-        await BBUserSettings.updateSettings({
-          omnibar: {
-            vMin: true
+        await BBUserSettings.updateSettings(
+          '123',
+          {
+            omnibar: {
+              vMin: true
+            }
           }
-        });
+        );
       } catch (err) {
         errorOccurred = true;
       }
@@ -117,9 +120,9 @@ describe('User settings', () => {
       requestWithTokenSpy.and.returnValue(Promise.resolve());
 
       // Each time updateSettings() is called, the previous request should be canceled.
-      BBUserSettings.updateSettings(config);
-      BBUserSettings.updateSettings(config);
-      BBUserSettings.updateSettings(config);
+      BBUserSettings.updateSettings('123', config);
+      BBUserSettings.updateSettings('124', config);
+      BBUserSettings.updateSettings('125', config);
 
       expect(requestWithTokenSpy).not.toHaveBeenCalled();
 
@@ -132,6 +135,7 @@ describe('User settings', () => {
           'abc',
           'PATCH',
           {
+            correlationId: '125',
             settings: config
           }
         );
@@ -193,7 +197,10 @@ describe('User settings', () => {
         }
       };
 
-      BBUserSettings.updateSettings(newSettings);
+      BBUserSettings.updateSettings(
+        '123',
+        newSettings
+      );
 
       setTimeout(() => {
         expect(setItemSpy).toHaveBeenCalledWith(
@@ -217,7 +224,10 @@ describe('User settings', () => {
         omnibar: { }
       };
 
-      BBUserSettings.updateSettings(newSettings);
+      BBUserSettings.updateSettings(
+        '123',
+        newSettings
+      );
 
       setTimeout(() => {
         expect(setItemSpy).toHaveBeenCalledWith(
@@ -243,7 +253,10 @@ describe('User settings', () => {
       let rejected = false;
 
       try {
-        await BBUserSettings.updateSettings(newSettings);
+        await BBUserSettings.updateSettings(
+          '123',
+          newSettings
+        );
       } catch (err) {
         rejected = true;
       }

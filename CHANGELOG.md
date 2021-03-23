@@ -1,3 +1,11 @@
+# 2.44.0 (2021-03-18)
+
+- Added `marketplace` to the list of valid service IDs for notifications. [#189](https://github.com/blackbaud/auth-client/pull/189)
+
+# 2.43.1 (2021-03-17)
+
+Fixed an issue where minimizing and then immediately maximizing the vertical navigation could cause it to minimize again. [#187](https://github.com/blackbaud/auth-client/pull/187)
+
 # 2.43.0 (2021-03-01)
 
 Updated omnibar to always connect to the client notification service if the user is logged in. This allows consuming applications to receive custom messages. [#184](https://github.com/blackbaud/auth-client/pull/184)
