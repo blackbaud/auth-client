@@ -1,3 +1,7 @@
+# 2.45.0 (2021-03-23)
+
+- Added ability for the omnibar to update the favicon of the page. [#183](https://github.com/blackbaud/auth-client/pull/183)
+
 # 2.44.0 (2021-03-18)
 
 - Added `marketplace` to the list of valid service IDs for notifications. [#189](https://github.com/blackbaud/auth-client/pull/189)
