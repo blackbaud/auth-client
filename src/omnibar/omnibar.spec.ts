@@ -1291,6 +1291,98 @@ describe('Omnibar', () => {
       });
     });
 
+    describe('branding', () => {
+      interface LinkInfo {
+        el: HTMLLinkElement;
+        removeSpy: jasmine.Spy;
+      }
+
+      const head = document.head;
+      const bbLogo = 'https://www.blackbaud.com/blackbaudlogo.png';
+      const customLogo = 'https://www.blackbaud.com/customlogo.png';
+
+      let linkInfos: LinkInfo[];
+      let iconLink: LinkInfo;
+      let appleIconLink: LinkInfo;
+      let maskIconLink: LinkInfo;
+      let manifestLink: LinkInfo;
+
+      function createLinkElement(rel: string): LinkInfo {
+        const el = document.createElement('link');
+        el.rel = rel;
+        el.href = bbLogo;
+        head.appendChild(el);
+
+        const linkInfo: LinkInfo = {
+          el,
+          removeSpy: spyOn(el, 'remove')
+        };
+
+        linkInfos.push(linkInfo);
+        return linkInfo;
+      }
+
+      function validateLinkInfo(
+        linkInfo: LinkInfo,
+        icon: string,
+        removeCalled: boolean
+      ) {
+        if (icon !== undefined) {
+          expect(linkInfo.el.href).toEqual(icon);
+        }
+        expect(linkInfo.removeSpy).toHaveBeenCalledTimes(removeCalled ? 1 : 0);
+      }
+
+      beforeEach(() => {
+        linkInfos = [];
+        iconLink = createLinkElement('icon');
+        appleIconLink = createLinkElement('apple-touch-icon');
+        maskIconLink = createLinkElement('mask-icon');
+        manifestLink = createLinkElement('manifest');
+      });
+
+      afterEach(() => {
+        for (const linkInfo of linkInfos) {
+          linkInfo.el.remove();
+        }
+      });
+
+      it('should update favicon', () => {
+        loadOmnibar();
+
+        fireMessageEvent({
+          branding: {
+            images: {
+              favIcon: {
+                url: customLogo
+              }
+            }
+          },
+          messageType: 'branding-update'
+        });
+
+        validateLinkInfo(iconLink, customLogo, false);
+        validateLinkInfo(appleIconLink, customLogo, false);
+        validateLinkInfo(maskIconLink, undefined, true);
+        validateLinkInfo(manifestLink, undefined, true);
+      });
+
+      it('should not update favicon', () => {
+        loadOmnibar();
+
+        fireMessageEvent({
+          branding: {
+            images: {}
+          },
+          messageType: 'branding-update'
+        });
+
+        validateLinkInfo(iconLink, bbLogo, false);
+        validateLinkInfo(appleIconLink, bbLogo, false);
+        validateLinkInfo(maskIconLink, bbLogo, false);
+        validateLinkInfo(manifestLink, bbLogo, false);
+      });
+    });
   });
 
   describe('pushNotificationsEnabled() method', () => {

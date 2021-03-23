@@ -15,6 +15,10 @@ import {
 } from '../shared/dom-utility';
 
 import {
+  BBOmnibarBranding
+} from './branding';
+
+import {
   BBOmnibarConfig
 } from './omnibar-config';
 
@@ -437,6 +441,20 @@ function handleEnvironmentUpdate(
   }
 }
 
+function handleBrandingUpdate(branding: BBOmnibarBranding): void {
+  const favIconUrl = branding?.images?.favIcon?.url;
+  if (favIconUrl) {
+    // Update the hrefs that we can support.
+    document.querySelectorAll<HTMLLinkElement>("link[rel='icon'], link[rel='apple-touch-icon']").forEach((linkEl) => {
+      linkEl.href = favIconUrl;
+    });
+    // Remove the elements that we can't support so there's no lingering default logo anywhere.
+    document.querySelectorAll<HTMLLinkElement>("link[rel='mask-icon'], link[rel='manifest']").forEach((linkEl) => {
+      linkEl.remove();
+    });
+  }
+}
+
 function handleNavigate(navItem: BBOmnibarNavigationItem): void {
   BBAuthInterop.handleNavigate(omnibarConfig.nav, navItem);
 }
@@ -581,6 +599,9 @@ function messageHandler(event: MessageEvent): void {
       break;
     case 'environment-update':
       handleEnvironmentUpdate(message.name, message.description, message.url);
+      break;
+    case 'branding-update':
+      handleBrandingUpdate(message.branding);
       break;
     case 'legacy-keep-alive-url-change':
       currentLegacyKeepAliveUrl = message.url;
