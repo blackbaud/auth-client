@@ -32,15 +32,15 @@ describe('Auth Get Domain', () => {
       expect(BBAuthDomain.getSTSDomain()).toBe('https://sts-sso.bbk12.com');
     });
 
-    it('returns S21 STS Url when user is on a Blackbaud domain', () => {
+    it('returns default STS Url when user is on a Blackbaud domain', () => {
       BBAuthDomain.CURRENT_DOMAIN = 'blackbaud.com';
-      expect(BBAuthDomain.getSTSDomain()).toBe('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+      expect(BBAuthDomain.getSTSDomain()).toBe('https://sts.sky.blackbaud.com');
     });
 
     // tslint:disable-next-line:max-line-length
-    it('returns S21 STS Url when user is on a registered third party domain which has NOT declared a CNAME STS endpoint', () => {
+    it('returns default STS Url when user is on a registered third party domain which has NOT declared a CNAME STS endpoint', () => {
       BBAuthDomain.CURRENT_DOMAIN = 'unregisteredthirdparty.com';
-      expect(BBAuthDomain.getSTSDomain()).toBe('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+      expect(BBAuthDomain.getSTSDomain()).toBe('https://sts.sky.blackbaud.com');
     });
 
     // tslint:disable-next-line:max-line-length

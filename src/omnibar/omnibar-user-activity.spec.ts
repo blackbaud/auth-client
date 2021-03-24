@@ -109,10 +109,10 @@ describe('Omnibar user activity', () => {
     });
 
     myDomain = spyOn(BBAuthDomain, 'getSTSDomain').and
-      .returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+      .returnValue('https://sts.sky.blackbaud.com');
 
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
-      switch (url.substr('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/'.length)) {
+      switch (url.substr('https://sts.sky.blackbaud.com/session/'.length)) {
         case 'renew':
           renewWasCalled = true;
           break;

@@ -10,10 +10,10 @@ describe('Omnibar user session expiration', () => {
 
   beforeAll(() => {
     domainSpy = spyOn(BBAuthDomain, 'getSTSDomain').and
-      .returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+      .returnValue('https://sts.sky.blackbaud.com');
 
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
-      switch (url.substr('https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/'.length)) {
+      switch (url.substr('https://sts.sky.blackbaud.com/session/'.length)) {
         case 'ttl':
           return ttlPromiseOverride || Promise.resolve(authTtl);
       }
@@ -43,7 +43,7 @@ describe('Omnibar user session expiration', () => {
       .then((expirationDate) => {
         expect(expirationDate).toBeNull();
         expect(requestSpy).toHaveBeenCalledWith(
-          'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/session/ttl',
+          'https://sts.sky.blackbaud.com/session/ttl',
           undefined,
           false
         );

@@ -27,7 +27,7 @@ describe('Auth token integration', () => {
     beforeEach(() => {
       requestSpy = spyOn(BBCsrfXhr, 'request');
       spyOn(BBAuthDomain, 'getRegisteredDomain').and.returnValue(undefined);
-      spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue('https://s21aidntoken00blkbapp01.nxt.blackbaud.com');
+      spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue('https://sts.sky.blackbaud.com');
       spyOn(BBAuthTokenIntegration, 'getLocationHostname').and.returnValue('blackbaud.com');
     });
 
@@ -35,7 +35,7 @@ describe('Auth token integration', () => {
       BBAuthTokenIntegration.getToken();
 
       expect(requestSpy).toHaveBeenCalledWith(
-        'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
+        'https://sts.sky.blackbaud.com/oauth2/token',
         undefined,
         undefined,
         undefined,
@@ -50,7 +50,7 @@ describe('Auth token integration', () => {
       BBAuthTokenIntegration.getToken(true, 'abc', '123');
 
       expect(requestSpy).toHaveBeenCalledWith(
-        'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
+        'https://sts.sky.blackbaud.com/oauth2/token',
         undefined,
         true,
         'abc',
@@ -65,7 +65,7 @@ describe('Auth token integration', () => {
       BBAuthTokenIntegration.getToken(true, 'abc', '123', 'xyz');
 
       expect(requestSpy).toHaveBeenCalledWith(
-        'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/oauth2/token',
+        'https://sts.sky.blackbaud.com/oauth2/token',
         undefined,
         true,
         'abc',
