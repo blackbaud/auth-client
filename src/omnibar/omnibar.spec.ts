@@ -835,6 +835,7 @@ describe('Omnibar', () => {
       const compactNavOnly = true;
       const navVersion = 'test';
       const hideResourceLinks = true;
+      const overrideServiceNavigation = true;
 
       const localNavItems: BBOmnibarNavigationItem[] = [
         {
@@ -870,6 +871,7 @@ describe('Omnibar', () => {
         onSearch: (searchArgs) => {
           return undefined;
         },
+        overrideServiceNavigation,
         svcId,
         theme
       });
@@ -898,6 +900,7 @@ describe('Omnibar', () => {
           localSearch: true,
           messageType: 'nav-ready',
           navVersion,
+          overrideServiceNavigation,
           services: [
             {
               items: [

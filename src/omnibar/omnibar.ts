@@ -543,6 +543,7 @@ function messageHandler(event: MessageEvent): void {
           localSearch: !!omnibarConfig.onSearch,
           messageType: 'nav-ready',
           navVersion: omnibarConfig.navVersion,
+          overrideServiceNavigation: omnibarConfig.overrideServiceNavigation,
           services: nav && nav.services,
           svcId: omnibarConfig.svcId,
           theme: omnibarConfig.theme

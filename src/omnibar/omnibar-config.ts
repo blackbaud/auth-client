@@ -61,5 +61,7 @@ export interface BBOmnibarConfig {
 
   hideResourceLinks?: boolean;
 
+  overrideServiceNavigation?: boolean;
+
   verticalUrl?: string;
 }
