@@ -13,7 +13,7 @@ const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
   'smartaidforparents.com': 'https://account.smartaidforparents.com',
   'smarttuition.com': 'https://account.smarttuition.com'
 };
-const defaultSTSUrl = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
+const defaultSTSUrl = 'https://sts.sky.blackbaud.com';
 
 export class BBAuthDomain {
 
