@@ -1,6 +1,6 @@
 # 2.46.0 (2021-04-22)
 
-- Migrated to the new STS Url. [#192](https://github.com/blackbaud/auth-client/pull/192)
+- Migrated to the new STS URL. [#192](https://github.com/blackbaud/auth-client/pull/192)
 
 # 2.45.0 (2021-03-23)
 
