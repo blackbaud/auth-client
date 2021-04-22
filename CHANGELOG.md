@@ -1,3 +1,7 @@
+# 2.46.0 (2021-04-22)
+
+- Migrated to the new STS URL. [#192](https://github.com/blackbaud/auth-client/pull/192)
+
 # 2.45.0 (2021-03-23)
 
 - Added the ability for the omnibar to update the favicon of the page. [#183](https://github.com/blackbaud/auth-client/pull/183)
@@ -8,11 +12,11 @@
 
 # 2.43.1 (2021-03-17)
 
-Fixed an issue where minimizing and then immediately maximizing the vertical navigation could cause it to minimize again. [#187](https://github.com/blackbaud/auth-client/pull/187)
+- Fixed an issue where minimizing and then immediately maximizing the vertical navigation could cause it to minimize again. [#187](https://github.com/blackbaud/auth-client/pull/187)
 
 # 2.43.0 (2021-03-01)
 
-Updated omnibar to always connect to the client notification service if the user is logged in. This allows consuming applications to receive custom messages. [#184](https://github.com/blackbaud/auth-client/pull/184)
+- Updated omnibar to always connect to the client notification service if the user is logged in. This allows consuming applications to receive custom messages. [#184](https://github.com/blackbaud/auth-client/pull/184)
 
 # 2.42.0 (2021-02-10)
 
