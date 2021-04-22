@@ -24,7 +24,7 @@ import {
 
 describe('Auth Cross Domain Iframe', () => {
   // URL to get IFrame
-  const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html';
+  const URL = 'https://sts.sky.blackbaud.com/Iframes/CrossDomainAuthFrame.html';
 
   let fakeIframe: HTMLIFrameElement;
 

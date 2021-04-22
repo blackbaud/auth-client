@@ -26,7 +26,7 @@ import {
 
 //#endregion
 
-const URL = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
+const URL = 'https://sts.sky.blackbaud.com/Iframes/CrossDomainAuthFrame.html'; // URL to get IFrame
 const HOST = 'security-token-svc';
 const SOURCE = 'auth-client';
 
@@ -41,7 +41,7 @@ export class BBAuthCrossDomainIframe {
   public static tokenRequests: any = {};
   public static requestCounter = 0;
 
-  private static TARGETORIGIN = 'https://s21aidntoken00blkbapp01.nxt.blackbaud.com';
+  private static TARGETORIGIN = 'https://sts.sky.blackbaud.com';
 
   public static reset() {
     this.requestCounter = 0;
