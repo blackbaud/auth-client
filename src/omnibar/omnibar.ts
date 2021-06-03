@@ -91,9 +91,28 @@ function addIframeEl(): void {
   );
 }
 
+function isModernTheme(): boolean {
+  const theme = omnibarConfig.theme;
+  return theme && theme.name === 'modern';
+}
+
+function handleEnvironmentElTheme(isModern: boolean): void {
+  const defaultThemeClass = 'sky-omnibar-environment-theme-default';
+  const modernThemeClass = 'sky-omnibar-environment-theme-modern';
+
+  if (isModern) {
+    envEl.classList.remove(defaultThemeClass);
+    envEl.classList.add(modernThemeClass);
+  } else {
+    envEl.classList.remove(modernThemeClass);
+    envEl.classList.add(defaultThemeClass);
+  }
+}
+
 function addEnvironmentEl(): void {
   envEl = document.createElement('div');
   envEl.className = 'sky-omnibar-environment';
+  handleEnvironmentElTheme(isModernTheme());
 
   envNameEl = document.createElement('span');
   envNameEl.className = 'sky-omnibar-environment-name';
@@ -110,13 +129,12 @@ function collapseIframe(): void {
   iframeEl.classList.remove(CLS_EXPANDED);
 }
 
-function isModernTheme(): boolean {
-  const theme = omnibarConfig.theme;
-  return theme && theme.name === 'modern';
-}
-
 function showVerticalNav(): boolean {
   if (isModernTheme()) {
+    if (omnibarConfig.svcId === 'tcs') {
+      return true;
+    }
+
     let qs = BBAuthInterop.getCurrentUrl().split('?')[1];
 
     if (qs) {
@@ -204,8 +222,6 @@ body {
 }
 
 .sky-omnibar-environment {
-  background-color: #e1e1e3;
-  color: #282b31;
   font-family: "Blackbaud Sans", "Open Sans", "Helvetica Neue", Arial, sans-serif;
   font-size: 12px;
   font-weight: 400;
@@ -218,6 +234,16 @@ body {
   white-space: nowrap;
 }
 
+.sky-omnibar-environment-theme-default {
+  background-color: #e1e1e3;
+  color: #282b31;
+}
+
+.sky-omnibar-environment-theme-modern {
+  background-color: transparent;
+  color: inherit;
+}
+
 .sky-omnibar-environment-description {
   margin-left: 15px;
   font-weight: bold;
@@ -225,7 +251,8 @@ body {
 
 .sky-omnibar-environment-description-present {
   background-color: #ffeccf;
-  border-bottom: 2px solid #fbb034
+  border-bottom: 2px solid #fbb034;
+  color: #282b31;
 }
 
 .sky-omnibar-environment-visible .sky-omnibar-environment {
@@ -677,6 +704,10 @@ export class BBOmnibar {
         updateArgs: args
       }
     );
+
+    if (args.theme) {
+      handleEnvironmentElTheme(args.theme.name === 'modern');
+    }
   }
 
   public static setTitle(args: BBOmnibarSetTitleArgs): void {
