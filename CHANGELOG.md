@@ -1,3 +1,7 @@
+# 2.47.0 (2021-06-03)
+
+- Style changes and automatically display vertical nav for `tcs`. [#196](https://github.com/blackbaud/auth-client/pull/196)
+
 # 2.46.0 (2021-04-22)
 
 - Migrated to the new STS URL. [#192](https://github.com/blackbaud/auth-client/pull/192)
