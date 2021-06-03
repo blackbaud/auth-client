@@ -572,10 +572,21 @@ describe('Omnibar', () => {
       const environmentInfoEl = document.querySelector('.sky-omnibar-environment-description') as any;
       let environmentInfoLinkEl: any;
 
-      const validateVisible = (visible: boolean) => {
+      const defaultThemeClass = 'sky-omnibar-environment-theme-default';
+      const defaultBackgroundColor = 'rgb(225, 225, 227)';
+      const modernThemeClass = 'sky-omnibar-environment-theme-modern';
+      const modernBackgroundColor = 'rgba(0, 0, 0, 0)';
+      const descriptionBackgroundColor = 'rgb(255, 236, 207)';
+
+      const validateVisible = (visible: boolean, className?: string, backgroundColor?: string) => {
         expect(document.body.classList.contains('sky-omnibar-environment-visible')).toBe(visible);
         expect(getComputedStyle(environmentEl).height).toBe(visible ? '24px' : '0px');
         expect(environmentNameEl.innerText.trim()).toBe(visible ? 'Environment name' : '');
+
+        if (visible) {
+          expect(environmentEl.classList.contains(className)).toBe(true);
+          expect(getComputedStyle(environmentEl).backgroundColor).toBe(backgroundColor);
+        }
       };
 
       const validateDescription = (visible: boolean, url?: boolean) => {
@@ -592,17 +603,30 @@ describe('Omnibar', () => {
         }
       };
 
+      // Initial state.
       validateVisible(false);
       validateDescription(false);
 
+      // Environment name present, default theme.
       fireMessageEvent({
         messageType: 'environment-update',
         name: 'Environment name'
       });
 
-      validateVisible(true);
+      validateVisible(true, defaultThemeClass, defaultBackgroundColor);
       validateDescription(false);
 
+      // Update to modern theme
+      BBOmnibar.update({
+        theme: {
+          name: 'modern'
+        }
+      });
+
+      validateVisible(true, modernThemeClass, modernBackgroundColor);
+      validateDescription(false);
+
+      // Back to initial state
       fireMessageEvent({
         messageType: 'environment-update',
         name: undefined
@@ -611,15 +635,27 @@ describe('Omnibar', () => {
       validateVisible(false);
       validateDescription(false);
 
+      // Environment name with description has description background with modern theme
       fireMessageEvent({
         description: 'Test environment',
         messageType: 'environment-update',
         name: 'Environment name'
       });
 
-      validateVisible(true);
+      validateVisible(true, modernThemeClass, descriptionBackgroundColor);
       validateDescription(true);
 
+      // Back to default theme keeps description background
+      BBOmnibar.update({
+        theme: {
+          name: 'theme'
+        }
+      });
+
+      validateVisible(true, defaultThemeClass, descriptionBackgroundColor);
+      validateDescription(true);
+
+      // Description with URL
       fireMessageEvent({
         description: 'Test environment',
         messageType: 'environment-update',
@@ -627,8 +663,9 @@ describe('Omnibar', () => {
         url: 'https://app.blackbaud.com/auth-client-env-url'
       });
 
-      validateVisible(true);
+      validateVisible(true, defaultThemeClass, descriptionBackgroundColor);
       validateDescription(true, true);
+
     });
 
     it('should restart activity tracking when the legacy session keep-alive URL changes', () => {
@@ -1420,6 +1457,40 @@ describe('Omnibar', () => {
       spyOn(BBOmnibarVertical, 'load');
 
       const config = {
+        theme: {
+          name: 'modern'
+        }
+      };
+
+      const loadPromise = loadOmnibar(config);
+
+      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(config, getIframeEl());
+
+      fireMessageEvent({
+        messageType: 'ready'
+      });
+
+      await loadPromise;
+
+      expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
+        getIframeEl(),
+        jasmine.objectContaining({
+          compactNavOnly: true
+        })
+      ]);
+
+      expect(pushNotificationsConnectSpy).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          showVerticalNav: true
+        })
+      );
+    });
+
+    it('should be loaded when the theme is modern and the svcid is \'tcs\'', async () => {
+      spyOn(BBOmnibarVertical, 'load');
+
+      const config = {
+        svcId: 'tcs',
         theme: {
           name: 'modern'
         }
