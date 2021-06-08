@@ -1,3 +1,6 @@
+# 2.48.0 (2021-06-08)
+- Added additional domain to the auth domain whitelist. (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.47.0 (2021-06-03)
 
 - Update styles and automatically display vertical nav for `tcs`. [#196](https://github.com/blackbaud/auth-client/pull/196)
