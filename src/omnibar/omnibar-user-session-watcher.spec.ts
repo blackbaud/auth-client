@@ -223,6 +223,15 @@ describe('Omnibar user session watcher', () => {
     validateIframe(getLegacyKeepAliveIFrame()[0]);
   });
 
+  it('should not take up any space', () => {
+    startWatching(false, TEST_LEGACY_KEEP_ALIVE_ORIGIN + '/legacy');
+
+    const iframeEl = getWatcherIFrame()[0];
+    expect(iframeEl.getAttribute('style')).toContain('display: block');
+    expect(iframeEl.getAttribute('height')).toBe('0');
+    expect(iframeEl.getAttribute('width')).toBe('0');
+  });
+
   it('should ignore unexpected event data without throwing an error', () => {
     startWatching();
 

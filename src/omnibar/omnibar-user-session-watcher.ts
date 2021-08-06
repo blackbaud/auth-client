@@ -42,10 +42,13 @@ function createIFrame(cls: string, url: string): HTMLIFrameElement {
   const iframe = document.createElement('iframe');
 
   iframe.className = cls;
-  iframe.width = '0';
-  iframe.height = '0';
   iframe.frameBorder = '0';
   iframe.src = url;
+
+  // Iframe is an inline element and won't take on height/width styles unless we make it a block.
+  iframe.style.display = 'block';
+  iframe.width = '0';
+  iframe.height = '0';
 
   // Hide from assistive technologies.
   iframe.tabIndex = -1;
