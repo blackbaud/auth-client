@@ -1,3 +1,7 @@
+# 2.48.1 (2021-08-06)
+
+- Fixed the background watcher iframe to no longer take up vertical space. [#199](https://github.com/blackbaud/auth-client/pull/199)
+
 # 2.48.0 (2021-06-08)
 - Added additional domain to the auth domain whitelist. [#198](https://github.com/blackbaud/auth-client/pull/198) (Thanks @Blackbaud-VeehaKhanna)
 
