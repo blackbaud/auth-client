@@ -12,7 +12,9 @@ const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
   'myschooltraining.com': 'https://sts-sso.myschooltraining.com',
   'smartaidforparents-com-stage.smarttuition.net': 'https://account.smartaidforparents-com-stage.smarttuition.net',
   'smartaidforparents.com': 'https://account.smartaidforparents.com',
-  'smarttuition.com': 'https://account.smarttuition.com'
+  'smarttuition.com': 'https://account.smarttuition.com',
+  'blackbaud.school': 'https://account.blackbaud.school',
+  'blackbaud.school.stage.d04.io': 'https://account.blackbaud.school.stage.d04.io'
 };
 const defaultSTSUrl = 'https://sts.sky.blackbaud.com';
 
