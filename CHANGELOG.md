@@ -1,6 +1,6 @@
 # 2.48.2 (2021-09-01)
 
-- Added additional domain to the auth domain whitelist (Thanks @Blackbaud-VeehaKhanna)
+- Added additional domain to the auth domain whitelist [#202](https://github.com/blackbaud/auth-client/pull/202) (Thanks @Blackbaud-VeehaKhanna)
 
 # 2.48.1 (2021-08-06)
 
