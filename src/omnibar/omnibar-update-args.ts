@@ -16,6 +16,6 @@ export interface BBOmnibarUpdateArgs {
 
   help?: {
     url: string
-  }
+  };
 
 }
