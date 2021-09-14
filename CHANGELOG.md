@@ -1,3 +1,7 @@
+# 2.50.0 (2021-09-14)
+
+- Added the `help` property to `BBOmnibarUpdateArgs`. [#204](https://github.com/blackbaud/auth-client/pull/204)
+
 # 2.49.0 (2021-09-02)
 
 - Added additional domain to the auth domain whitelist. [#202](https://github.com/blackbaud/auth-client/pull/202) (Thanks @Blackbaud-AlexisCoulter)
