@@ -1,5 +1,3 @@
-//#region imports
-
 import {
   BBOmnibarNavigation
 } from './omnibar-navigation';
@@ -8,8 +6,6 @@ import {
   BBOmnibarTheme
 } from './theming';
 
-//#endregion
-
 export interface BBOmnibarUpdateArgs {
 
   theme?: BBOmnibarTheme;
@@ -17,5 +13,9 @@ export interface BBOmnibarUpdateArgs {
   compactNavOnly?: boolean;
 
   nav?: BBOmnibarNavigation;
+
+  help?: {
+    url: string
+  }
 
 }
