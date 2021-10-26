@@ -40,6 +40,9 @@ const notificationSvcIds: {
   fenxt: {
     requiresNotif: true
   },
+  gsrch: {
+    requiresNotif: true
+  },
   marketplace: {
     requiresNotif: false
   },

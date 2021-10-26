@@ -293,6 +293,7 @@ describe('Omnibar push notifications', () => {
     await testSvcId('tcs', true, true);
     await testSvcId('chrch', false, true);
     await testSvcId('merchservices', false, true);
+    await testSvcId('gsrch', true, true);
   });
 
 });
