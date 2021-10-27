@@ -1,3 +1,7 @@
+# 2.51.0 (2021-10-26)
+
+- Added `gsrch` to the list of valid service IDs for notifications. [#206](https://github.com/blackbaud/auth-client/pull/206)
+
 # 2.50.0 (2021-09-14)
 
 - Added the `help` property to `BBOmnibarUpdateArgs`. [#204](https://github.com/blackbaud/auth-client/pull/204)
