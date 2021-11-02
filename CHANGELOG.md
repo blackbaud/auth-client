@@ -1,6 +1,6 @@
 # 2.51.1 (2021-11-02)
 
-- Added JustGiving staging url to auth domain whitelist. (Thanks @Blackbaud-VeehaKhanna)
+- Added JustGiving staging url to auth domain whitelist. [#208](https://github.com/blackbaud/auth-client/pull/208) (Thanks @Blackbaud-VeehaKhanna)
 
 # 2.51.0 (2021-10-26)
 
