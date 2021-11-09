@@ -7,6 +7,7 @@ const thirdPartyDomainSTSUrlMappings: { [domain: string]: string; } = {
   'blackbaudportal.com': 'https://sts.blackbaudportal.com',
   'donorcentral.com': 'https://sts-dc.donorcentral.com',
   'etapestry.com': 'https://sts.etapestry.com',
+  'justgiving.com': 'https://id.justgiving.com',
   'mycampus-app.com': 'https://sts-sso.mycampus-app.com',
   'myschoolapp.com': 'https://sts-sso.myschoolapp.com',
   'myschoolautomation.com': 'https://sts-sso.myschoolautomation.com',
