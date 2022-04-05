@@ -2,7 +2,6 @@ module.exports = function (config) {
   'use strict';
 
   let testWebpackConfig = require('../webpack/webpack.test.config');
-  let remapIstanbul = require('remap-istanbul');
 
   config.set({
     basePath: '',
@@ -21,10 +20,7 @@ module.exports = function (config) {
       reporters: [
         { type: 'json' },
         { type: 'html' }
-      ],
-      _onWriteReport: function (collector) {
-        return remapIstanbul.remap(collector.getFinalCoverage());
-      }
+      ]
     },
     webpackServer: {
       noInfo: true
