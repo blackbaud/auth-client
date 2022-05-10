@@ -1,3 +1,7 @@
+# 2.55.0 (2022-05-10)
+
+- Add functions to get session time to live and renew session. [#211](https://github.com/blackbaud/auth-client/pull/211) (Thanks @Blackbaud-AlexisCoulter)
+
 # 2.54.0 (2021-11-10)
 
 - Removed JustGiving staging url from auth domain whitelist. [#210](https://github.com/blackbaud/auth-client/pull/210) (Thanks @Blackbaud-VeehaKhanna)

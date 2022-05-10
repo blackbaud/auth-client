@@ -55,6 +55,23 @@ describe('Auth token integration', () => {
     expect(domainSpy).toHaveBeenCalled();
   });
 
+  it('should redirect to the signin page if the user is not signed in and posting with csrf', (done) => {
+    navigateSpy.and.callFake((url: string) => {
+      expect(url).toBe('https://signin.blackbaud.com/signin/?redirectUrl=' + encodeURIComponent(location.href));
+      done();
+    });
+
+    BBCsrfXhr.postWithCSRF('https://example.com/token');
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      responseText: undefined,
+      status: 401
+    });
+
+    expect(domainSpy).toHaveBeenCalled();
+  });
+
   it('should not redirect to the signin page when redirecting is disabled', (done) => {
     BBCsrfXhr.request('https://example.com/token', undefined, true)
       .catch((reason: BBAuthTokenError) => {
@@ -87,6 +104,22 @@ describe('Auth token integration', () => {
     });
   });
 
+  it('should not redirect to the error page when the user is offline while posting with csrf', (done) => {
+    BBCsrfXhr.postWithCSRF('https://example.com/token')
+      .catch((reason: BBAuthTokenError) => {
+        expect(reason.code).toBe(BBAuthTokenErrorCode.Offline);
+        expect(reason.message).toBe('The user is offline.');
+        done();
+      });
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      responseText: undefined,
+      status: 0
+    });
+  });
+
   it('should redirect when the user is not a member of the specified environment', (done) => {
     navigateSpy.and.callFake((url: string) => {
       expect(url).toBe(
@@ -99,6 +132,27 @@ describe('Auth token integration', () => {
     });
 
     BBCsrfXhr.request('https://example.com/token');
+
+    const request = jasmine.Ajax.requests.mostRecent();
+
+    request.respondWith({
+      responseText: undefined,
+      status: 403
+    });
+  });
+
+  it('should redirect to error page when any other error occurrs while posting with csrf', (done) => {
+    navigateSpy.and.callFake((url: string) => {
+      expect(url).toBe(
+        'https://host.nxt.blackbaud.com/errors/security?source=auth-client&url=' +
+        encodeURIComponent(location.href) +
+        '&code=invalid_env'
+      );
+
+      done();
+    });
+
+    BBCsrfXhr.postWithCSRF('https://example.com/token');
 
     const request = jasmine.Ajax.requests.mostRecent();
 
@@ -160,6 +214,65 @@ describe('Auth token integration', () => {
             expires_in: 12345
           });
 
+          done();
+        });
+      }
+    });
+  });
+
+  it('should return session TTL if the user is signed in', (done) => {
+    const requestPromise = BBCsrfXhr.postWithCSRF('https://example.com/session/ttl');
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc'
+      }),
+      status: 200
+    });
+
+    // Wait for the TTL request to kick off.
+    const intervalId = setInterval(() => {
+      const request = jasmine.Ajax.requests.mostRecent();
+      if (request.url === 'https://example.com/session/ttl') {
+        clearInterval(intervalId);
+
+        request.respondWith({
+          responseText: '1234',
+          status: 200
+        });
+
+        requestPromise.then((response: any) => {
+          expect(response).toEqual('1234');
+          done();
+        });
+      }
+    });
+  });
+
+  it('should renew the user session if the user is signed in', (done) => {
+    const requestPromise = BBCsrfXhr.postWithCSRF('https://example.com/session/renew');
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc'
+      }),
+      status: 200
+    });
+
+    // Wait for the TTL request to kick off.
+    const intervalId = setInterval(() => {
+      const request = jasmine.Ajax.requests.mostRecent();
+      if (request.url === 'https://example.com/session/renew') {
+        clearInterval(intervalId);
+
+        request.respondWith({
+          status: 200
+        });
+
+        requestPromise.then((response: any) => {
+          expect(response).toEqual('');
           done();
         });
       }

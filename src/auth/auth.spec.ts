@@ -246,4 +246,24 @@ describe('Auth', () => {
       done();
     });
   });
+
+  it('should return session TTL.', (done) => {
+    spyOn(BBAuth, 'getTTL')
+    .and.returnValue(Promise.resolve(1234));
+
+    BBAuth.getTTL().then((ttl: number) => {
+      expect(ttl).toBe(1234);
+      done();
+    });
+  });
+
+  it('should renew the session.', (done) => {
+    spyOn(BBAuth, 'renewSession')
+    .and.returnValue(Promise.resolve(undefined));
+
+    BBAuth.renewSession().then((result: any) => {
+      expect(result).toBe(undefined);
+      done();
+    });
+  });
 });

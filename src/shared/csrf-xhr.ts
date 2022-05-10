@@ -18,7 +18,7 @@ function post(
     value: string
   },
   body: any,
-  okCB: (responseText: string) => any,
+  okCB: (response: any) => any,
   unuthCB: (reason: BBAuthTokenError) => any
 ) {
   const xhr = new XMLHttpRequest();
@@ -159,6 +159,50 @@ export class BBCsrfXhr {
             }
           }
         });
+    });
+  }
+
+  public static postWithCSRF(
+    url: string
+  ) {
+    return new Promise((resolve: any, reject: any) => {
+      // First get the CSRF token
+      new Promise((resolveCsrf: any, rejectCsrf: any) => {
+          requestToken(BBAuthDomain.getSTSDomain() + '/session/csrf', 'token_needed')
+            .then(resolveCsrf)
+            .catch(rejectCsrf);
+      }).then((csrfResponse: any) => {
+          // Next issue the request with the csrf token
+          return new Promise((res: any, rej: any) => {
+            post(
+              url,
+              {
+                name: 'X-CSRF',
+                value: csrfResponse['csrf_token']
+              },
+              undefined,
+              (result: any) => {
+                res(result);
+              },
+              rej
+            );
+          });
+        })
+      .then(resolve)
+      .catch((reason: BBAuthTokenError) => {
+        if (reason.code === BBAuthTokenErrorCode.Offline) {
+          reject(reason);
+        } else {
+          switch (reason.code) {
+            case BBAuthTokenErrorCode.NotLoggedIn:
+              BBAuthNavigator.redirectToSignin();
+              break;
+            default:
+              BBAuthNavigator.redirectToError(reason.code);
+              break;
+          }
+        }
+      });
     });
   }
 
