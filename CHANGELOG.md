@@ -1,6 +1,6 @@
 # 2.55.0 (2022-05-10)
 
-- Add functions to get session time to live and renew session. [#211](https://github.com/blackbaud/auth-client/pull/211) (Thanks @Blackbaud-AlexisCoulter)
+- Add functions to get session time to live and renew session. [#212](https://github.com/blackbaud/auth-client/pull/212) (Thanks @Blackbaud-AlexisCoulter)
 
 # 2.54.0 (2021-11-10)
 
