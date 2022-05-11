@@ -1,8 +1,10 @@
 //#region imports
 
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 import {
   BBAuth
 } from './auth';
+import { BBAuthDomain } from './auth-domain';
 
 import {
   BBAuthTokenIntegration
@@ -248,21 +250,23 @@ describe('Auth', () => {
   });
 
   it('should return session TTL.', (done) => {
-    spyOn(BBAuth, 'getTTL')
-    .and.returnValue(Promise.resolve(1234));
+    const postSpy = spyOn(BBCsrfXhr, 'postWithCSRF').and.returnValue(Promise.resolve(1234));
+    spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue('https://sts.sky.blackbaud.com');
 
     BBAuth.getTTL().then((ttl: number) => {
       expect(ttl).toBe(1234);
+      expect(postSpy).toHaveBeenCalledWith('https://sts.sky.blackbaud.com/session/ttl');
       done();
     });
   });
 
-  it('should renew the session.', (done) => {
-    spyOn(BBAuth, 'renewSession')
-    .and.returnValue(Promise.resolve(undefined));
+  fit('should renew the session.', (done) => {
+    const postSpy = spyOn(BBCsrfXhr, 'postWithCSRF').and.returnValue(Promise.resolve());
+    spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue('https://sts.sky.blackbaud.com');
 
     BBAuth.renewSession().then((result: any) => {
       expect(result).toBe(undefined);
+      expect(postSpy).toHaveBeenCalledWith('https://sts.sky.blackbaud.com/session/renew');
       done();
     });
   });
