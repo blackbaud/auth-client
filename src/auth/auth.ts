@@ -16,6 +16,14 @@ import {
   BBAuthTokenResponse
 } from './auth-token-response';
 
+import {
+  BBAuthDomain
+} from './auth-domain';
+
+import {
+  BBCsrfXhr
+} from '../shared/csrf-xhr';
+
 //#endregion
 
 const TOKENIZED_URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?\/(.*)/;
@@ -70,6 +78,18 @@ export class BBAuth {
     args?: BBAuthGetTokenArgs
   ): Promise<string> {
     return BBAuth.getTokenInternal(args);
+  }
+
+  public static getTTL(): Promise<any> {
+    return BBCsrfXhr.postWithCSRF(
+      BBAuthDomain.getSTSDomain() + '/session/ttl'
+    );
+  }
+
+  public static renewSession(): Promise<any> {
+    return BBCsrfXhr.postWithCSRF(
+      BBAuthDomain.getSTSDomain() + '/session/renew'
+    );
   }
 
   public static clearTokenCache() {
