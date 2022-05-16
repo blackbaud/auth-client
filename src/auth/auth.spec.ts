@@ -260,7 +260,7 @@ describe('Auth', () => {
     });
   });
 
-  fit('should renew the session.', (done) => {
+  it('should renew the session.', (done) => {
     const postSpy = spyOn(BBCsrfXhr, 'postWithCSRF').and.returnValue(Promise.resolve());
     spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue('https://sts.sky.blackbaud.com');
 
