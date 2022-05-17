@@ -1,3 +1,7 @@
+# 2.55.1 (2022-05-17)
+
+- Fixed issue with 2.55.0 publishing to the CDN. [#213](https://github.com/blackbaud/auth-client/pull/213)
+
 # 2.55.0 (2022-05-10)
 
 - Add functions to get session time to live and renew session. [#212](https://github.com/blackbaud/auth-client/pull/212) (Thanks @Blackbaud-AlexisCoulter)
