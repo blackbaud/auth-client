@@ -345,6 +345,7 @@ async function connectPushNotifications(checkLoggedIn?: boolean): Promise<void> 
       envId: omnibarConfig.envId,
       handleNavigate,
       handleNavigateUrl,
+      handlePushNotificationsChange,
       leId: omnibarConfig.leId,
       notificationsCallback,
       openPushNotificationsMenu,

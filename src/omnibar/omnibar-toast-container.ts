@@ -184,6 +184,9 @@ function messageHandler(event: MessageEvent): void {
       }
 
       break;
+    case 'push-notifications-change':
+      initArgs.pushNotificationsChangeCallback(message.notifications);
+      break;
     case 'push-notifications-open':
       initArgs.openMenuCallback();
       break;

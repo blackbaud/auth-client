@@ -26,6 +26,7 @@ describe('Omnibar toast container', () => {
   let previousContainerUrl: string;
   let navigateCallbackSpy: jasmine.Spy;
   let navigateUrlCallbackSpy: jasmine.Spy;
+  let pushNotificationsChangeCallbackSpy: jasmine.Spy;
 
   let getTokenFake: () => Promise<string>;
 
@@ -48,6 +49,7 @@ describe('Omnibar toast container', () => {
       navigateCallback: navigateCallbackSpy,
       navigateUrlCallback: navigateUrlCallbackSpy,
       openMenuCallback: openMenuCallbackSpy,
+      pushNotificationsChangeCallback: pushNotificationsChangeCallbackSpy,
       svcId: 'xyz',
       url: 'https://example.com/init'
     });
@@ -122,6 +124,7 @@ describe('Omnibar toast container', () => {
     openMenuCallbackSpy = jasmine.createSpy('openMenuCallback');
     navigateCallbackSpy = jasmine.createSpy('navigateCallback');
     navigateUrlCallbackSpy = jasmine.createSpy('navigateUrlCallback');
+    pushNotificationsChangeCallbackSpy = jasmine.createSpy('pushNotificationsChangeCallback');
 
     getTokenFake = () => Promise.resolve(testToken);
 
@@ -284,6 +287,31 @@ describe('Omnibar toast container', () => {
     });
 
     expect(openMenuCallbackSpy).toHaveBeenCalled();
+  });
+
+  it('should call the specified callback when push notifications are updated', () => {
+    const testNotifications = [
+      {
+        id: '123',
+        read: true,
+        touched: true
+      }
+    ];
+
+    loadToastContainer();
+
+    fireMessageEvent({
+      messageType: 'toast-ready'
+    });
+
+    expect(pushNotificationsChangeCallbackSpy).not.toHaveBeenCalled();
+
+    fireMessageEvent({
+      messageType: 'push-notifications-change',
+      notifications: testNotifications
+    });
+
+    expect(pushNotificationsChangeCallbackSpy).toHaveBeenCalledWith(testNotifications);
   });
 
   it('should call the specified navigate callback', () => {

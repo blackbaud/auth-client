@@ -8,6 +8,8 @@ export interface BBOmnibarPushNotificationsConnectArgs {
 
   envId: string;
 
+  handlePushNotificationsChange: (notifications: any[]) => void;
+
   handleNavigate: (navItem: BBOmnibarNavigationItem) => void;
 
   handleNavigateUrl: (url: string) => void;

@@ -75,6 +75,7 @@ async function initToastContainer(
     navigateCallback: args.handleNavigate,
     navigateUrlCallback: args.handleNavigateUrl,
     openMenuCallback: args.openPushNotificationsMenu,
+    pushNotificationsChangeCallback: args.handlePushNotificationsChange,
     svcId: args.svcId,
     url: BBAuthInterop.getCurrentUrl()
   });

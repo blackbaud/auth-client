@@ -12,6 +12,8 @@ export interface BBOmnibarToastContainerInitArgs {
 
   leId: string;
 
+  pushNotificationsChangeCallback: (notifications: any[]) => void;
+
   openMenuCallback: () => void;
 
   navigateCallback: (navItem: BBOmnibarNavigationItem) => void;

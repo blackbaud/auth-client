@@ -57,6 +57,7 @@ describe('Omnibar push notifications', () => {
       envId: 'abc',
       handleNavigate: jasmine.createSpy('handleNavigate'),
       handleNavigateUrl: jasmine.createSpy('handleNavigateUrl'),
+      handlePushNotificationsChange: jasmine.createSpy('handlePushNotificationsChange'),
       leId: '123',
       notificationsCallback: jasmine.createSpy('notificationsCallback'),
       openPushNotificationsMenu: jasmine.createSpy('openPushNotificationsMenu'),
@@ -219,6 +220,7 @@ describe('Omnibar push notifications', () => {
         navigateCallback: args.handleNavigate,
         navigateUrlCallback: args.handleNavigateUrl,
         openMenuCallback: args.openPushNotificationsMenu,
+        pushNotificationsChangeCallback: args.handlePushNotificationsChange,
         svcId: args.svcId,
         url: BBAuthInterop.getCurrentUrl()
       }
