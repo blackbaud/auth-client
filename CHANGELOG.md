@@ -1,3 +1,7 @@
+# 2.55.2 (2022-06-08)
+
+- Fixed issue where the omnibar notifications menu was not updated when a notification toast message was clicked. [#214](https://github.com/blackbaud/auth-client/pull/214)
+
 # 2.55.1 (2022-05-17)
 
 - Fixed issue with 2.55.0 publishing to the CDN. [#213](https://github.com/blackbaud/auth-client/pull/213)
