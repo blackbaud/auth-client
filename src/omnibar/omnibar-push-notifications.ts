@@ -43,6 +43,9 @@ const notificationSvcIds: {
   gsrch: {
     requiresNotif: true
   },
+  lst: {
+    requiresNotif: false
+  },
   marketplace: {
     requiresNotif: false
   },
