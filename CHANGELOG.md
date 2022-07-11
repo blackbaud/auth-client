@@ -1,4 +1,4 @@
-# 2.56.0 (2022-07-11)
+# 2.56.0 (2022-07-12)
 
 - Added `lst` to the list of valid service IDs for notifications. [#215](https://github.com/blackbaud/auth-client/pull/215)
 
