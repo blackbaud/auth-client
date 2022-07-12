@@ -1,7 +1,3 @@
-# 2.56.1 (2022-07-12)
-
-- Fixed the release tag. [#217](https://github.com/blackbaud/auth-client/pull/217)
-
 # 2.56.0 (2022-07-12)
 
 - Added `lst` to the list of valid service IDs for notifications. [#215](https://github.com/blackbaud/auth-client/pull/215)
