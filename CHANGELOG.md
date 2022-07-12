@@ -1,3 +1,7 @@
+# 2.56.0 (2022-07-12)
+
+- Added `lst` to the list of valid service IDs for notifications. [#215](https://github.com/blackbaud/auth-client/pull/215)
+
 # 2.55.2 (2022-06-08)
 
 - Fixed issue where the omnibar notifications menu was not updated when a notification toast message was clicked. [#214](https://github.com/blackbaud/auth-client/pull/214)
