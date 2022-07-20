@@ -34,6 +34,9 @@ const notificationSvcIds: {
   chrch: {
     requiresNotif: false
   },
+  donorcentrics: {
+    requiresNotif: false
+  },
   faith: {
     requiresNotif: true
   },
