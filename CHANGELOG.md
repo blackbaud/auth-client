@@ -1,3 +1,7 @@
+# 2.57.0 (2022-08-04)
+
+- Added `donorcentrics` to the list of valid service IDs for notifications. [#218](https://github.com/blackbaud/auth-client/pull/218)
+
 # 2.56.0 (2022-07-12)
 
 - Added `lst` to the list of valid service IDs for notifications. [#215](https://github.com/blackbaud/auth-client/pull/215)
