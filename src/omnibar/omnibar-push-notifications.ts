@@ -69,6 +69,9 @@ const notificationSvcIds: {
   },
   tcs: {
     requiresNotif: true
+  },
+  'web-compt': {
+    requiresNotif: false
   }
 };
 
