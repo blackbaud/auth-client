@@ -31,43 +31,43 @@ const notificationSvcIds: {
     requiresNotif: boolean
   }
 } = {
-  chrch: {
+  'chrch': {
     requiresNotif: false
   },
-  donorcentrics: {
+  'donorcentrics': {
     requiresNotif: false
   },
-  faith: {
+  'faith': {
     requiresNotif: true
   },
-  fenxt: {
+  'fenxt': {
     requiresNotif: true
   },
-  gsrch: {
+  'gsrch': {
     requiresNotif: true
   },
-  lst: {
+  'lst': {
     requiresNotif: false
   },
-  marketplace: {
+  'marketplace': {
     requiresNotif: false
   },
-  merchservices: {
+  'merchservices': {
     requiresNotif: false
   },
-  renxt: {
+  'renxt': {
     requiresNotif: false
   },
-  skydev: {
+  'skydev': {
     requiresNotif: false
   },
-  skydevhome: {
+  'skydevhome': {
     requiresNotif: false
   },
-  skyux: {
+  'skyux': {
     requiresNotif: false
   },
-  tcs: {
+  'tcs': {
     requiresNotif: true
   },
   'web-compt': {
