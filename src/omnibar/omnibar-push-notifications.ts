@@ -55,6 +55,9 @@ const notificationSvcIds: {
   merchservices: {
     requiresNotif: false
   },
+  ogcon: {
+    requiresNotif: true
+  },
   renxt: {
     requiresNotif: false
   },
