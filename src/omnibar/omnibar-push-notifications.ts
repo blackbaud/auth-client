@@ -69,6 +69,9 @@ const notificationSvcIds: {
   },
   tcs: {
     requiresNotif: true
+  },
+  admin: {
+    requiresNotif: false
   }
 };
 
