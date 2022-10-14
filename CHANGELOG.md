@@ -1,6 +1,6 @@
 # 2.59.0 (2022-10-13)
 
-- Added `ogcon` to the list of valid service IDs for notifications. [#218](https://github.com/blackbaud/auth-client/pull/218)
+- Added `ogcon` to the list of valid service IDs for notifications. [#XXX](https://github.com/blackbaud/auth-client/pull/XXX)
 
 # 2.58.0 (2022-10-07)
 
