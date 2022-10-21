@@ -9,6 +9,10 @@ import {
 } from './omnibar-notifications-config';
 
 import {
+  BBOmnibarResizeArgs
+} from './omnibar-resize-args';
+
+import {
   BBOmnibarSearchArgs
 } from './omnibar-search-args';
 
@@ -62,4 +66,6 @@ export interface BBOmnibarConfig {
   hideResourceLinks?: boolean;
 
   verticalUrl?: string;
+
+  onResize?: (resizeArgs: BBOmnibarResizeArgs) => void;
 }

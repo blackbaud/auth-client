@@ -23,10 +23,16 @@ import {
 } from './omnibar-config';
 
 import {
+  BBOmnibarResizeArgs
+} from './omnibar-resize-args';
+
+import {
   BBOmnibarVertical
 } from './omnibar-vertical';
 
 describe('Omnibar vertical', () => {
+  type MediaQueryChangeListener = (ev: MediaQueryListEvent) => any;
+
   const BASE_URL = 'about:blank';
 
   // tslint:disable-next-line:max-line-length
@@ -104,7 +110,7 @@ describe('Omnibar vertical', () => {
 
   beforeEach(() => {
     messageIsFromOmnibarReturnValue = true;
-    userSettingsReturnValue = Promise.resolve(undefined);
+    userSettingsReturnValue = Promise.resolve({});
 
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
@@ -390,6 +396,70 @@ describe('Omnibar vertical', () => {
       });
 
       validateExpanded(false);
+    });
+
+    function validateOnResize(config: jasmine.SpyObj<BBOmnibarConfig>, size: number): void {
+      expect(config.onResize).toHaveBeenCalledWith({
+        position: 'left',
+        size
+      } as BBOmnibarResizeArgs);
+
+      (config.onResize as jasmine.Spy).calls.reset();
+    }
+
+    it('should call the config\'s onResize() callback when expanding or collapsing', async () => {
+      const config = jasmine.createSpyObj<BBOmnibarConfig>('config', ['onResize']);
+
+      await loadOmnibarVertical(config);
+
+      validateOnResize(config, 300);
+
+      fireMessageEvent({
+        messageType: 'minimize'
+      });
+
+      validateOnResize(config, 90);
+
+      fireMessageEvent({
+        messageType: 'maximize'
+      });
+
+      validateOnResize(config, 300);
+    });
+
+    it('should call the config\'s onResize() callback on XS media breakpoint', async () => {
+      let mediaListener!: MediaQueryChangeListener;
+
+      const matchMediaSpy = spyOn(window, 'matchMedia').and.callFake((query) => {
+        return {
+          addEventListener: (_: 'change', listener: MediaQueryChangeListener) => {
+            mediaListener = listener;
+          },
+          removeEventListener: jasmine.createSpy('removeEventListener')
+        } as any;
+      });
+
+      const config = jasmine.createSpyObj<BBOmnibarConfig>('config', ['onResize']);
+
+      await loadOmnibarVertical(config);
+
+      expect(matchMediaSpy).toHaveBeenCalledWith('max-width: 767px');
+      expect(mediaListener).toBeDefined();
+
+      const iframeWrapper = getIframeWrapperEl();
+
+      // The IFRAME wrapper is shown/hidden as the window size crosses the "xs" breakpoint using CSS,
+      // so calling the media breakpoint listener won't have an effect. Manually emulate that behavior
+      // to ensure the onResize() function is called as needed.
+      iframeWrapper.style.display = 'none';
+      mediaListener(new MediaQueryListEvent('change', { matches: true }));
+
+      validateOnResize(config, 0);
+
+      iframeWrapper.style.display = 'initial';
+      mediaListener(new MediaQueryListEvent('change', { matches: false }));
+
+      validateOnResize(config, 300);
     });
 
     it('should navigate by URL', async () => {

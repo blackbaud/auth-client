@@ -26,6 +26,7 @@ const CLS_EXPANDED = 'sky-omnibar-vertical-expanded';
 const CLS_LOADING = 'sky-omnibar-vertical-loading';
 const CLS_BODY = 'sky-omnibar-vertical-body';
 const CLS_BODY_MINIMIZED = 'sky-omnibar-vertical-body-minimized';
+const CLS_IFRAME_WRAPPER = 'sky-omnibar-vertical-iframe-wrapper';
 
 const WIDTH_MAX = 300;
 const WIDTH_MIN = 90;
@@ -39,6 +40,26 @@ let iframeWrapperEl: HTMLDivElement;
 let omnibarConfig: BBOmnibarConfig;
 let promiseResolve: (value?: any) => void;
 let styleEl: HTMLStyleElement;
+let windowMediaQuery: MediaQueryList;
+
+function updateSize(): void {
+  if (omnibarConfig.onResize) {
+    let size = 0;
+
+    const wrapperStyle = getComputedStyle(
+      document.querySelector(`.${CLS_IFRAME_WRAPPER}`)
+    );
+
+    if (wrapperStyle.display !== 'none') {
+      size = document.body.classList.contains(CLS_BODY_MINIMIZED) ? WIDTH_MIN : WIDTH_MAX;
+    }
+
+    omnibarConfig.onResize({
+      position: 'left',
+      size
+    });
+  }
+}
 
 function userSettingsMinimized(): boolean {
   return currentSettings?.omnibar?.vMin;
@@ -68,7 +89,7 @@ function addIframeEl(afterEl: HTMLElement): void {
   );
 
   iframeWrapperEl = document.createElement('div');
-  iframeWrapperEl.className = `sky-omnibar-vertical-iframe-wrapper ${CLS_LOADING}`;
+  iframeWrapperEl.className = `${CLS_IFRAME_WRAPPER} ${CLS_LOADING}`;
   iframeWrapperEl.appendChild(iframeEl);
 
   afterEl.insertAdjacentElement('afterend', iframeWrapperEl);
@@ -78,7 +99,7 @@ function addIframeEl(afterEl: HTMLElement): void {
 
 function addStyleEl(): void {
   styleEl = BBAuthDomUtility.addCss(`
-.sky-omnibar-vertical-iframe-wrapper {
+.${CLS_IFRAME_WRAPPER} {
   position: fixed;
   top: 50px;
   left: 0;
@@ -88,11 +109,11 @@ function addStyleEl(): void {
   z-index: 999;
 }
 
-.sky-omnibar-vertical-iframe-wrapper.${CLS_LOADING} {
+.${CLS_IFRAME_WRAPPER}.${CLS_LOADING} {
   border-right: solid 1px #e2e3e4;
 }
 
-.${CLS_BODY_MINIMIZED} .sky-omnibar-vertical-iframe-wrapper:not(.${CLS_EXPANDED}) {
+.${CLS_BODY_MINIMIZED} .${CLS_IFRAME_WRAPPER}:not(.${CLS_EXPANDED}) {
   width: ${WIDTH_MIN}px;
 }
 
@@ -121,12 +142,30 @@ function addStyleEl(): void {
 }
 
 @media (max-width: 767px) {
-  .sky-omnibar-vertical-iframe-wrapper {
+  .${CLS_IFRAME_WRAPPER} {
     display: none;
   }
 }
 `
   );
+}
+
+function windowMediaQueryChange(): void {
+  updateSize();
+}
+
+function addWindowMediaListener(): void {
+  if (omnibarConfig.onResize) {
+    windowMediaQuery = window.matchMedia('max-width: 767px');
+    windowMediaQuery.addEventListener('change', windowMediaQueryChange);
+  }
+}
+
+function removeWindowMediaListener(): void {
+  if (windowMediaQuery) {
+    windowMediaQuery.removeEventListener('change', windowMediaQueryChange);
+    windowMediaQuery = undefined;
+  }
 }
 
 function postLocationChangeMessage(): void {
@@ -135,6 +174,7 @@ function postLocationChangeMessage(): void {
 
 function minimize(): void {
   document.body.classList.add(CLS_BODY_MINIMIZED);
+  updateSize();
 }
 
 function maximize(): void {
@@ -164,6 +204,8 @@ function updateMinimized(verticalNavMinimized: boolean, updateSettings: boolean)
   } else {
     maximize();
   }
+
+  updateSize();
 }
 
 function messageHandler(event: MessageEvent): void {
@@ -260,7 +302,9 @@ export class BBOmnibarVertical {
         /* Let currentSettings remain undefined */
       }
 
+      addWindowMediaListener();
       addIframeEl(afterEl);
+      updateSize();
 
       window.addEventListener('message', messageHandler);
     });
@@ -312,6 +356,8 @@ export class BBOmnibarVertical {
     maximize();
 
     window.removeEventListener('message', messageHandler);
+
+    removeWindowMediaListener();
 
     settingsUpdatesToIgnore.clear();
 

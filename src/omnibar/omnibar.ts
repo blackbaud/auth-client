@@ -68,7 +68,11 @@ import {
 
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
+const CLS_ENVIRONMENT_VISIBLE = 'sky-omnibar-environment-visible';
+const CLS_ENVIRONMENT_DESCRIPTION_VISIBLE = 'sky-omnibar-environment-description-present';
 const HOST_ID = 'omnibar';
+const OMNIBAR_HEIGHT = 50;
+const ENVIRONMENT_HEIGHT = 24;
 
 let envEl: HTMLDivElement;
 let envNameEl: HTMLSpanElement;
@@ -179,7 +183,7 @@ function addStyleEl(): void {
 
   styleEl = BBAuthDomUtility.addCss(`
 body {
-  margin-top: 50px;
+  margin-top: ${OMNIBAR_HEIGHT}px;
 }
 
 #bb-help-container {
@@ -189,7 +193,7 @@ body {
 .sky-omnibar-iframe,
 .sky-omnibar-placeholder {
   border: none;
-  height: 50px;
+  height: ${OMNIBAR_HEIGHT}px;
   width: 100%;
   position: fixed;
   top: 0;
@@ -226,7 +230,7 @@ body {
   font-size: 12px;
   font-weight: 400;
   height: 0;
-  line-height: 24px;
+  line-height: ${ENVIRONMENT_HEIGHT}px;
   overflow: hidden;
   padding: 0 15px;
   text-align: right;
@@ -249,17 +253,19 @@ body {
   font-weight: bold;
 }
 
-.sky-omnibar-environment-description-present {
+.${CLS_ENVIRONMENT_DESCRIPTION_VISIBLE} {
   background-color: #ffeccf;
   border-bottom: 2px solid #fbb034;
   color: #282b31;
 }
 
-.sky-omnibar-environment-visible .sky-omnibar-environment {
-  height: 24px;
+.${CLS_ENVIRONMENT_VISIBLE} .sky-omnibar-environment {
+  height: ${ENVIRONMENT_HEIGHT}px;
 }
 `
   );
+
+  updateSize();
 }
 
 function addPlaceholderEl(): void {
@@ -294,6 +300,15 @@ async function handleSearch(searchArgs: BBOmnibarSearchArgs): Promise<void> {
         results
       }
     );
+  }
+}
+
+function updateSize(): void {
+  if (omnibarConfig.onResize) {
+    omnibarConfig.onResize({
+      position: 'top',
+      size: OMNIBAR_HEIGHT + (document.body.classList.contains(CLS_ENVIRONMENT_VISIBLE) ? 24 : 0)
+    });
   }
 }
 
@@ -439,8 +454,6 @@ function handleEnvironmentUpdate(
   description: string,
   url: string
 ): void {
-  const bodyCls = 'sky-omnibar-environment-visible';
-  const descCls = 'sky-omnibar-environment-description-present';
   const bodyClassList = document.body.classList;
 
   name = name || '';
@@ -448,10 +461,10 @@ function handleEnvironmentUpdate(
   envNameEl.innerText = name;
 
   if (name) {
-    bodyClassList.add(bodyCls);
+    bodyClassList.add(CLS_ENVIRONMENT_VISIBLE);
 
     if (description) {
-      envEl.classList.add(descCls);
+      envEl.classList.add(CLS_ENVIRONMENT_DESCRIPTION_VISIBLE);
 
       if (url) {
         const a = document.createElement('a');
@@ -462,11 +475,13 @@ function handleEnvironmentUpdate(
         envDescEl.innerText = description;
       }
     } else {
-      envEl.classList.remove(descCls);
+      envEl.classList.remove(CLS_ENVIRONMENT_DESCRIPTION_VISIBLE);
     }
   } else {
-    bodyClassList.remove(bodyCls);
+    bodyClassList.remove(CLS_ENVIRONMENT_VISIBLE);
   }
+
+  updateSize();
 }
 
 function handleBrandingUpdate(branding: BBOmnibarBranding): void {
@@ -735,6 +750,8 @@ export class BBOmnibar {
     BBAuthDomUtility.removeCss(styleEl);
 
     window.removeEventListener('message', messageHandler);
+
+    document.body.classList.remove(CLS_ENVIRONMENT_VISIBLE);
 
     omnibarConfig =
       styleEl =
