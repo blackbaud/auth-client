@@ -59,6 +59,10 @@ import {
 } from './omnibar-push-notifications-connect-args';
 
 import {
+  BBOmnibarResizeArgs
+} from './omnibar-resize-args';
+
+import {
   BBOmnibarToastContainer
 } from './omnibar-toast-container';
 
@@ -524,6 +528,37 @@ describe('Omnibar', () => {
       // Should not throw an error.
     });
 
+    it('should call the omnibar config\'s onResize() callback when rendered', () => {
+      const config = {
+        onResize: jasmine.createSpy('onResize')
+      } as BBOmnibarConfig;
+
+      loadOmnibar(config);
+
+      expect(config.onResize).toHaveBeenCalledWith({
+        position: 'top',
+        size: 50
+      } as BBOmnibarResizeArgs);
+    });
+
+    it('should call the omnibar config\'s onResize() callback when the environment bar is displayed', () => {
+      const config = {
+        onResize: jasmine.createSpy('onResize')
+      } as BBOmnibarConfig;
+
+      loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'environment-update',
+        name: 'Environment name'
+      });
+
+      expect(config.onResize).toHaveBeenCalledWith({
+        position: 'top',
+        size: 74
+      } as BBOmnibarResizeArgs);
+    });
+
     it('should open the help widget if the help widget is present on the page', () => {
       loadOmnibar();
 
@@ -583,7 +618,7 @@ describe('Omnibar', () => {
         expect(getComputedStyle(environmentEl).height).toBe(visible ? '24px' : '0px');
         expect(environmentNameEl.innerText.trim()).toBe(visible ? 'Environment name' : '');
 
-        if (visible) {
+        if (visible && className && backgroundColor) {
           expect(environmentEl.classList.contains(className)).toBe(true);
           expect(getComputedStyle(environmentEl).backgroundColor).toBe(backgroundColor);
         }
@@ -665,7 +700,6 @@ describe('Omnibar', () => {
 
       validateVisible(true, defaultThemeClass, descriptionBackgroundColor);
       validateDescription(true, true);
-
     });
 
     it('should restart activity tracking when the legacy session keep-alive URL changes', () => {
@@ -904,9 +938,7 @@ describe('Omnibar', () => {
           ]
         },
         navVersion,
-        onSearch: (searchArgs) => {
-          return undefined;
-        },
+        onSearch: jasmine.createSpy('onSearch'),
         svcId,
         theme
       });
@@ -1361,7 +1393,7 @@ describe('Omnibar', () => {
 
       function validateLinkInfo(
         linkInfo: LinkInfo,
-        icon: string,
+        icon: string | undefined,
         removeCalled: boolean
       ) {
         if (icon !== undefined) {
