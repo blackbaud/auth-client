@@ -31,6 +31,9 @@ const notificationSvcIds: {
     requiresNotif: boolean
   }
 } = {
+  admin: {
+    requiresNotif: false
+  },
   chrch: {
     requiresNotif: false
   },

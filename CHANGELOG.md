@@ -1,5 +1,9 @@
+# 2.59.0 (2022-10-14)
+- Added admin as a push notification svcid [#223](https://github.com/blackbaud/auth-client/pull/223) (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.58.0 (2022-10-07)
 - Added TMFA Mirror url to auth domain whitelist. [#221](https://github.com/blackbaud/auth-client/pull/221) (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.57.0 (2022-08-04)
 
 - Added `donorcentrics` to the list of valid service IDs for notifications. [#218](https://github.com/blackbaud/auth-client/pull/218)
