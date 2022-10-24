@@ -1,75 +1,42 @@
-import {
-  BBAuth
-} from '../auth';
+import { BBAuth } from '../auth';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBAuthNavigator
-} from '../shared/navigator';
+import { BBAuthNavigator } from '../shared/navigator';
 
-import {
-  BBAuthDomUtility
-} from '../shared/dom-utility';
+import { BBAuthDomUtility } from '../shared/dom-utility';
 
-import {
-  BBOmnibarBranding
-} from './branding';
+import { BBOmnibarBranding } from './branding';
 
-import {
-  BBOmnibarConfig
-} from './omnibar-config';
+import { BBOmnibarConfig } from './omnibar-config';
 
-import {
-  BBOmnibarNavigationItem
-} from './omnibar-navigation-item';
+import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 
-import {
-  BBOmnibarNotificationItem
-} from './omnibar-notification-item';
+import { BBOmnibarNotificationItem } from './omnibar-notification-item';
 
-import {
-  BBOmnibarSearchArgs
-} from './omnibar-search-args';
+import { BBOmnibarSearchArgs } from './omnibar-search-args';
 
-import {
-  BBOmnibarSetTitleArgs
-} from './omnibar-set-title-args';
+import { BBOmnibarSetTitleArgs } from './omnibar-set-title-args';
 
-import {
-  BBOmnibarUserActivity
-} from './omnibar-user-activity';
+import { BBOmnibarUserActivity } from './omnibar-user-activity';
 
-import {
-  BBOmnibarUserActivityPrompt
-} from './omnibar-user-activity-prompt';
+import { BBOmnibarUserActivityPrompt } from './omnibar-user-activity-prompt';
 
-import {
-  BBOmnibarUpdateArgs
-} from './omnibar-update-args';
+import { BBOmnibarUpdateArgs } from './omnibar-update-args';
 
-import {
-  BBOmnibarPushNotifications
-} from './omnibar-push-notifications';
+import { BBOmnibarPushNotifications } from './omnibar-push-notifications';
 
-import {
-  BBOmnibarToastContainer
-} from './omnibar-toast-container';
+import { BBOmnibarToastContainer } from './omnibar-toast-container';
 
-import {
-  BBOmnibarVertical
-} from './omnibar-vertical';
+import { BBOmnibarVertical } from './omnibar-vertical';
 
-import {
-  BBOmnibarThemeAccent
-} from './theming';
+import { BBOmnibarThemeAccent } from './theming';
 
 const CLS_EXPANDED = 'sky-omnibar-iframe-expanded';
 const CLS_LOADING = 'sky-omnibar-loading';
 const CLS_ENVIRONMENT_VISIBLE = 'sky-omnibar-environment-visible';
-const CLS_ENVIRONMENT_DESCRIPTION_VISIBLE = 'sky-omnibar-environment-description-present';
+const CLS_ENVIRONMENT_DESCRIPTION_VISIBLE =
+  'sky-omnibar-environment-description-present';
 const HOST_ID = 'omnibar';
 const OMNIBAR_HEIGHT = 50;
 const ENVIRONMENT_HEIGHT = 24;
@@ -154,7 +121,8 @@ function showVerticalNav(): boolean {
 }
 
 function addStyleEl(): void {
-  let accentCss = 'background: linear-gradient(to right, #71bf44 0, #31b986 50%, #00b2ec 100%);';
+  let accentCss =
+    'background: linear-gradient(to right, #71bf44 0, #31b986 50%, #00b2ec 100%);';
   let accentHeight = '5px';
   let backgroundColor = '#4d5259';
   let borderBottom = 'none';
@@ -177,7 +145,9 @@ function addStyleEl(): void {
     if (accent === false) {
       accentCss = 'display: none;';
     } else if (accent && (accent as BBOmnibarThemeAccent).color) {
-      accentCss = `background-color: ${(accent as BBOmnibarThemeAccent).color};`;
+      accentCss = `background-color: ${
+        (accent as BBOmnibarThemeAccent).color
+      };`;
     }
   }
 
@@ -262,8 +232,7 @@ body {
 .${CLS_ENVIRONMENT_VISIBLE} .sky-omnibar-environment {
   height: ${ENVIRONMENT_HEIGHT}px;
 }
-`
-  );
+`);
 
   updateSize();
 }
@@ -293,13 +262,10 @@ async function handleSearch(searchArgs: BBOmnibarSearchArgs): Promise<void> {
   if (omnibarConfig.onSearch) {
     const results = await omnibarConfig.onSearch(searchArgs);
 
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        messageType: 'search-results',
-        results
-      }
-    );
+    BBAuthInterop.postOmnibarMessage(iframeEl, {
+      messageType: 'search-results',
+      results,
+    });
   }
 }
 
@@ -307,34 +273,36 @@ function updateSize(): void {
   if (omnibarConfig.onResize) {
     omnibarConfig.onResize({
       position: 'top',
-      size: OMNIBAR_HEIGHT + (document.body.classList.contains(CLS_ENVIRONMENT_VISIBLE) ? 24 : 0)
+      size:
+        OMNIBAR_HEIGHT +
+        (document.body.classList.contains(CLS_ENVIRONMENT_VISIBLE) ? 24 : 0),
     });
   }
 }
 
 function openPushNotificationsMenu(): void {
-  BBAuthInterop.postOmnibarMessage(
-    iframeEl,
-    {
-      messageType: 'push-notifications-open'
-    }
-  );
+  BBAuthInterop.postOmnibarMessage(iframeEl, {
+    messageType: 'push-notifications-open',
+  });
 }
 
-function notificationsCallback(notifications: any): void {
-  BBAuthInterop.postOmnibarMessage(
-    iframeEl,
-    {
-      messageType: 'push-notifications-update',
-      pushNotifications: notifications
-    }
-  );
+function notificationsCallback(notifications: {
+  notifications: {
+    isRead: boolean;
+  }[];
+}): void {
+  BBAuthInterop.postOmnibarMessage(iframeEl, {
+    messageType: 'push-notifications-update',
+    pushNotifications: notifications,
+  });
 
   BBOmnibarToastContainer.showNewNotifications(notifications);
 
-  unreadNotificationCount = notifications &&
+  unreadNotificationCount =
+    notifications &&
     notifications.notifications &&
-    notifications.notifications.filter((notification: any) => !notification.isRead).length;
+    notifications.notifications.filter((notification) => !notification.isRead)
+      .length;
 
   updateTitle();
 }
@@ -343,31 +311,31 @@ function customMessageCallback(message: { value: string }): void {
   BBOmnibarVertical.refreshSettings(message.value);
 }
 
-async function connectPushNotifications(checkLoggedIn?: boolean): Promise<void> {
+async function connectPushNotifications(
+  checkLoggedIn?: boolean
+): Promise<void> {
   if (checkLoggedIn) {
     try {
       await BBAuth.getToken({
-        disableRedirect: true
+        disableRedirect: true,
       });
     } catch (err) {
       return;
     }
   }
 
-  await BBOmnibarPushNotifications.connect(
-    {
-      customMessageCallback,
-      envId: omnibarConfig.envId,
-      handleNavigate,
-      handleNavigateUrl,
-      handlePushNotificationsChange,
-      leId: omnibarConfig.leId,
-      notificationsCallback,
-      openPushNotificationsMenu,
-      showVerticalNav: showVerticalNav(),
-      svcId: omnibarConfig.svcId
-    }
-  );
+  await BBOmnibarPushNotifications.connect({
+    customMessageCallback,
+    envId: omnibarConfig.envId,
+    handleNavigate,
+    handleNavigateUrl,
+    handlePushNotificationsChange,
+    leId: omnibarConfig.leId,
+    notificationsCallback,
+    openPushNotificationsMenu,
+    showVerticalNav: showVerticalNav(),
+    svcId: omnibarConfig.svcId,
+  });
 }
 
 function disconnectPushNotifications(): void {
@@ -382,19 +350,16 @@ async function refreshUserCallback(): Promise<void> {
   try {
     token = await BBAuth.getToken({
       disableRedirect: true,
-      forceNewToken: true
+      forceNewToken: true,
     });
   } catch (err) {
     /* Let token remain undefined */
   }
 
-  BBAuthInterop.postOmnibarMessage(
-    iframeEl,
-    {
-      messageType: 'refresh-user',
-      token
-    }
-  );
+  BBAuthInterop.postOmnibarMessage(iframeEl, {
+    messageType: 'refresh-user',
+    token,
+  });
 
   if (showVerticalNav()) {
     BBOmnibarVertical.refreshUser(token);
@@ -411,7 +376,7 @@ function showInactivityCallback(): void {
   BBOmnibarUserActivityPrompt.show({
     sessionRenewCallback: () => {
       BBOmnibarUserActivity.userRenewedSession();
-    }
+    },
   });
 }
 
@@ -430,7 +395,7 @@ function startActivityTracking(): void {
 }
 
 function handleHelp(): void {
-  const BBHELP = (window as any).BBHELP;
+  const BBHELP = window.BBHELP;
 
   if (BBHELP) {
     BBHELP.HelpWidget.open();
@@ -445,7 +410,7 @@ function handleNotificationRead(notification: BBOmnibarNotificationItem): void {
   }
 }
 
-function handlePushNotificationsChange(notifications: any[]): void {
+function handlePushNotificationsChange(notifications: unknown[]): void {
   BBOmnibarPushNotifications.updateNotifications(notifications);
 }
 
@@ -488,13 +453,21 @@ function handleBrandingUpdate(branding: BBOmnibarBranding): void {
   const favIconUrl = branding?.images?.favIcon?.url;
   if (favIconUrl) {
     // Update the hrefs that we can support.
-    document.querySelectorAll<HTMLLinkElement>("link[rel='icon'], link[rel='apple-touch-icon']").forEach((linkEl) => {
-      linkEl.href = favIconUrl;
-    });
+    document
+      .querySelectorAll<HTMLLinkElement>(
+        "link[rel='icon'], link[rel='apple-touch-icon']"
+      )
+      .forEach((linkEl) => {
+        linkEl.href = favIconUrl;
+      });
     // Remove the elements that we can't support so there's no lingering default logo anywhere.
-    document.querySelectorAll<HTMLLinkElement>("link[rel='mask-icon'], link[rel='manifest']").forEach((linkEl) => {
-      linkEl.remove();
-    });
+    document
+      .querySelectorAll<HTMLLinkElement>(
+        "link[rel='mask-icon'], link[rel='manifest']"
+      )
+      .forEach((linkEl) => {
+        linkEl.remove();
+      });
   }
 }
 
@@ -510,16 +483,16 @@ function monkeyPatchState(): void {
   const oldPushState = history.pushState;
   const oldReplaceState = history.replaceState;
 
-  function newPushState() {
-    const result = oldPushState.apply(history, arguments);
+  function newPushState(...args: unknown[]) {
+    const result = oldPushState.apply(history, args);
 
     handleStateChange();
 
     return result;
   }
 
-  function newReplaceState() {
-    const result = oldReplaceState.apply(history, arguments);
+  function newReplaceState(...args: unknown[]) {
+    const result = oldReplaceState.apply(history, args);
 
     handleStateChange();
 
@@ -536,14 +509,11 @@ function initLocalNotifications(): void {
   if (notificationsConfig) {
     notificationsConfig.onReady({
       updateNotifications: (notifications) => {
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            messageType: 'notifications-update',
-            notifications
-          }
-        );
-      }
+        BBAuthInterop.postOmnibarMessage(iframeEl, {
+          messageType: 'notifications-update',
+          notifications,
+        });
+      },
     });
   }
 }
@@ -551,7 +521,10 @@ function initLocalNotifications(): void {
 function messageHandler(event: MessageEvent): void {
   const message = event.data;
 
-  if (!BBAuthInterop.messageIsFromOmnibar(event) || (message.hostId !== HOST_ID)) {
+  if (
+    !BBAuthInterop.messageIsFromOmnibar(event) ||
+    message.hostId !== HOST_ID
+  ) {
     return;
   }
 
@@ -564,33 +537,27 @@ function messageHandler(event: MessageEvent): void {
       // be validated against the provided origin.  If the origin of the host page
       // does not match a whilelist of allowed origins maintained by the omnibar,
       // further communications between the omnibar and host will be blocked.
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          messageType: 'host-ready'
-        }
-      );
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        messageType: 'host-ready',
+      });
 
       monkeyPatchState();
 
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          compactNavOnly: omnibarConfig.compactNavOnly || showVerticalNav(),
-          enableHelp: omnibarConfig.enableHelp,
-          envId: omnibarConfig.envId,
-          hideResourceLinks: omnibarConfig.hideResourceLinks,
-          leId: omnibarConfig.leId,
-          localNavItems: nav && nav.localNavItems,
-          localNotifications: !!omnibarConfig.notifications,
-          localSearch: !!omnibarConfig.onSearch,
-          messageType: 'nav-ready',
-          navVersion: omnibarConfig.navVersion,
-          services: nav && nav.services,
-          svcId: omnibarConfig.svcId,
-          theme: omnibarConfig.theme
-        }
-      );
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        compactNavOnly: omnibarConfig.compactNavOnly || showVerticalNav(),
+        enableHelp: omnibarConfig.enableHelp,
+        envId: omnibarConfig.envId,
+        hideResourceLinks: omnibarConfig.hideResourceLinks,
+        leId: omnibarConfig.leId,
+        localNavItems: nav && nav.localNavItems,
+        localNotifications: !!omnibarConfig.notifications,
+        localSearch: !!omnibarConfig.onSearch,
+        messageType: 'nav-ready',
+        navVersion: omnibarConfig.navVersion,
+        services: nav && nav.services,
+        svcId: omnibarConfig.svcId,
+        theme: omnibarConfig.theme,
+      });
 
       initLocalNotifications();
       connectPushNotifications(true);
@@ -630,9 +597,7 @@ function messageHandler(event: MessageEvent): void {
       handleHelp();
       break;
     case 'notification-read':
-      handleNotificationRead(
-        message.notification
-      );
+      handleNotificationRead(message.notification);
       break;
     case 'push-notifications-change':
       handlePushNotificationsChange(message.notifications);
@@ -658,13 +623,14 @@ function messageHandler(event: MessageEvent): void {
 }
 
 function buildOmnibarUrl(): string {
-  const omnibarUrl = omnibarConfig.url ||
+  const omnibarUrl =
+    omnibarConfig.url ||
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/';
 
-  return omnibarUrl +
-    (omnibarUrl.indexOf('?') < 0 ? '?' : '&') +
-    `hostid=${HOST_ID}`;
+  return (
+    omnibarUrl + (omnibarUrl.indexOf('?') < 0 ? '?' : '&') + `hostid=${HOST_ID}`
+  );
 }
 
 function updateTitle(): void {
@@ -686,14 +652,14 @@ function updateTitle(): void {
 }
 
 export class BBOmnibar {
-  public static load(config: BBOmnibarConfig): Promise<any> {
+  public static load(config: BBOmnibarConfig): Promise<void> {
     omnibarConfig = omnibarConfig = config;
 
     // TODO: Deprecate this and only allow it to come from the legacy-keep-alive-url-change message
     // from the omnibar.
     currentLegacyKeepAliveUrl = omnibarConfig.legacyKeepAliveUrl;
 
-    return new Promise<any>((resolve: any) => {
+    return new Promise<void>((resolve) => {
       promiseResolve = resolve;
 
       addStyleEl();
@@ -713,13 +679,10 @@ export class BBOmnibar {
   }
 
   public static update(args: BBOmnibarUpdateArgs): void {
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        messageType: 'update',
-        updateArgs: args
-      }
-    );
+    BBAuthInterop.postOmnibarMessage(iframeEl, {
+      messageType: 'update',
+      updateArgs: args,
+    });
 
     if (args.theme) {
       handleEnvironmentElTheme(args.theme.name === 'modern');
@@ -764,6 +727,6 @@ export class BBOmnibar {
       unreadNotificationCount =
       currentTitleParts =
       serviceName =
-      undefined;
+        undefined;
   }
 }

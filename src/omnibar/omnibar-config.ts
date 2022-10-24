@@ -1,32 +1,18 @@
 //#region imports
 
-import {
-  BBOmnibarNavigation
-} from './omnibar-navigation';
+import { BBOmnibarNavigation } from './omnibar-navigation';
 
-import {
-  BBOmnibarNotificationsConfig
-} from './omnibar-notifications-config';
+import { BBOmnibarNotificationsConfig } from './omnibar-notifications-config';
 
-import {
-  BBOmnibarResizeArgs
-} from './omnibar-resize-args';
+import { BBOmnibarResizeArgs } from './omnibar-resize-args';
 
-import {
-  BBOmnibarSearchArgs
-} from './omnibar-search-args';
+import { BBOmnibarSearchArgs } from './omnibar-search-args';
 
-import {
-  BBOmnibarSearchResults
-} from './omnibar-search-results';
+import { BBOmnibarSearchResults } from './omnibar-search-results';
 
-import {
-  BBOmnibarServiceItem
-} from './omnibar-service-item';
+import { BBOmnibarServiceItem } from './omnibar-service-item';
 
-import {
-  BBOmnibarTheme
-} from './theming';
+import { BBOmnibarTheme } from './theming';
 
 //#endregion
 
@@ -45,7 +31,9 @@ export interface BBOmnibarConfig {
 
   url?: string;
 
-  onSearch?: (searchArgs: BBOmnibarSearchArgs) => Promise<BBOmnibarSearchResults>;
+  onSearch?: (
+    searchArgs: BBOmnibarSearchArgs
+  ) => Promise<BBOmnibarSearchResults>;
 
   services?: BBOmnibarServiceItem[];
 

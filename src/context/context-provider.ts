@@ -1,31 +1,16 @@
-import {
-  BBAuth,
-  BBAuthTokenErrorCode
-} from '../auth';
+import { BBAuth, BBAuthTokenErrorCode } from '../auth';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBCsrfXhr
-} from '../shared/csrf-xhr';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 
-import {
-  BBAuthDomUtility
-} from '../shared/dom-utility';
+import { BBAuthDomUtility } from '../shared/dom-utility';
 
-import {
-  BBAuthNavigator
-} from '../shared/navigator';
+import { BBAuthNavigator } from '../shared/navigator';
 
-import {
-  BBContextArgs
-} from './context-args';
+import { BBContextArgs } from './context-args';
 
-import {
-  BBContextDestinations
-} from './context-destinations';
+import { BBContextDestinations } from './context-destinations';
 
 const HOST_ID = 'context-provider';
 
@@ -50,16 +35,17 @@ function showPicker(
   width: 100%;
   z-index: 10000;
 }
-`
-    );
+`);
   }
 
   function addIframeEl() {
     const iframeUrl =
       BBContextProvider.url +
-      '?hosted=1&svcid=' + encodeURIComponent(args.svcId) +
+      '?hosted=1&svcid=' +
+      encodeURIComponent(args.svcId) +
       `&hostid=${HOST_ID}` +
-      '&url=' + encodeURIComponent(args.url);
+      '&url=' +
+      encodeURIComponent(args.url);
 
     iframeEl = BBAuthDomUtility.addIframe(
       iframeUrl,
@@ -68,35 +54,25 @@ function showPicker(
     );
   }
 
-  function handleGetToken(
-    tokenRequestId: any,
-    disableRedirect: boolean
-  ) {
+  function handleGetToken(tokenRequestId: string, disableRedirect: boolean) {
     BBAuth.getToken({
-      disableRedirect
-    })
-      .then(
-        (token: string) => {
-          BBAuthInterop.postOmnibarMessage(
-            iframeEl,
-            {
-              messageType: 'token',
-              token,
-              tokenRequestId
-            }
-          );
-        },
-        (reason: any) => {
-          BBAuthInterop.postOmnibarMessage(
-            iframeEl,
-            {
-              messageType: 'token-fail',
-              reason,
-              tokenRequestId
-            }
-          );
-        }
-      );
+      disableRedirect,
+    }).then(
+      (token: string) => {
+        BBAuthInterop.postOmnibarMessage(iframeEl, {
+          messageType: 'token',
+          token,
+          tokenRequestId,
+        });
+      },
+      (reason: unknown) => {
+        BBAuthInterop.postOmnibarMessage(iframeEl, {
+          messageType: 'token-fail',
+          reason,
+          tokenRequestId,
+        });
+      }
+    );
   }
 
   function destroy() {
@@ -104,9 +80,7 @@ function showPicker(
 
     BBAuthDomUtility.removeCss(styleEl);
 
-    iframeEl =
-      styleEl =
-      undefined;
+    iframeEl = styleEl = undefined;
 
     window.removeEventListener('message', messageHandler);
   }
@@ -114,39 +88,33 @@ function showPicker(
   function messageHandler(event: MessageEvent) {
     const message = event.data;
 
-    if (!BBAuthInterop.messageIsFromOmnibar(event) || (message.hostId !== HOST_ID)) {
+    if (
+      !BBAuthInterop.messageIsFromOmnibar(event) ||
+      message.hostId !== HOST_ID
+    ) {
       return;
     }
 
     switch (message.messageType) {
       case 'ready':
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            messageType: 'host-ready'
-          }
-        );
+        BBAuthInterop.postOmnibarMessage(iframeEl, {
+          messageType: 'host-ready',
+        });
 
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            contextDestinations: destinations,
-            messageType: 'context-provide'
-          }
-        );
+        BBAuthInterop.postOmnibarMessage(iframeEl, {
+          contextDestinations: destinations,
+          messageType: 'context-provide',
+        });
 
         break;
       case 'get-token':
-        handleGetToken(
-          message.tokenRequestId,
-          message.disableRedirect
-        );
+        handleGetToken(message.tokenRequestId, message.disableRedirect);
         break;
       case 'welcome-cancel':
         destroy();
 
         reject({
-          reason: 'canceled'
+          reason: 'canceled',
         });
 
         break;
@@ -175,7 +143,6 @@ function redirectToError() {
 }
 
 export class BBContextProvider {
-
   public static url = 'https://host.nxt.blackbaud.com/omnibar/welcome';
 
   public static ensureContext(args: BBContextArgs): Promise<BBContextArgs> {
@@ -187,19 +154,17 @@ export class BBContextProvider {
 
     return new Promise<BBContextArgs>((resolve, reject) => {
       if (svcId) {
-        BBAuth.getToken()
-          .then((token) => {
-            let url = 'https://nav-pusa01.app.blackbaud.net/navaf/user/destinations?svcid=' +
-              encodeURIComponent(svcId);
+        BBAuth.getToken().then((token) => {
+          let url =
+            'https://nav-pusa01.app.blackbaud.net/navaf/user/destinations?svcid=' +
+            encodeURIComponent(svcId);
 
-            if (args.url) {
-              url += '&referringurl=' + encodeURIComponent(args.url);
-            }
+          if (args.url) {
+            url += '&referringurl=' + encodeURIComponent(args.url);
+          }
 
-            BBCsrfXhr.requestWithToken(
-              url,
-              token
-            ).then((destinations: BBContextDestinations) => {
+          BBCsrfXhr.requestWithToken(url, token).then(
+            (destinations: BBContextDestinations) => {
               const items = destinations && destinations.items;
               const itemCount = items && items.length;
 
@@ -218,7 +183,8 @@ export class BBContextProvider {
                 // Redirect to the error page.
                 redirectToError();
               }
-            });
+            }
+          );
         });
       } else {
         // The nav service will only return environments when a service ID is provided,
@@ -227,5 +193,4 @@ export class BBContextProvider {
       }
     });
   }
-
 }

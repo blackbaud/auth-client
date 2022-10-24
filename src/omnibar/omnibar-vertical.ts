@@ -1,26 +1,14 @@
-import {
-  BBUserSettings
-} from '../user-settings/user-settings';
+import { BBUserSettings } from '../user-settings/user-settings';
 
-import {
-  BBUserConfig
-} from '../user-settings/user-config';
+import { BBUserConfig } from '../user-settings/user-config';
 
-import {
-  BBAuthDomUtility
-} from '../shared/dom-utility';
+import { BBAuthDomUtility } from '../shared/dom-utility';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBAuthNavigator
-} from '../shared/navigator';
+import { BBAuthNavigator } from '../shared/navigator';
 
-import {
-  BBOmnibarConfig
-} from './omnibar-config';
+import { BBOmnibarConfig } from './omnibar-config';
 
 const CLS_EXPANDED = 'sky-omnibar-vertical-expanded';
 const CLS_LOADING = 'sky-omnibar-vertical-loading';
@@ -38,7 +26,7 @@ let currentUrl: string;
 let iframeEl: HTMLIFrameElement;
 let iframeWrapperEl: HTMLDivElement;
 let omnibarConfig: BBOmnibarConfig;
-let promiseResolve: (value?: any) => void;
+let promiseResolve: (value?: unknown) => void;
 let styleEl: HTMLStyleElement;
 let windowMediaQuery: MediaQueryList;
 
@@ -51,12 +39,14 @@ function updateSize(): void {
     );
 
     if (wrapperStyle.display !== 'none') {
-      size = document.body.classList.contains(CLS_BODY_MINIMIZED) ? WIDTH_MIN : WIDTH_MAX;
+      size = document.body.classList.contains(CLS_BODY_MINIMIZED)
+        ? WIDTH_MIN
+        : WIDTH_MAX;
     }
 
     omnibarConfig.onResize({
       position: 'left',
-      size
+      size,
     });
   }
 }
@@ -78,7 +68,8 @@ function addIframeEl(afterEl: HTMLElement): void {
     minimize();
   }
 
-  const omnibarVerticalUrl = omnibarConfig.verticalUrl ||
+  const omnibarVerticalUrl =
+    omnibarConfig.verticalUrl ||
     /* istanbul ignore next */
     'https://host.nxt.blackbaud.com/omnibar/vertical';
 
@@ -146,8 +137,7 @@ function addStyleEl(): void {
     display: none;
   }
 }
-`
-  );
+`);
 }
 
 function windowMediaQueryChange(): void {
@@ -181,7 +171,10 @@ function maximize(): void {
   document.body.classList.remove(CLS_BODY_MINIMIZED);
 }
 
-function updateMinimized(verticalNavMinimized: boolean, updateSettings: boolean): void {
+function updateMinimized(
+  verticalNavMinimized: boolean,
+  updateSettings: boolean
+): void {
   if (updateSettings) {
     const correlationId = Date.now().toString();
 
@@ -189,14 +182,11 @@ function updateMinimized(verticalNavMinimized: boolean, updateSettings: boolean)
     // taken place.
     settingsUpdatesToIgnore.add(correlationId);
 
-    BBUserSettings.updateSettings(
-      correlationId,
-      {
-        omnibar: {
-          vMin: verticalNavMinimized
-        }
-      }
-    );
+    BBUserSettings.updateSettings(correlationId, {
+      omnibar: {
+        vMin: verticalNavMinimized,
+      },
+    });
   }
 
   if (verticalNavMinimized) {
@@ -224,26 +214,20 @@ function messageHandler(event: MessageEvent): void {
       // be validated against the provided origin.  If the origin of the host page
       // does not match a whilelist of allowed origins maintained by the omnibar,
       // further communications between the omnibar and host will be blocked.
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          messageType: 'host-ready'
-        }
-      );
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        messageType: 'host-ready',
+      });
 
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          envId: omnibarConfig.envId,
-          leId: omnibarConfig.leId,
-          messageType: 'nav-ready',
-          minimized: userSettingsMinimized(),
-          navVersion: omnibarConfig.navVersion,
-          services: nav && nav.services,
-          svcId: omnibarConfig.svcId,
-          theme: omnibarConfig.theme
-        }
-      );
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        envId: omnibarConfig.envId,
+        leId: omnibarConfig.leId,
+        messageType: 'nav-ready',
+        minimized: userSettingsMinimized(),
+        navVersion: omnibarConfig.navVersion,
+        services: nav && nav.services,
+        svcId: omnibarConfig.svcId,
+        theme: omnibarConfig.theme,
+      });
 
       postLocationChangeMessage();
 
@@ -262,10 +246,7 @@ function messageHandler(event: MessageEvent): void {
       BBAuthNavigator.navigate(message.url);
       break;
     case 'navigate':
-      BBAuthInterop.handleNavigate(
-        omnibarConfig.nav,
-        message.navItem
-      );
+      BBAuthInterop.handleNavigate(omnibarConfig.nav, message.navItem);
       break;
     case 'get-token':
       BBAuthInterop.handleGetToken(
@@ -284,14 +265,13 @@ function messageHandler(event: MessageEvent): void {
 }
 
 export class BBOmnibarVertical {
-
   public static async load(
     config: BBOmnibarConfig,
     afterEl: HTMLElement
   ): Promise<void> {
     omnibarConfig = config;
 
-    return new Promise<any>(async (resolve) => {
+    return new Promise<void>(async (resolve) => {
       promiseResolve = resolve;
 
       addStyleEl();
@@ -317,13 +297,10 @@ export class BBOmnibarVertical {
   }
 
   public static refreshUser(token: string): void {
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        messageType: 'refresh-user',
-        token
-      }
-    );
+    BBAuthInterop.postOmnibarMessage(iframeEl, {
+      messageType: 'refresh-user',
+      token,
+    });
   }
 
   public static async refreshSettings(correlationId: string): Promise<void> {
@@ -335,15 +312,12 @@ export class BBOmnibarVertical {
 
       updateMinimized(currentSettings?.omnibar?.vMin, false);
 
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          messageType: 'update-vertical',
-          updateArgs: {
-            minimized: currentSettings?.omnibar?.vMin
-          }
-        }
-      );
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        messageType: 'update-vertical',
+        updateArgs: {
+          minimized: currentSettings?.omnibar?.vMin,
+        },
+      });
     }
   }
 
@@ -367,7 +341,7 @@ export class BBOmnibarVertical {
       iframeWrapperEl =
       omnibarConfig =
       promiseResolve =
-      styleEl = undefined;
+      styleEl =
+        undefined;
   }
-
 }

@@ -1,19 +1,23 @@
-import {
-  BBAuthInterop
-} from './interop';
+import { BBAuthInterop } from './interop';
 
 describe('Interop', () => {
-
   function validateMethod(
-    methodName: 'messageIsFromOmnibar' | 'messageIsFromOmnibarVertical' | 'messageIsFromToastContainer',
+    methodName:
+      | 'messageIsFromOmnibar'
+      | 'messageIsFromOmnibarVertical'
+      | 'messageIsFromToastContainer',
     validSource: string
   ) {
-    function validate(source: string, origin: string, expectedIsValid: boolean) {
+    function validate(
+      source: string,
+      origin: string,
+      expectedIsValid: boolean
+    ) {
       const isValid = BBAuthInterop[methodName]({
         data: {
-          source
+          source,
         },
-        origin
+        origin,
       });
 
       expect(isValid).toBe(expectedIsValid);
@@ -34,11 +38,16 @@ describe('Interop', () => {
   });
 
   it('should validate that incoming messages originate from the vertical omnibar', () => {
-    validateMethod('messageIsFromOmnibarVertical', 'skyux-spa-omnibar-vertical');
+    validateMethod(
+      'messageIsFromOmnibarVertical',
+      'skyux-spa-omnibar-vertical'
+    );
   });
 
   it('should validate that incoming messages originate from the toast container', () => {
-    validateMethod('messageIsFromToastContainer', 'skyux-spa-omnibar-toast-container');
+    validateMethod(
+      'messageIsFromToastContainer',
+      'skyux-spa-omnibar-toast-container'
+    );
   });
-
 });

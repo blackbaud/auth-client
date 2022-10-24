@@ -1,54 +1,57 @@
-import {
-  BBAuth
-} from '../auth';
+import { BBAuth } from '../auth';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBOmnibarPushNotifications
-} from './omnibar-push-notifications';
+import { BBOmnibarPushNotifications } from './omnibar-push-notifications';
 
-import {
-  BBOmnibarPushNotificationsConnectArgs
-} from './omnibar-push-notifications-connect-args';
+import { BBOmnibarPushNotificationsConnectArgs } from './omnibar-push-notifications-connect-args';
 
-import {
-  BBOmnibarScriptLoader
-} from './omnibar-script-loader';
+import { BBOmnibarScriptLoader } from './omnibar-script-loader';
 
-import {
-  BBOmnibarToastContainer
-} from './omnibar-toast-container';
+import { BBOmnibarToastContainer } from './omnibar-toast-container';
 
 describe('Omnibar push notifications', () => {
+  // tslint:disable-next-line:max-line-length
+  const testTokenWithNotificationEntitlement =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjpbIm5vdGlmIiwiZm9vIl19.XskU9eHmCxzkRq0GIgmZd3MtFHZ9xaWJUWeuUkDjPb0';
 
   // tslint:disable-next-line:max-line-length
-  const testTokenWithNotificationEntitlement = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjpbIm5vdGlmIiwiZm9vIl19.XskU9eHmCxzkRq0GIgmZd3MtFHZ9xaWJUWeuUkDjPb0';
-
-  // tslint:disable-next-line:max-line-length
-  const testTokenWithoutNotificationEntitlement = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
+  const testTokenWithoutNotificationEntitlement =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
   let addCustomMessageListenerSpy: jasmine.Spy;
   let addListenerSpy: jasmine.Spy;
   let destroySpy: jasmine.Spy;
   let initSpy: jasmine.Spy;
-  let registerScriptSpy: jasmine.Spy<typeof BBOmnibarScriptLoader.registerScript>;
+  let registerScriptSpy: jasmine.Spy<
+    typeof BBOmnibarScriptLoader.registerScript
+  >;
   let updateNotificationsSpy: jasmine.Spy;
   let toastContainerInitSpy: jasmine.Spy<typeof BBOmnibarToastContainer.init>;
   let getTokenSpy: jasmine.Spy<typeof BBAuth.getToken>;
 
-  function createNotificationsClient(): any {
-    return (window as any).BBNotificationsClient = {
-      BBNotifications: {
-        addCustomMessageListener: addCustomMessageListenerSpy,
-        addListener: addListenerSpy,
-        destroy: destroySpy,
-        init: initSpy,
-        updateNotifications: updateNotificationsSpy
-      }
+  function createNotificationsClient(): typeof window.BBNotificationsClient.BBNotifications {
+    const notificationsSpyObj = jasmine.createSpyObj<
+      typeof window.BBNotificationsClient.BBNotifications
+    >('BBNotifications', [
+      'addCustomMessageListener',
+      'addListener',
+      'destroy',
+      'init',
+      'updateNotifications',
+    ]);
+
+    window.BBNotificationsClient = {
+      BBNotifications: notificationsSpyObj,
     };
+
+    addCustomMessageListenerSpy = notificationsSpyObj.addCustomMessageListener;
+    addListenerSpy = notificationsSpyObj.addListener;
+    destroySpy = notificationsSpyObj.destroy;
+    initSpy = notificationsSpyObj.init;
+    updateNotificationsSpy = notificationsSpyObj.updateNotifications;
+
+    return window.BBNotificationsClient.BBNotifications;
   }
 
   function createTestConnectArgs(): BBOmnibarPushNotificationsConnectArgs {
@@ -57,12 +60,14 @@ describe('Omnibar push notifications', () => {
       envId: 'abc',
       handleNavigate: jasmine.createSpy('handleNavigate'),
       handleNavigateUrl: jasmine.createSpy('handleNavigateUrl'),
-      handlePushNotificationsChange: jasmine.createSpy('handlePushNotificationsChange'),
+      handlePushNotificationsChange: jasmine.createSpy(
+        'handlePushNotificationsChange'
+      ),
       leId: '123',
       notificationsCallback: jasmine.createSpy('notificationsCallback'),
       openPushNotificationsMenu: jasmine.createSpy('openPushNotificationsMenu'),
       showVerticalNav: false,
-      svcId: 'xyz'
+      svcId: 'xyz',
     };
   }
 
@@ -78,9 +83,9 @@ describe('Omnibar push notifications', () => {
 
     createNotificationsClient();
 
-    getTokenSpy
-      .and
-      .returnValue(Promise.resolve(testTokenWithNotificationEntitlement));
+    getTokenSpy.and.returnValue(
+      Promise.resolve(testTokenWithNotificationEntitlement)
+    );
 
     const args = createTestConnectArgs();
     args.svcId = svcId;
@@ -99,28 +104,25 @@ describe('Omnibar push notifications', () => {
       notificationsInitExpectation = notificationsInitExpectation.not;
     }
 
-    notificationsInitExpectation.toHaveBeenCalledWith(args.notificationsCallback);
+    notificationsInitExpectation.toHaveBeenCalledWith(
+      args.notificationsCallback
+    );
   }
 
   beforeEach(() => {
     registerScriptSpy = spyOn(BBOmnibarScriptLoader, 'registerScript');
 
-    addCustomMessageListenerSpy = jasmine.createSpy('addCustomMessageListener');
-    addListenerSpy = jasmine.createSpy('addListener');
-    initSpy = jasmine.createSpy('init');
-    destroySpy = jasmine.createSpy('destroy');
-    updateNotificationsSpy = jasmine.createSpy('updateNotifications');
-
-    toastContainerInitSpy = spyOn(BBOmnibarToastContainer, 'init')
-      .and
-      .returnValue(Promise.resolve());
+    toastContainerInitSpy = spyOn(
+      BBOmnibarToastContainer,
+      'init'
+    ).and.returnValue(Promise.resolve());
 
     getTokenSpy = spyOn(BBAuth, 'getToken');
   });
 
   afterEach(async () => {
     await BBOmnibarPushNotifications.disconnect();
-    delete (window as any).BBNotificationsClient;
+    delete window.BBNotificationsClient;
   });
 
   it('should init the notifications client', async () => {
@@ -131,7 +133,7 @@ describe('Omnibar push notifications', () => {
     expect(registerScriptSpy).not.toHaveBeenCalled();
 
     expect(initSpy).toHaveBeenCalledWith({
-      tokenCallback: jasmine.any(Function)
+      tokenCallback: jasmine.any(Function),
     });
   });
 
@@ -142,7 +144,9 @@ describe('Omnibar push notifications', () => {
 
     await BBOmnibarPushNotifications.connect(createTestConnectArgs());
 
-    expect(registerScriptSpy).toHaveBeenCalledWith(BBOmnibarPushNotifications.NOTIFICATIONS_CLIENT_URL);
+    expect(registerScriptSpy).toHaveBeenCalledWith(
+      BBOmnibarPushNotifications.NOTIFICATIONS_CLIENT_URL
+    );
   });
 
   it('should not register notifications client again if previously connected', async () => {
@@ -157,13 +161,14 @@ describe('Omnibar push notifications', () => {
   });
 
   it('should pass a function to get a token to notifications init', async () => {
+    createNotificationsClient();
+
     let tokenCallback: () => void;
 
-    initSpy
-      .and
-      .callFake((args: { tokenCallback: typeof tokenCallback }) => tokenCallback = args.tokenCallback);
-
-    createNotificationsClient();
+    initSpy.and.callFake(
+      (args: { tokenCallback: typeof tokenCallback }) =>
+        (tokenCallback = args.tokenCallback)
+    );
 
     await BBOmnibarPushNotifications.connect(createTestConnectArgs());
 
@@ -180,8 +185,8 @@ describe('Omnibar push notifications', () => {
     const testNotifications = [
       {
         isRead: true,
-        notificationId: '1'
-      }
+        notificationId: '1',
+      },
     ];
 
     BBOmnibarPushNotifications.updateNotifications(testNotifications);
@@ -202,9 +207,9 @@ describe('Omnibar push notifications', () => {
   it('should listen for push notifications if the required entitlement is in an array in the JWT', async () => {
     createNotificationsClient();
 
-    getTokenSpy
-      .and
-      .returnValue(Promise.resolve(testTokenWithNotificationEntitlement));
+    getTokenSpy.and.returnValue(
+      Promise.resolve(testTokenWithNotificationEntitlement)
+    );
 
     const args = createTestConnectArgs();
     args.svcId = 'fenxt';
@@ -213,26 +218,24 @@ describe('Omnibar push notifications', () => {
 
     expect(addListenerSpy).toHaveBeenCalledWith(args.notificationsCallback);
 
-    expect(toastContainerInitSpy).toHaveBeenCalledWith(
-      {
-        envId: args.envId,
-        leId: args.leId,
-        navigateCallback: args.handleNavigate,
-        navigateUrlCallback: args.handleNavigateUrl,
-        openMenuCallback: args.openPushNotificationsMenu,
-        pushNotificationsChangeCallback: args.handlePushNotificationsChange,
-        svcId: args.svcId,
-        url: BBAuthInterop.getCurrentUrl()
-      }
-    );
+    expect(toastContainerInitSpy).toHaveBeenCalledWith({
+      envId: args.envId,
+      leId: args.leId,
+      navigateCallback: args.handleNavigate,
+      navigateUrlCallback: args.handleNavigateUrl,
+      openMenuCallback: args.openPushNotificationsMenu,
+      pushNotificationsChangeCallback: args.handlePushNotificationsChange,
+      svcId: args.svcId,
+      url: BBAuthInterop.getCurrentUrl(),
+    });
   });
 
   it('should not connect to push notifications if the required entitlement is missing', async () => {
     createNotificationsClient();
 
-    getTokenSpy
-      .and
-      .returnValue(Promise.resolve(testTokenWithoutNotificationEntitlement));
+    getTokenSpy.and.returnValue(
+      Promise.resolve(testTokenWithoutNotificationEntitlement)
+    );
 
     const args = createTestConnectArgs();
     args.svcId = 'fenxt';
@@ -245,9 +248,7 @@ describe('Omnibar push notifications', () => {
   it('should disable push notifications for a given service ID when the user is logged out', async () => {
     createNotificationsClient();
 
-    getTokenSpy
-      .and
-      .returnValue(Promise.reject('The user is not logged in'));
+    getTokenSpy.and.returnValue(Promise.reject('The user is not logged in'));
 
     const args = createTestConnectArgs();
     args.svcId = 'fenxt';
@@ -279,7 +280,7 @@ describe('Omnibar push notifications', () => {
 
     expect(addCustomMessageListenerSpy).toHaveBeenCalledWith({
       callback: args.customMessageCallback,
-      customMessageType: 'ui-config-global-settings-update'
+      customMessageType: 'ui-config-global-settings-update',
     });
   });
 
@@ -297,5 +298,4 @@ describe('Omnibar push notifications', () => {
     await testSvcId('merchservices', false, true);
     await testSvcId('gsrch', true, true);
   });
-
 });

@@ -1,26 +1,14 @@
-import {
-  BBAuthDomain
-} from '../auth/auth-domain';
+import { BBAuthDomain } from '../auth/auth-domain';
 
-import {
-  BBCsrfXhr
-} from '../shared/csrf-xhr';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 
-import {
-  BBAuthNavigator
-} from '../shared/navigator';
+import { BBAuthNavigator } from '../shared/navigator';
 
-import {
-  BBOmnibarUserActivityProcessor
-} from './omnibar-user-activity-processor';
+import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
 
-import {
-  BBOmnibarUserSessionExpiration
-} from './omnibar-user-session-expiration';
+import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
 
-import {
-  BBOmnibarUserSessionWatcher
-} from './omnibar-user-session-watcher';
+import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
 
 let isTracking: boolean;
 let clientX: number;
@@ -31,7 +19,7 @@ let currentShowInactivityCallback: () => void;
 let isShowingInactivityPrompt: boolean;
 let lastActivity: number;
 let lastRenewal: number;
-let intervalId: any;
+let intervalId: ReturnType<typeof setInterval>;
 let lastRefreshId = '';
 let currentAllowAnonymous: boolean;
 let currentLegacyKeepAliveUrl: string;
@@ -56,15 +44,15 @@ function trackMouseMove(e: MouseEvent) {
 function renewSession() {
   const now = Date.now();
 
-  if (!lastRenewal || now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY) {
+  if (
+    !lastRenewal ||
+    now - lastRenewal > BBOmnibarUserActivity.MIN_RENEWAL_RETRY
+  ) {
     lastRenewal = now;
 
-    BBCsrfXhr.request(
-      BBAuthDomain.getSTSDomain() + '/session/renew',
-      {
-        inactivity: 1
-      }
-    ).catch(/* istanbul ignore next */ () => undefined);
+    BBCsrfXhr.request(BBAuthDomain.getSTSDomain() + '/session/renew', {
+      inactivity: 1,
+    }).catch(/* istanbul ignore next */ () => undefined);
   }
 }
 
@@ -101,11 +89,12 @@ function startActivityTimer() {
   }
 
   intervalId = setInterval(async () => {
-    const expirationDate = await BBOmnibarUserSessionExpiration.getSessionExpiration(
-      lastRefreshId,
-      legacyTtl,
-      currentAllowAnonymous
-    );
+    const expirationDate =
+      await BBOmnibarUserSessionExpiration.getSessionExpiration(
+        lastRefreshId,
+        legacyTtl,
+        currentAllowAnonymous
+      );
 
     // Verify activity tracking didn't stop since session expiration retrieval began.
     if (isTracking) {
@@ -113,14 +102,15 @@ function startActivityTimer() {
         allowAnonymous: currentAllowAnonymous,
         closeInactivityPrompt,
         expirationDate,
-        inactivityPromptDuration: BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION,
+        inactivityPromptDuration:
+          BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION,
         isShowingInactivityPrompt,
         lastActivity,
         maxSessionAge: BBOmnibarUserActivity.MAX_SESSION_AGE,
         minRenewalAge: BBOmnibarUserActivity.MIN_RENEWAL_AGE,
         redirectForInactivity,
         renewSession,
-        showInactivityPrompt
+        showInactivityPrompt,
       });
     }
   }, BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL);
@@ -212,6 +202,6 @@ export class BBOmnibarUserActivity {
       currentHideInactivityCallback =
       currentAllowAnonymous =
       currentLegacyKeepAliveUrl =
-      undefined;
+        undefined;
   }
 }

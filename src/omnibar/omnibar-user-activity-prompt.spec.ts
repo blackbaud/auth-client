@@ -1,31 +1,29 @@
 //#region imports
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBOmnibarUserActivityPrompt
-} from './omnibar-user-activity-prompt';
+import { BBOmnibarUserActivityPrompt } from './omnibar-user-activity-prompt';
 
 //#endregion
 
 describe('User activity prompt', () => {
-
   const PROMPT_URL = 'about:blank';
 
   let postOmnibarMessageSpy: jasmine.Spy;
 
   let messageIsFromOmnibarReturnValue = true;
 
-  function fireMessageEvent(data: any, includeSource = true) {
+  function fireMessageEvent(
+    data: Record<string, unknown>,
+    includeSource = true
+  ) {
     if (includeSource) {
       data.source = 'skyux-spa-omnibar';
     }
 
     window.dispatchEvent(
       new MessageEvent('message', {
-        data
+        data,
       })
     );
   }
@@ -37,13 +35,9 @@ describe('User activity prompt', () => {
   beforeAll(() => {
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
 
-    spyOn(
-      BBAuthInterop,
-      'messageIsFromOmnibar'
-    ).and.callFake(() => {
+    spyOn(BBAuthInterop, 'messageIsFromOmnibar').and.callFake(() => {
       return messageIsFromOmnibarReturnValue;
     });
-
   });
 
   beforeEach(() => {
@@ -56,7 +50,7 @@ describe('User activity prompt', () => {
 
   it('should load the activity prompt IFRAME', () => {
     BBOmnibarUserActivityPrompt.show({
-      sessionRenewCallback: () => undefined
+      sessionRenewCallback: () => undefined,
     });
 
     const iframeEl = getIframeEl();
@@ -65,9 +59,15 @@ describe('User activity prompt', () => {
 
     const iframeStyle = getComputedStyle(iframeEl);
 
-    expect(iframeStyle.backgroundColor).toEqual(jasmine.stringMatching(/^transparent|rgba\(0, 0, 0, 0\)$/gi));
-    expect(iframeStyle.borderStyle).toEqual(jasmine.stringMatching(/^|none$/gi));
-    expect(iframeStyle.height).toBe(document.documentElement.clientHeight + 'px');
+    expect(iframeStyle.backgroundColor).toEqual(
+      jasmine.stringMatching(/^transparent|rgba\(0, 0, 0, 0\)$/gi)
+    );
+    expect(iframeStyle.borderStyle).toEqual(
+      jasmine.stringMatching(/^|none$/gi)
+    );
+    expect(iframeStyle.height).toBe(
+      document.documentElement.clientHeight + 'px'
+    );
     expect(iframeStyle.left).toBe('0px');
     expect(iframeStyle.position).toBe('fixed');
     expect(iframeStyle.top).toBe('0px');
@@ -78,11 +78,11 @@ describe('User activity prompt', () => {
 
   it('should post the host-ready message and show the IFRAME when the inactivity prompt IFRAME is ready', () => {
     BBOmnibarUserActivityPrompt.show({
-      sessionRenewCallback: () => undefined
+      sessionRenewCallback: () => undefined,
     });
 
     fireMessageEvent({
-      messageType: 'ready'
+      messageType: 'ready',
     });
 
     const iframeEl = getIframeEl();
@@ -90,7 +90,7 @@ describe('User activity prompt', () => {
     expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
       iframeEl,
       jasmine.objectContaining({
-        messageType: 'host-ready'
+        messageType: 'host-ready',
       })
     );
 
@@ -101,11 +101,11 @@ describe('User activity prompt', () => {
     const sessionRenewCallbackSpy = jasmine.createSpy('sessionRenewCallback');
 
     BBOmnibarUserActivityPrompt.show({
-      sessionRenewCallback: sessionRenewCallbackSpy
+      sessionRenewCallback: sessionRenewCallbackSpy,
     });
 
     fireMessageEvent({
-      messageType: 'session-renew'
+      messageType: 'session-renew',
     });
 
     expect(sessionRenewCallbackSpy).toHaveBeenCalled();
@@ -117,11 +117,11 @@ describe('User activity prompt', () => {
     const sessionRenewCallbackSpy = jasmine.createSpy('sessionRenewCallback');
 
     BBOmnibarUserActivityPrompt.show({
-      sessionRenewCallback: sessionRenewCallbackSpy
+      sessionRenewCallback: sessionRenewCallbackSpy,
     });
 
     fireMessageEvent({
-      messageType: 'session-renew'
+      messageType: 'session-renew',
     });
 
     expect(sessionRenewCallbackSpy).not.toHaveBeenCalled();
@@ -129,7 +129,7 @@ describe('User activity prompt', () => {
 
   it('should remove the activity prompt IFRAME', () => {
     BBOmnibarUserActivityPrompt.show({
-      sessionRenewCallback: () => undefined
+      sessionRenewCallback: () => undefined,
     });
 
     expect(getIframeEl()).not.toBeNull();
@@ -138,5 +138,4 @@ describe('User activity prompt', () => {
 
     expect(getIframeEl()).toBeNull();
   });
-
 });

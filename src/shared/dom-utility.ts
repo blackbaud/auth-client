@@ -1,5 +1,4 @@
 export class BBAuthDomUtility {
-
   public static addCss(css: string): HTMLStyleElement {
     const styleEl = document.createElement('style');
 
@@ -10,11 +9,7 @@ export class BBAuthDomUtility {
     return styleEl;
   }
 
-  public static createIframe(
-    src: string,
-    className: string,
-    title: string
-  ) {
+  public static createIframe(src: string, className: string, title: string) {
     const iframeEl = document.createElement('iframe');
     iframeEl.className = className;
     iframeEl.title = title;
@@ -41,11 +36,11 @@ export class BBAuthDomUtility {
 
   public static removeEl(el: HTMLElement, parentEl = document.body) {
     if (parentEl.contains(el)) {
-       parentEl.removeChild(el);
+      parentEl.removeChild(el);
     }
   }
 
-  public static addElToBodyTop(el: any) {
+  public static addElToBodyTop(el: Element) {
     const body = document.body;
 
     /* istanbul ignore else */
@@ -56,5 +51,4 @@ export class BBAuthDomUtility {
       body.appendChild(el);
     }
   }
-
 }

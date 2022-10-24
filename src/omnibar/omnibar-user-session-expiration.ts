@@ -2,49 +2,58 @@ import { BBAuthDomain } from '../auth/auth-domain';
 import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 let ttlCache: {
-  allowAnonymous: boolean,
-  promise: Promise<number>,
-  refreshId: string
+  allowAnonymous: boolean;
+  promise: Promise<number>;
+  refreshId: string;
 };
 
-function getExpirationFromAuthTtl(refreshId: string, allowAnonymous: boolean): Promise<number> {
-  if (ttlCache && ttlCache.refreshId === refreshId && ttlCache.allowAnonymous === allowAnonymous) {
+function getExpirationFromAuthTtl(
+  refreshId: string,
+  allowAnonymous: boolean
+): Promise<number> {
+  if (
+    ttlCache &&
+    ttlCache.refreshId === refreshId &&
+    ttlCache.allowAnonymous === allowAnonymous
+  ) {
     return ttlCache.promise;
   }
 
-  const promise = new Promise<number>((resolve, reject) => {
+  const promise = new Promise<number>((resolve) => {
     BBCsrfXhr.request(
       BBAuthDomain.getSTSDomain() + '/session/ttl',
       undefined,
       allowAnonymous
-    )
-      .then(
-        (ttl: number) => {
-          const expirationDate = (ttl === null) ? null : Date.now() + ttl * 1000;
+    ).then(
+      (ttl: number) => {
+        const expirationDate = ttl === null ? null : Date.now() + ttl * 1000;
 
-          resolve(expirationDate);
-        },
-        () => {
-          resolve(null);
-        }
-      );
+        resolve(expirationDate);
+      },
+      () => {
+        resolve(null);
+      }
+    );
   });
 
   ttlCache = {
     allowAnonymous,
     promise,
-    refreshId
+    refreshId,
   };
 
   return promise;
 }
 
 export class BBOmnibarUserSessionExpiration {
-
-  public static getSessionExpiration(refreshId: string, legacyTtl: number, allowAnonymous: boolean): Promise<number> {
+  public static getSessionExpiration(
+    refreshId: string,
+    legacyTtl: number,
+    allowAnonymous: boolean
+  ): Promise<number> {
     const authTtlPromise = getExpirationFromAuthTtl(refreshId, allowAnonymous);
 
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       authTtlPromise.then((authExpirationDate: number) => {
         let expirationDate: number;
 
@@ -65,5 +74,4 @@ export class BBOmnibarUserSessionExpiration {
   public static reset() {
     ttlCache = undefined;
   }
-
 }

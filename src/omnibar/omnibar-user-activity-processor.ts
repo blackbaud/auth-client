@@ -13,7 +13,7 @@ export class BBOmnibarUserActivityProcessor {
       minRenewalAge,
       redirectForInactivity,
       renewSession,
-      showInactivityPrompt
+      showInactivityPrompt,
     } = args;
 
     const now = Date.now();

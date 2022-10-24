@@ -1,5 +1,4 @@
 export interface BBContextDestinationsItem {
-
   legalEntity?: string;
 
   entitlementName?: string;
@@ -11,5 +10,4 @@ export interface BBContextDestinationsItem {
   title?: string;
 
   url?: string;
-
 }

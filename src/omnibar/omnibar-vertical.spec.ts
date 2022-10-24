@@ -1,47 +1,34 @@
-import {
-  BBAuth
-} from '../auth';
+import { BBAuth } from '../auth';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBAuthNavigator
-} from '../shared/navigator';
+import { BBAuthNavigator } from '../shared/navigator';
 
-import {
-  BBUserConfig
- } from '../user-settings/user-config';
+import { BBUserConfig } from '../user-settings/user-config';
 
-import {
-  BBUserSettings
-} from '../user-settings/user-settings';
+import { BBUserSettings } from '../user-settings/user-settings';
 
-import {
-  BBOmnibarConfig
-} from './omnibar-config';
+import { BBOmnibarConfig } from './omnibar-config';
 
-import {
-  BBOmnibarResizeArgs
-} from './omnibar-resize-args';
+import { BBOmnibarResizeArgs } from './omnibar-resize-args';
 
-import {
-  BBOmnibarVertical
-} from './omnibar-vertical';
+import { BBOmnibarVertical } from './omnibar-vertical';
 
 describe('Omnibar vertical', () => {
-  type MediaQueryChangeListener = (ev: MediaQueryListEvent) => any;
+  type MediaQueryChangeListener = (ev: MediaQueryListEvent) => void;
 
   const BASE_URL = 'about:blank';
 
   // tslint:disable-next-line:max-line-length
-  const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
+  const testToken =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
 
   let afterEl: HTMLElement;
   let messageIsFromOmnibarReturnValue: boolean;
   let navigateSpy: jasmine.Spy<typeof BBAuthNavigator.navigate>;
-  let postOmnibarMessageSpy: jasmine.Spy<typeof BBAuthInterop.postOmnibarMessage>;
+  let postOmnibarMessageSpy: jasmine.Spy<
+    typeof BBAuthInterop.postOmnibarMessage
+  >;
   let updateSettingsSpy: jasmine.Spy<typeof BBUserSettings.updateSettings>;
   let userSettingsReturnValue: Promise<BBUserConfig>;
 
@@ -54,10 +41,7 @@ describe('Omnibar vertical', () => {
     config = config || {};
     config.verticalUrl = config.verticalUrl || BASE_URL;
 
-    BBOmnibarVertical.load(
-      config,
-      afterEl
-    );
+    BBOmnibarVertical.load(config, afterEl);
 
     return new Promise((resolve) => {
       try {
@@ -71,27 +55,36 @@ describe('Omnibar vertical', () => {
   }
 
   function getIframeEl(): HTMLIFrameElement {
-    return document.querySelector('.sky-omnibar-vertical-iframe') as HTMLIFrameElement;
+    return document.querySelector(
+      '.sky-omnibar-vertical-iframe'
+    ) as HTMLIFrameElement;
   }
 
   function getIframeWrapperEl(): HTMLDivElement {
-    return document.querySelector('.sky-omnibar-vertical-iframe-wrapper') as HTMLDivElement;
+    return document.querySelector(
+      '.sky-omnibar-vertical-iframe-wrapper'
+    ) as HTMLDivElement;
   }
 
-  function fireMessageEvent(data: any, includeSource = true): void {
+  function fireMessageEvent(
+    data: Record<string, unknown>,
+    includeSource = true
+  ): void {
     if (includeSource) {
       data.source = 'skyux-spa-omnibar-vertical';
     }
 
     window.dispatchEvent(
       new MessageEvent('message', {
-        data
+        data,
       })
     );
   }
 
   function validateExpanded(expanded: boolean): void {
-    expect(getIframeWrapperEl().classList.contains('sky-omnibar-vertical-expanded')).toBe(expanded);
+    expect(
+      getIframeWrapperEl().classList.contains('sky-omnibar-vertical-expanded')
+    ).toBe(expanded);
   }
 
   function destroyOmnibar(): void {
@@ -105,7 +98,9 @@ describe('Omnibar vertical', () => {
   function validateMinimized(minimized: boolean): void {
     const wrapperEl = getIframeWrapperEl();
 
-    expect(getComputedStyle(wrapperEl).width).toBe(minimized ? '90px' : '300px');
+    expect(getComputedStyle(wrapperEl).width).toBe(
+      minimized ? '90px' : '300px'
+    );
   }
 
   beforeEach(() => {
@@ -117,31 +112,19 @@ describe('Omnibar vertical', () => {
 
     getTokenFake = () => Promise.resolve(testToken);
 
-    spyOn(
-      BBAuth,
-      'getToken'
-    ).and.callFake(() => {
+    spyOn(BBAuth, 'getToken').and.callFake(() => {
       return getTokenFake();
     });
 
-    spyOn(
-      BBAuthInterop,
-      'messageIsFromOmnibarVertical'
-    ).and.callFake(() => {
+    spyOn(BBAuthInterop, 'messageIsFromOmnibarVertical').and.callFake(() => {
       return messageIsFromOmnibarReturnValue;
     });
 
-    spyOn(
-      BBUserSettings,
-      'getSettings'
-    ).and.callFake(() => {
+    spyOn(BBUserSettings, 'getSettings').and.callFake(() => {
       return userSettingsReturnValue;
     });
 
-    updateSettingsSpy = spyOn(
-      BBUserSettings,
-      'updateSettings'
-    );
+    updateSettingsSpy = spyOn(BBUserSettings, 'updateSettings');
   });
 
   afterEach(() => {
@@ -169,7 +152,7 @@ describe('Omnibar vertical', () => {
     expect(getComputedStyle(iframeEl).visibility).toBe('hidden');
 
     fireMessageEvent({
-      messageType: 'display-ready'
+      messageType: 'display-ready',
     });
 
     expect(getComputedStyle(wrapperEl).display).toBe('block');
@@ -186,43 +169,37 @@ describe('Omnibar vertical', () => {
     spyOn(Date, 'now').and.returnValue(123);
 
     fireMessageEvent({
-      messageType: 'minimize'
+      messageType: 'minimize',
     });
 
     validateMinimized(true);
 
-    expect(updateSettingsSpy).toHaveBeenCalledWith(
-      '123',
-      {
-        omnibar: {
-          vMin: true
-        }
-      }
-    );
+    expect(updateSettingsSpy).toHaveBeenCalledWith('123', {
+      omnibar: {
+        vMin: true,
+      },
+    });
 
     updateSettingsSpy.calls.reset();
 
     fireMessageEvent({
-      messageType: 'maximize'
+      messageType: 'maximize',
     });
 
     validateMinimized(false);
 
-    expect(updateSettingsSpy).toHaveBeenCalledWith(
-      '123',
-      {
-        omnibar: {
-          vMin: false
-        }
-      }
-    );
+    expect(updateSettingsSpy).toHaveBeenCalledWith('123', {
+      omnibar: {
+        vMin: false,
+      },
+    });
   });
 
-  it('should respect the user\'s global settings', async () => {
+  it("should respect the user's global settings", async () => {
     userSettingsReturnValue = Promise.resolve({
       omnibar: {
-        vMin: true
-      }
+        vMin: true,
+      },
     });
 
     await loadOmnibarVertical();
@@ -230,7 +207,7 @@ describe('Omnibar vertical', () => {
     validateMinimized(true);
   });
 
-  it('should load the left nav with default settings if the user\'s global settings fail to load', async () => {
+  it("should load the left nav with default settings if the user's global settings fail to load", async () => {
     userSettingsReturnValue = Promise.reject();
 
     await loadOmnibarVertical();
@@ -239,7 +216,6 @@ describe('Omnibar vertical', () => {
   });
 
   describe('interop with omnibar', () => {
-
     it('should notify the omnibar when navigation is ready to be loaded', async () => {
       const envId = 'abc';
       const svcId = 'xyz';
@@ -255,26 +231,26 @@ describe('Omnibar vertical', () => {
               items: [
                 {
                   title: 'Some item',
-                  url: 'https://example.com/'
-                }
+                  url: 'https://example.com/',
+                },
               ],
-              title: 'Some service'
-            }
-          ]
+              title: 'Some service',
+            },
+          ],
         },
         navVersion,
-        svcId
+        svcId,
       });
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
 
       expect(postOmnibarMessageSpy.calls.argsFor(0)).toEqual([
         getIframeEl(),
         {
-          messageType: 'host-ready'
-        }
+          messageType: 'host-ready',
+        },
       ]);
 
       expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
@@ -290,28 +266,25 @@ describe('Omnibar vertical', () => {
               items: [
                 {
                   title: 'Some item',
-                  url: 'https://example.com/'
-                }
+                  url: 'https://example.com/',
+                },
               ],
-              title: 'Some service'
-            }
+              title: 'Some service',
+            },
           ],
           svcId,
-          theme: undefined
-        }
+          theme: undefined,
+        },
       ]);
     });
 
     it('should notify the omnibar when a requested token is available', async (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
-            messageType: 'token',
-            token: testToken,
-            tokenRequestId: 123
-          }
-        );
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+          messageType: 'token',
+          token: testToken,
+          tokenRequestId: 123,
+        });
 
         done();
       });
@@ -320,20 +293,17 @@ describe('Omnibar vertical', () => {
 
       fireMessageEvent({
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
     it('should notify the omnibar when a requested token is not available', async (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
-            messageType: 'token-fail',
-            reason: 'The user is not logged in.',
-            tokenRequestId: 123
-          }
-        );
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+          messageType: 'token-fail',
+          reason: 'The user is not logged in.',
+          tokenRequestId: 123,
+        });
 
         done();
       });
@@ -347,7 +317,7 @@ describe('Omnibar vertical', () => {
       fireMessageEvent({
         disableRedirect: false,
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
@@ -356,13 +326,10 @@ describe('Omnibar vertical', () => {
 
       BBOmnibarVertical.refreshUser(testToken);
 
-      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-        getIframeEl(),
-        {
-          messageType: 'refresh-user',
-          token: testToken
-        }
-      );
+      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+        messageType: 'refresh-user',
+        token: testToken,
+      });
     });
   });
 
@@ -374,7 +341,7 @@ describe('Omnibar vertical', () => {
 
       fireMessageEvent(
         {
-          messageType: 'expand'
+          messageType: 'expand',
         },
         false
       );
@@ -386,60 +353,73 @@ describe('Omnibar vertical', () => {
       await loadOmnibarVertical();
 
       fireMessageEvent({
-        messageType: 'expand'
+        messageType: 'expand',
       });
 
       validateExpanded(true);
 
       fireMessageEvent({
-        messageType: 'collapse'
+        messageType: 'collapse',
       });
 
       validateExpanded(false);
     });
 
-    function validateOnResize(config: jasmine.SpyObj<BBOmnibarConfig>, size: number): void {
+    function validateOnResize(
+      config: jasmine.SpyObj<BBOmnibarConfig>,
+      size: number
+    ): void {
       expect(config.onResize).toHaveBeenCalledWith({
         position: 'left',
-        size
+        size,
       } as BBOmnibarResizeArgs);
 
       (config.onResize as jasmine.Spy).calls.reset();
     }
 
-    it('should call the config\'s onResize() callback when expanding or collapsing', async () => {
-      const config = jasmine.createSpyObj<BBOmnibarConfig>('config', ['onResize']);
+    it("should call the config's onResize() callback when expanding or collapsing", async () => {
+      const config = jasmine.createSpyObj<BBOmnibarConfig>('config', [
+        'onResize',
+      ]);
 
       await loadOmnibarVertical(config);
 
       validateOnResize(config, 300);
 
       fireMessageEvent({
-        messageType: 'minimize'
+        messageType: 'minimize',
       });
 
       validateOnResize(config, 90);
 
       fireMessageEvent({
-        messageType: 'maximize'
+        messageType: 'maximize',
       });
 
       validateOnResize(config, 300);
     });
 
-    it('should call the config\'s onResize() callback on XS media breakpoint', async () => {
+    it("should call the config's onResize() callback on XS media breakpoint", async () => {
       let mediaListener!: MediaQueryChangeListener;
 
-      const matchMediaSpy = spyOn(window, 'matchMedia').and.callFake((query) => {
-        return {
-          addEventListener: (_: 'change', listener: MediaQueryChangeListener) => {
-            mediaListener = listener;
-          },
-          removeEventListener: jasmine.createSpy('removeEventListener')
-        } as any;
-      });
+      const mqlSpyObj = jasmine.createSpyObj<MediaQueryList>('mqlSpyObj', [
+        'addEventListener',
+        'removeEventListener',
+      ]);
 
-      const config = jasmine.createSpyObj<BBOmnibarConfig>('config', ['onResize']);
+      mqlSpyObj.addEventListener.and.callFake(
+        (_: 'change', listener: MediaQueryChangeListener) => {
+          mediaListener = listener;
+        }
+      );
+
+      const matchMediaSpy = spyOn(window, 'matchMedia').and.returnValue(
+        mqlSpyObj
+      );
+
+      const config = jasmine.createSpyObj<BBOmnibarConfig>('config', [
+        'onResize',
+      ]);
 
       await loadOmnibarVertical(config);
 
@@ -467,7 +447,7 @@ describe('Omnibar vertical', () => {
 
       fireMessageEvent({
         messageType: 'navigate-url',
-        url: 'https://example.com/'
+        url: 'https://example.com/',
       });
 
       expect(navigateSpy).toHaveBeenCalledWith('https://example.com/');
@@ -479,35 +459,32 @@ describe('Omnibar vertical', () => {
       fireMessageEvent({
         messageType: 'navigate',
         navItem: {
-          url: 'https://example.com/'
-        }
+          url: 'https://example.com/',
+        },
       });
 
       expect(navigateSpy).toHaveBeenCalledWith('https://example.com/');
     });
 
-    it('should notify omnibar and update minimized state when the user\'s global settings have changed', async () => {
+    it("should notify omnibar and update minimized state when the user's global settings have changed", async () => {
       await loadOmnibarVertical();
 
       validateMinimized(false);
 
       userSettingsReturnValue = Promise.resolve({
         omnibar: {
-          vMin: true
-        }
+          vMin: true,
+        },
       });
 
       await BBOmnibarVertical.refreshSettings('123');
 
-      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-        getIframeEl(),
-        {
-          messageType: 'update-vertical',
-          updateArgs: {
-            minimized: true
-          }
-        }
-      );
+      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+        messageType: 'update-vertical',
+        updateArgs: {
+          minimized: true,
+        },
+      });
 
       validateMinimized(true);
     });
@@ -518,15 +495,15 @@ describe('Omnibar vertical', () => {
       spyOn(Date, 'now').and.returnValue(123);
 
       fireMessageEvent({
-        messageType: 'minimize'
+        messageType: 'minimize',
       });
 
       validateMinimized(true);
 
       userSettingsReturnValue = Promise.resolve({
         omnibar: {
-          vMin: true
-        }
+          vMin: true,
+        },
       });
 
       await BBOmnibarVertical.refreshSettings('123');
@@ -536,5 +513,4 @@ describe('Omnibar vertical', () => {
       validateMinimized(true);
     });
   });
-
 });

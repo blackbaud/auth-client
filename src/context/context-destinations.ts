@@ -1,15 +1,9 @@
-import {
-  BBContextDestinationsContext
-} from './context-destinations-context';
+import { BBContextDestinationsContext } from './context-destinations-context';
 
-import {
-  BBContextDestinationsItem
-} from './context-destinations-item';
+import { BBContextDestinationsItem } from './context-destinations-item';
 
 export interface BBContextDestinations {
-
   context?: BBContextDestinationsContext;
 
   items?: BBContextDestinationsItem[];
-
 }

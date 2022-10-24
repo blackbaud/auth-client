@@ -1,5 +1,4 @@
 export interface BBContextArgs {
-
   url?: string;
 
   leId?: string;
@@ -15,5 +14,4 @@ export interface BBContextArgs {
   svcIdRequired?: boolean;
 
   disableRedirect?: boolean;
-
 }

@@ -1,80 +1,45 @@
-import {
-  BBOmnibar
-} from './omnibar';
+import { BBOmnibar } from './omnibar';
 
-import {
-  BBOmnibarConfig
-} from './omnibar-config';
+import { BBOmnibarConfig } from './omnibar-config';
 
-import {
-  BBOmnibarNavigationItem
-} from './omnibar-navigation-item';
+import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 
-import {
-  BBOmnibarSearchArgs
-} from './omnibar-search-args';
+import { BBOmnibarSearchArgs } from './omnibar-search-args';
 
-import {
-  BBOmnibarSearchResults
-} from './omnibar-search-results';
+import { BBOmnibarSearchResults } from './omnibar-search-results';
 
-import {
-  BBOmnibarUserActivity
-} from './omnibar-user-activity';
+import { BBOmnibarUserActivity } from './omnibar-user-activity';
 
-import {
-  BBOmnibarTheme
-} from './theming';
+import { BBOmnibarTheme } from './theming';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBAuthNavigator
-} from '../shared/navigator';
+import { BBAuthNavigator } from '../shared/navigator';
 
-import {
-  BBAuth
-} from '../auth';
+import { BBAuth } from '../auth';
 
-import {
-  BBOmnibarUpdateArgs
-} from './omnibar-update-args';
+import { BBOmnibarUpdateArgs } from './omnibar-update-args';
 
-import {
-  BBOmnibarUserActivityPrompt
-} from './omnibar-user-activity-prompt';
+import { BBOmnibarUserActivityPrompt } from './omnibar-user-activity-prompt';
 
-import {
-  BBOmnibarUserActivityPromptShowArgs
-} from './omnibar-user-activity-prompt-show-args';
+import { BBOmnibarUserActivityPromptShowArgs } from './omnibar-user-activity-prompt-show-args';
 
-import {
-  BBOmnibarPushNotifications
-} from './omnibar-push-notifications';
+import { BBOmnibarPushNotifications } from './omnibar-push-notifications';
 
-import {
-  BBOmnibarPushNotificationsConnectArgs
-} from './omnibar-push-notifications-connect-args';
+import { BBOmnibarPushNotificationsConnectArgs } from './omnibar-push-notifications-connect-args';
 
-import {
-  BBOmnibarResizeArgs
-} from './omnibar-resize-args';
+import { BBOmnibarResizeArgs } from './omnibar-resize-args';
 
-import {
-  BBOmnibarToastContainer
-} from './omnibar-toast-container';
+import { BBOmnibarToastContainer } from './omnibar-toast-container';
 
-import {
-  BBOmnibarVertical
-} from './omnibar-vertical';
+import { BBOmnibarVertical } from './omnibar-vertical';
 
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
 
   // tslint:disable-next-line:max-line-length
-  const testToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
+  const testToken =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyLCIxYmIuZW50aXRsZW1lbnRzIjoibm90aWYifQ.9geiUl3O3ZlEzZVNm28clN0SmZCfn3OSBnfZxNcymHc';
 
   async function loadOmnibar(config?: BBOmnibarConfig): Promise<void> {
     config = config || {};
@@ -97,7 +62,11 @@ describe('Omnibar', () => {
     ) as HTMLDivElement;
   }
 
-  function fireMessageEvent(data: any, includeSource = true, hostId = 'omnibar'): void {
+  function fireMessageEvent(
+    data: Record<string, unknown>,
+    includeSource = true,
+    hostId = 'omnibar'
+  ): void {
     data.hostId = hostId;
 
     if (includeSource) {
@@ -106,13 +75,15 @@ describe('Omnibar', () => {
 
     window.dispatchEvent(
       new MessageEvent('message', {
-        data
+        data,
       })
     );
   }
 
   function validateExpanded(expanded: boolean): void {
-    expect(getIframeEl().classList.contains('sky-omnibar-iframe-expanded')).toBe(expanded);
+    expect(
+      getIframeEl().classList.contains('sky-omnibar-iframe-expanded')
+    ).toBe(expanded);
   }
 
   function destroyOmnibar(): void {
@@ -120,12 +91,20 @@ describe('Omnibar', () => {
   }
 
   let navigateSpy: jasmine.Spy<typeof BBAuthNavigator.navigate>;
-  let postOmnibarMessageSpy: jasmine.Spy<typeof BBAuthInterop.postOmnibarMessage>;
+  let postOmnibarMessageSpy: jasmine.Spy<
+    typeof BBAuthInterop.postOmnibarMessage
+  >;
   let getTokenSpy: jasmine.Spy<typeof BBAuth.getToken>;
   let startTrackingSpy: jasmine.Spy<typeof BBOmnibarUserActivity.startTracking>;
-  let pushNotificationsConnectSpy: jasmine.Spy<typeof BBOmnibarPushNotifications.connect>;
-  let pushNotificationsDisconnectSpy: jasmine.Spy<typeof BBOmnibarPushNotifications.disconnect>;
-  let toastContainerShowNewSpy: jasmine.Spy<typeof BBOmnibarToastContainer.showNewNotifications>;
+  let pushNotificationsConnectSpy: jasmine.Spy<
+    typeof BBOmnibarPushNotifications.connect
+  >;
+  let pushNotificationsDisconnectSpy: jasmine.Spy<
+    typeof BBOmnibarPushNotifications.disconnect
+  >;
+  let toastContainerShowNewSpy: jasmine.Spy<
+    typeof BBOmnibarToastContainer.showNewNotifications
+  >;
 
   let messageIsFromOmnibarReturnValue = true;
   let getTokenFake: () => Promise<string>;
@@ -135,24 +114,15 @@ describe('Omnibar', () => {
     navigateSpy = spyOn(BBAuthNavigator, 'navigate');
     postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
 
-    spyOn(
-      BBAuthInterop,
-      'messageIsFromOmnibar'
-    ).and.callFake(() => {
+    spyOn(BBAuthInterop, 'messageIsFromOmnibar').and.callFake(() => {
       return messageIsFromOmnibarReturnValue;
     });
 
-    getTokenSpy = spyOn(
-      BBAuth,
-      'getToken'
-    ).and.callFake(() => {
+    getTokenSpy = spyOn(BBAuth, 'getToken').and.callFake(() => {
       return getTokenFake();
     });
 
-    pushNotificationsConnectSpy = spyOn(
-      BBOmnibarPushNotifications,
-      'connect'
-    );
+    pushNotificationsConnectSpy = spyOn(BBOmnibarPushNotifications, 'connect');
 
     pushNotificationsDisconnectSpy = spyOn(
       BBOmnibarPushNotifications,
@@ -171,7 +141,9 @@ describe('Omnibar', () => {
     // Disable animations so computed styles can be validated without waiting for animations to complete.
     const styleEl = document.createElement('style');
 
-    styleEl.appendChild(document.createTextNode('* { transition: none !important }'));
+    styleEl.appendChild(
+      document.createTextNode('* { transition: none !important }')
+    );
 
     document.head.appendChild(styleEl);
 
@@ -181,7 +153,7 @@ describe('Omnibar', () => {
   });
 
   afterEach(() => {
-    delete (window as any).BBHELP;
+    delete window.BBHELP;
 
     messageIsFromOmnibarReturnValue = true;
 
@@ -207,7 +179,7 @@ describe('Omnibar', () => {
 
   it('should load omnibar with query parameters correctly', () => {
     loadOmnibar({
-      url: BASE_URL + '?test=value'
+      url: BASE_URL + '?test=value',
     });
 
     const iframeEl = getIframeEl();
@@ -232,7 +204,7 @@ describe('Omnibar', () => {
     expect(getComputedStyle(iframeEl).visibility).toBe('hidden');
 
     fireMessageEvent({
-      messageType: 'display-ready'
+      messageType: 'display-ready',
     });
 
     expect(getComputedStyle(placeholderEl).display).toBe('none');
@@ -242,8 +214,8 @@ describe('Omnibar', () => {
   it('should style the placeholder element based on the provided theme', () => {
     loadOmnibar({
       theme: {
-        backgroundColor: 'rgb(123, 0, 4)'
-      }
+        backgroundColor: 'rgb(123, 0, 4)',
+      },
     });
 
     const placeholderEl = getPlaceholderEl();
@@ -264,9 +236,9 @@ describe('Omnibar', () => {
     loadOmnibar({
       theme: {
         accent: {
-          color: 'rgb(3, 5, 6)'
-        }
-      }
+          color: 'rgb(3, 5, 6)',
+        },
+      },
     });
 
     const placeholderEl = getPlaceholderEl();
@@ -284,8 +256,8 @@ describe('Omnibar', () => {
   it('should not show a placeholder accent when the provided theme removes it', () => {
     loadOmnibar({
       theme: {
-        accent: false
-      }
+        accent: false,
+      },
     });
 
     const placeholderEl = getPlaceholderEl();
@@ -302,8 +274,8 @@ describe('Omnibar', () => {
   it('should apply pre-defined styles when the theme name is "modern"', () => {
     loadOmnibar({
       theme: {
-        name: 'modern'
-      }
+        name: 'modern',
+      },
     });
 
     const placeholderEl = getPlaceholderEl();
@@ -321,28 +293,27 @@ describe('Omnibar', () => {
   });
 
   it('should disable redirect when the session ends and allow anonymous is true', (done) => {
-    postOmnibarMessageSpy.and.callFake(
-      (iframeEl: HTMLIFrameElement, data: any) => {
-        if (data.messageType === 'token') {
-          expect(startTrackingSpy).toHaveBeenCalledWith(
-            jasmine.any(Function),
-            jasmine.any(Function),
-            jasmine.any(Function),
-            true,
-            undefined
-          );
+    postOmnibarMessageSpy.and.callFake((_, data: { messageType: string }) => {
+      if (data.messageType === 'token') {
+        expect(startTrackingSpy).toHaveBeenCalledWith(
+          jasmine.any(Function),
+          jasmine.any(Function),
+          jasmine.any(Function),
+          true,
+          undefined
+        );
 
-          done();
-        }
+        done();
+      }
     });
 
     loadOmnibar({
-      allowAnonymous: true
+      allowAnonymous: true,
     });
 
     fireMessageEvent({
       messageType: 'get-token',
-      tokenRequestId: 123
+      tokenRequestId: 123,
     });
   });
 
@@ -354,7 +325,7 @@ describe('Omnibar', () => {
 
       fireMessageEvent(
         {
-          messageType: 'expand'
+          messageType: 'expand',
         },
         false
       );
@@ -367,7 +338,7 @@ describe('Omnibar', () => {
 
       fireMessageEvent(
         {
-          messageType: 'get-token'
+          messageType: 'get-token',
         },
         true,
         'context-provider'
@@ -380,13 +351,13 @@ describe('Omnibar', () => {
       loadOmnibar();
 
       fireMessageEvent({
-        messageType: 'expand'
+        messageType: 'expand',
       });
 
       validateExpanded(true);
 
       fireMessageEvent({
-        messageType: 'collapse'
+        messageType: 'collapse',
       });
 
       validateExpanded(false);
@@ -397,7 +368,7 @@ describe('Omnibar', () => {
 
       fireMessageEvent({
         messageType: 'navigate-url',
-        url: 'https://example.com/'
+        url: 'https://example.com/',
       });
 
       expect(navigateSpy).toHaveBeenCalledWith('https://example.com/');
@@ -409,8 +380,8 @@ describe('Omnibar', () => {
       fireMessageEvent({
         messageType: 'navigate',
         navItem: {
-          url: 'https://example.com/'
-        }
+          url: 'https://example.com/',
+        },
       });
 
       expect(navigateSpy).toHaveBeenCalledWith('https://example.com/');
@@ -419,30 +390,32 @@ describe('Omnibar', () => {
     it('should allow the host page to handle navigation when navigating by nav item', () => {
       loadOmnibar({
         nav: {
-          beforeNavCallback(item: BBOmnibarNavigationItem) {
+          beforeNavCallback() {
             return false;
-          }
-        }
+          },
+        },
       });
 
       fireMessageEvent({
         messageType: 'navigate',
         navItem: {
-          url: 'https://example.com/'
-        }
+          url: 'https://example.com/',
+        },
       });
 
       expect(navigateSpy).not.toHaveBeenCalled();
     });
 
-    it('should call the config\'s onSearch() callback when search is invoked', (done) => {
+    it("should call the config's onSearch() callback when search is invoked", (done) => {
       const config = {
-        onSearch: jasmine.createSpy('onSearch').and.returnValue(Promise.resolve(undefined))
+        onSearch: jasmine
+          .createSpy('onSearch')
+          .and.returnValue(Promise.resolve(undefined)),
       };
 
       postOmnibarMessageSpy.and.callFake(() => {
         expect(config.onSearch).toHaveBeenCalledWith({
-          searchText: 'abc'
+          searchText: 'abc',
         });
 
         done();
@@ -453,46 +426,46 @@ describe('Omnibar', () => {
       fireMessageEvent({
         messageType: 'search',
         searchArgs: {
-          searchText: 'abc'
-        }
+          searchText: 'abc',
+        },
       });
     });
 
-    it('should not attempt to call the config\'s onSearch() callback when it is not defined', () => {
+    it("should not attempt to call the config's onSearch() callback when it is not defined", () => {
       loadOmnibar();
 
       fireMessageEvent({
         messageType: 'search',
         searchArgs: {
-          searchText: 'abc'
-        }
+          searchText: 'abc',
+        },
       });
 
       // Should not throw an error.
     });
 
-    it('should call the notification config\'s onReady() callback', () => {
+    it("should call the notification config's onReady() callback", () => {
       const config = {
         notifications: {
-          onReady: jasmine.createSpy('onReady')
-        }
+          onReady: jasmine.createSpy('onReady'),
+        },
       };
 
       loadOmnibar(config);
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
 
       expect(config.notifications.onReady).toHaveBeenCalled();
     });
 
-    it('should call the notification config\'s onNotificationRead() callback', () => {
+    it("should call the notification config's onNotificationRead() callback", () => {
       const config = {
         notifications: {
           onNotificationRead: jasmine.createSpy('onNotificationRead'),
-          onReady: jasmine.createSpy('onReady')
-        }
+          onReady: jasmine.createSpy('onReady'),
+        },
       };
 
       loadOmnibar(config);
@@ -500,20 +473,20 @@ describe('Omnibar', () => {
       fireMessageEvent({
         messageType: 'notification-read',
         notification: {
-          id: 1
-        }
+          id: 1,
+        },
       });
 
       expect(config.notifications.onNotificationRead).toHaveBeenCalledWith({
-        id: 1
+        id: 1,
       });
     });
 
-    it('should not call the notification config\'s onNotificationRead() callback if not specified', () => {
+    it("should not call the notification config's onNotificationRead() callback if not specified", () => {
       const config = {
         notifications: {
-          onReady: jasmine.createSpy('onReady')
-        }
+          onReady: jasmine.createSpy('onReady'),
+        },
       };
 
       loadOmnibar(config);
@@ -521,41 +494,41 @@ describe('Omnibar', () => {
       fireMessageEvent({
         messageType: 'notification-read',
         notification: {
-          id: 1
-        }
+          id: 1,
+        },
       });
 
       // Should not throw an error.
     });
 
-    it('should call the omnibar config\'s onResize() callback when rendered', () => {
+    it("should call the omnibar config's onResize() callback when rendered", () => {
       const config = {
-        onResize: jasmine.createSpy('onResize')
+        onResize: jasmine.createSpy('onResize'),
       } as BBOmnibarConfig;
 
       loadOmnibar(config);
 
       expect(config.onResize).toHaveBeenCalledWith({
         position: 'top',
-        size: 50
+        size: 50,
       } as BBOmnibarResizeArgs);
     });
 
-    it('should call the omnibar config\'s onResize() callback when the environment bar is displayed', () => {
+    it("should call the omnibar config's onResize() callback when the environment bar is displayed", () => {
       const config = {
-        onResize: jasmine.createSpy('onResize')
+        onResize: jasmine.createSpy('onResize'),
       } as BBOmnibarConfig;
 
       loadOmnibar(config);
 
       fireMessageEvent({
         messageType: 'environment-update',
-        name: 'Environment name'
+        name: 'Environment name',
       });
 
       expect(config.onResize).toHaveBeenCalledWith({
         position: 'top',
-        size: 74
+        size: 74,
       } as BBOmnibarResizeArgs);
     });
 
@@ -564,14 +537,14 @@ describe('Omnibar', () => {
 
       const openSpy = jasmine.createSpy('open');
 
-      (window as any).BBHELP = {
+      window.BBHELP = {
         HelpWidget: {
-          open: openSpy
-        }
+          open: openSpy,
+        },
       };
 
       fireMessageEvent({
-        messageType: 'help-open'
+        messageType: 'help-open',
       });
 
       expect(openSpy).toHaveBeenCalled();
@@ -581,7 +554,7 @@ describe('Omnibar', () => {
       loadOmnibar();
 
       fireMessageEvent({
-        messageType: 'help-open'
+        messageType: 'help-open',
       });
 
       // Should not throw an error.
@@ -590,10 +563,13 @@ describe('Omnibar', () => {
     it('should provide a way to renew the user session', () => {
       loadOmnibar();
 
-      const userRenewedSessionSpy = spyOn(BBOmnibarUserActivity, 'userRenewedSession');
+      const userRenewedSessionSpy = spyOn(
+        BBOmnibarUserActivity,
+        'userRenewedSession'
+      );
 
       fireMessageEvent({
-        messageType: 'session-renew'
+        messageType: 'session-renew',
       });
 
       expect(userRenewedSessionSpy).toHaveBeenCalled();
@@ -602,10 +578,16 @@ describe('Omnibar', () => {
     it('should display the current environment when specified by the omnibar', () => {
       loadOmnibar();
 
-      const environmentEl = document.querySelector('.sky-omnibar-environment') as any;
-      const environmentNameEl = document.querySelector('.sky-omnibar-environment-name') as any;
-      const environmentInfoEl = document.querySelector('.sky-omnibar-environment-description') as any;
-      let environmentInfoLinkEl: any;
+      const environmentEl = document.querySelector(
+        '.sky-omnibar-environment'
+      ) as HTMLElement;
+      const environmentNameEl = document.querySelector(
+        '.sky-omnibar-environment-name'
+      ) as HTMLElement;
+      const environmentInfoEl = document.querySelector(
+        '.sky-omnibar-environment-description'
+      ) as HTMLElement;
+      let environmentInfoLinkEl: HTMLAnchorElement;
 
       const defaultThemeClass = 'sky-omnibar-environment-theme-default';
       const defaultBackgroundColor = 'rgb(225, 225, 227)';
@@ -613,28 +595,50 @@ describe('Omnibar', () => {
       const modernBackgroundColor = 'rgba(0, 0, 0, 0)';
       const descriptionBackgroundColor = 'rgb(255, 236, 207)';
 
-      const validateVisible = (visible: boolean, className?: string, backgroundColor?: string) => {
-        expect(document.body.classList.contains('sky-omnibar-environment-visible')).toBe(visible);
-        expect(getComputedStyle(environmentEl).height).toBe(visible ? '24px' : '0px');
-        expect(environmentNameEl.innerText.trim()).toBe(visible ? 'Environment name' : '');
+      const validateVisible = (
+        visible: boolean,
+        className?: string,
+        backgroundColor?: string
+      ) => {
+        expect(
+          document.body.classList.contains('sky-omnibar-environment-visible')
+        ).toBe(visible);
+        expect(getComputedStyle(environmentEl).height).toBe(
+          visible ? '24px' : '0px'
+        );
+        expect(environmentNameEl.innerText.trim()).toBe(
+          visible ? 'Environment name' : ''
+        );
 
         if (visible && className && backgroundColor) {
           expect(environmentEl.classList.contains(className)).toBe(true);
-          expect(getComputedStyle(environmentEl).backgroundColor).toBe(backgroundColor);
+          expect(getComputedStyle(environmentEl).backgroundColor).toBe(
+            backgroundColor
+          );
         }
       };
 
       const validateDescription = (visible: boolean, url?: boolean) => {
-        expect(environmentEl.classList.contains('sky-omnibar-environment-description-present')).toBe(visible);
+        expect(
+          environmentEl.classList.contains(
+            'sky-omnibar-environment-description-present'
+          )
+        ).toBe(visible);
 
         environmentInfoLinkEl = environmentInfoEl.querySelector('a');
 
         if (visible && url) {
-          expect(environmentInfoLinkEl.innerText.trim()).toBe('Test environment');
-          expect(environmentInfoLinkEl.href).toBe('https://app.blackbaud.com/auth-client-env-url');
+          expect(environmentInfoLinkEl.innerText.trim()).toBe(
+            'Test environment'
+          );
+          expect(environmentInfoLinkEl.href).toBe(
+            'https://app.blackbaud.com/auth-client-env-url'
+          );
         } else {
           expect(environmentInfoLinkEl).toBe(null);
-          expect(environmentInfoEl.innerText.trim()).toBe(visible ? 'Test environment' : '');
+          expect(environmentInfoEl.innerText.trim()).toBe(
+            visible ? 'Test environment' : ''
+          );
         }
       };
 
@@ -645,7 +649,7 @@ describe('Omnibar', () => {
       // Environment name present, default theme.
       fireMessageEvent({
         messageType: 'environment-update',
-        name: 'Environment name'
+        name: 'Environment name',
       });
 
       validateVisible(true, defaultThemeClass, defaultBackgroundColor);
@@ -654,8 +658,8 @@ describe('Omnibar', () => {
       // Update to modern theme
       BBOmnibar.update({
         theme: {
-          name: 'modern'
-        }
+          name: 'modern',
+        },
       });
 
       validateVisible(true, modernThemeClass, modernBackgroundColor);
@@ -664,7 +668,7 @@ describe('Omnibar', () => {
       // Back to initial state
       fireMessageEvent({
         messageType: 'environment-update',
-        name: undefined
+        name: undefined,
       });
 
       validateVisible(false);
@@ -674,7 +678,7 @@ describe('Omnibar', () => {
       fireMessageEvent({
         description: 'Test environment',
         messageType: 'environment-update',
-        name: 'Environment name'
+        name: 'Environment name',
       });
 
       validateVisible(true, modernThemeClass, descriptionBackgroundColor);
@@ -683,8 +687,8 @@ describe('Omnibar', () => {
       // Back to default theme keeps description background
       BBOmnibar.update({
         theme: {
-          name: 'theme'
-        }
+          name: 'theme',
+        },
       });
 
       validateVisible(true, defaultThemeClass, descriptionBackgroundColor);
@@ -695,7 +699,7 @@ describe('Omnibar', () => {
         description: 'Test environment',
         messageType: 'environment-update',
         name: 'Environment name',
-        url: 'https://app.blackbaud.com/auth-client-env-url'
+        url: 'https://app.blackbaud.com/auth-client-env-url',
       });
 
       validateVisible(true, defaultThemeClass, descriptionBackgroundColor);
@@ -709,7 +713,7 @@ describe('Omnibar', () => {
 
       fireMessageEvent({
         messageType: 'legacy-keep-alive-url-change',
-        url: 'https://example.com/track'
+        url: 'https://example.com/track',
       });
 
       expect(startTrackingSpy).toHaveBeenCalledWith(
@@ -727,12 +731,12 @@ describe('Omnibar', () => {
       const serviceName = 'test service';
 
       BBOmnibar.setTitle({
-        titleParts: []
+        titleParts: [],
       });
 
       fireMessageEvent({
         messageType: 'selected-service-update',
-        serviceName
+        serviceName,
       });
 
       expect(document.title).toBe(serviceName);
@@ -745,133 +749,138 @@ describe('Omnibar', () => {
 
       fireMessageEvent({
         messageType: 'selected-service-update',
-        serviceName
+        serviceName,
       });
 
       expect(document.title).not.toBe(serviceName);
     });
 
     it('should set the document title with the number of unread notifications', (done) => {
-      pushNotificationsConnectSpy
-        .and
-        .callFake(
-          async (args: BBOmnibarPushNotificationsConnectArgs) => {
-            const serviceName = 'test service';
+      pushNotificationsConnectSpy.and.callFake(
+        async (args: BBOmnibarPushNotificationsConnectArgs) => {
+          const serviceName = 'test service';
 
-            fireMessageEvent({
-              messageType: 'selected-service-update',
-              serviceName
-            });
+          fireMessageEvent({
+            messageType: 'selected-service-update',
+            serviceName,
+          });
 
-            BBOmnibar.setTitle({
-              titleParts: [
-                'with notifications'
-              ]
-            });
+          BBOmnibar.setTitle({
+            titleParts: ['with notifications'],
+          });
 
-            expect(document.title).toBe('with notifications - test service');
+          expect(document.title).toBe('with notifications - test service');
 
-            args.notificationsCallback(
+          args.notificationsCallback({
+            notifications: [
               {
-                notifications: [
-                  {
-                    notificationId: '1',
-                    shortMessage: 'Hello world'
-                  }
-                ]
-              }
-            );
+                notificationId: '1',
+                shortMessage: 'Hello world',
+              },
+            ],
+          });
 
-            expect(document.title).toBe('(1) with notifications - test service');
+          expect(document.title).toBe('(1) with notifications - test service');
 
-            done();
-          }
+          done();
+        }
       );
 
       loadOmnibar();
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
     });
 
     it('should show the inactivity prompt', (done) => {
       const showSpy = spyOn(BBOmnibarUserActivityPrompt, 'show');
 
-      startTrackingSpy.and.callFake(async (
-        refreshUserCallback: () => void,
-        showInactivityCallback: () => void
-      ) => {
-        showInactivityCallback();
+      startTrackingSpy.and.callFake(
+        async (
+          refreshUserCallback: () => void,
+          showInactivityCallback: () => void
+        ) => {
+          showInactivityCallback();
 
-        expect(showSpy).toHaveBeenCalled();
+          expect(showSpy).toHaveBeenCalled();
 
-        // Ensure the asynchronous getToken() call has completed before ending the test.
-        await getTokenSpy();
+          // Ensure the asynchronous getToken() call has completed before ending the test.
+          await getTokenSpy();
 
-        done();
-      });
+          done();
+        }
+      );
 
       loadOmnibar();
 
       // Getting a token starts the activity tracking.
       fireMessageEvent({
-        messageType: 'get-token'
+        messageType: 'get-token',
       });
     });
 
     it('should renew the session when the user dismisses the inactivity prompt', (done) => {
-      spyOn(BBOmnibarUserActivityPrompt, 'show').and.callFake((args: BBOmnibarUserActivityPromptShowArgs) => {
-        args.sessionRenewCallback();
-      });
+      spyOn(BBOmnibarUserActivityPrompt, 'show').and.callFake(
+        (args: BBOmnibarUserActivityPromptShowArgs) => {
+          args.sessionRenewCallback();
+        }
+      );
 
-      const userRenewedSessionSpy = spyOn(BBOmnibarUserActivity, 'userRenewedSession');
+      const userRenewedSessionSpy = spyOn(
+        BBOmnibarUserActivity,
+        'userRenewedSession'
+      );
 
-      startTrackingSpy.and.callFake(async (
-        refreshUserCallback: () => void,
-        showInactivityCallback: () => void
-      ) => {
-        showInactivityCallback();
+      startTrackingSpy.and.callFake(
+        async (
+          refreshUserCallback: () => void,
+          showInactivityCallback: () => void
+        ) => {
+          showInactivityCallback();
 
-        expect(userRenewedSessionSpy).toHaveBeenCalled();
+          expect(userRenewedSessionSpy).toHaveBeenCalled();
 
-        // Ensure the asynchronous getToken() call has completed before ending the test.
-        await getTokenSpy();
+          // Ensure the asynchronous getToken() call has completed before ending the test.
+          await getTokenSpy();
 
-        done();
-      });
+          done();
+        }
+      );
 
       loadOmnibar();
 
       // Getting a token starts the activity tracking.
       fireMessageEvent({
-        messageType: 'get-token'
+        messageType: 'get-token',
       });
     });
 
     it('should hide the inactivity prompt', (done) => {
       const hideSpy = spyOn(BBOmnibarUserActivityPrompt, 'hide');
 
-      startTrackingSpy.and.callFake(async (
-        refreshUserCallback: () => void,
-        showInactivityCallback: () => void,
-        hideInactivityCallback: () => void
-      ) => {
-        hideInactivityCallback();
+      startTrackingSpy.and.callFake(
+        async (
+          refreshUserCallback: () => void,
+          showInactivityCallback: () => void,
+          hideInactivityCallback: () => void
+        ) => {
+          hideInactivityCallback();
 
-        expect(hideSpy).toHaveBeenCalled();
+          expect(hideSpy).toHaveBeenCalled();
 
-        // Ensure the asynchronous getToken() call has completed before ending the test.
-        await getTokenSpy();
+          // Ensure the asynchronous getToken() call has completed before ending the test.
+          await getTokenSpy();
 
-        done();
-      });
+          done();
+        }
+      );
 
       loadOmnibar();
 
       // Getting a token starts the activity tracking.
       fireMessageEvent({
-        messageType: 'get-token'
+        messageType: 'get-token',
       });
     });
 
@@ -879,26 +888,27 @@ describe('Omnibar', () => {
       const testNotifications = [
         {
           isRead: true,
-          notificationId: '1'
-        }
+          notificationId: '1',
+        },
       ];
 
-      const updateNotificationsSpy = spyOn(BBOmnibarPushNotifications, 'updateNotifications');
+      const updateNotificationsSpy = spyOn(
+        BBOmnibarPushNotifications,
+        'updateNotifications'
+      );
 
       loadOmnibar();
 
       fireMessageEvent({
         messageType: 'push-notifications-change',
-        notifications: testNotifications
+        notifications: testNotifications,
       });
 
       expect(updateNotificationsSpy).toHaveBeenCalledWith(testNotifications);
     });
-
   });
 
   describe('interop with omnibar', () => {
-
     it('should notify the omnibar when navigation is ready to be loaded', () => {
       const envId = 'abc';
       const svcId = 'xyz';
@@ -910,12 +920,12 @@ describe('Omnibar', () => {
       const localNavItems: BBOmnibarNavigationItem[] = [
         {
           title: 'Test',
-          url: 'https://example.com/'
-        }
+          url: 'https://example.com/',
+        },
       ];
 
       const theme: BBOmnibarTheme = {
-        backgroundColor: 'green'
+        backgroundColor: 'green',
       };
 
       loadOmnibar({
@@ -930,28 +940,28 @@ describe('Omnibar', () => {
               items: [
                 {
                   title: 'Some item',
-                  url: 'https://example.com/'
-                }
+                  url: 'https://example.com/',
+                },
               ],
-              title: 'Some service'
-            }
-          ]
+              title: 'Some service',
+            },
+          ],
         },
         navVersion,
         onSearch: jasmine.createSpy('onSearch'),
         svcId,
-        theme
+        theme,
       });
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
 
       expect(postOmnibarMessageSpy.calls.argsFor(0)).toEqual([
         getIframeEl(),
         {
-          messageType: 'host-ready'
-        }
+          messageType: 'host-ready',
+        },
       ]);
 
       expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
@@ -972,31 +982,28 @@ describe('Omnibar', () => {
               items: [
                 {
                   title: 'Some item',
-                  url: 'https://example.com/'
-                }
+                  url: 'https://example.com/',
+                },
               ],
-              title: 'Some service'
-            }
+              title: 'Some service',
+            },
           ],
           svcId,
-          theme
-        }
+          theme,
+        },
       ]);
     });
 
-    it('should notify the omnibar when the host page\'s URL changes', () => {
-      function validateHistoryMonkeyPatch(historyFn: string) {
+    it("should notify the omnibar when the host page's URL changes", () => {
+      function validateHistoryMonkeyPatch(historyFn: keyof History) {
         postOmnibarMessageSpy.calls.reset();
 
-        (history as any)[historyFn]({}, '', '/test');
+        history[historyFn]({}, '', '/test');
 
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          iframeEl,
-          {
-            href: location.href,
-            messageType: 'location-change'
-          }
-        );
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(iframeEl, {
+          href: location.href,
+          messageType: 'location-change',
+        });
       }
 
       loadOmnibar();
@@ -1009,7 +1016,7 @@ describe('Omnibar', () => {
       // Do this after the pushState/replaceState spies are established since the omnibar
       // monkey-patches it once the host page is ready.
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
 
       validateHistoryMonkeyPatch('pushState');
@@ -1018,23 +1025,20 @@ describe('Omnibar', () => {
 
     it('should notify the omnibar when search results are available', (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
-            messageType: 'search-results',
-            results: {
-              items: [
-                {
-                  title: 'test',
-                  url: 'https://example.com/'
-                }
-              ],
-              searchArgs: {
-                searchText: 'abc'
-              }
-            } as BBOmnibarSearchResults
-          }
-        );
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+          messageType: 'search-results',
+          results: {
+            items: [
+              {
+                title: 'test',
+                url: 'https://example.com/',
+              },
+            ],
+            searchArgs: {
+              searchText: 'abc',
+            },
+          } as BBOmnibarSearchResults,
+        });
 
         done();
       });
@@ -1045,12 +1049,12 @@ describe('Omnibar', () => {
             items: [
               {
                 title: 'test',
-                url: 'https://example.com/'
-              }
+                url: 'https://example.com/',
+              },
             ],
-            searchArgs
+            searchArgs,
           });
-        }
+        },
       };
 
       loadOmnibar(config);
@@ -1058,21 +1062,18 @@ describe('Omnibar', () => {
       fireMessageEvent({
         messageType: 'search',
         searchArgs: {
-          searchText: 'abc'
-        }
+          searchText: 'abc',
+        },
       });
     });
 
     it('should notify the omnibar when a requested token is available', (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
-            messageType: 'token',
-            token: testToken,
-            tokenRequestId: 123
-          }
-        );
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+          messageType: 'token',
+          token: testToken,
+          tokenRequestId: 123,
+        });
 
         done();
       });
@@ -1081,20 +1082,17 @@ describe('Omnibar', () => {
 
       fireMessageEvent({
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
     it('should notify the omnibar when a requested token is not available', (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
-            messageType: 'token-fail',
-            reason: 'The user is not logged in.',
-            tokenRequestId: 123
-          }
-        );
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+          messageType: 'token-fail',
+          reason: 'The user is not logged in.',
+          tokenRequestId: 123,
+        });
 
         done();
       });
@@ -1108,47 +1106,45 @@ describe('Omnibar', () => {
       fireMessageEvent({
         disableRedirect: false,
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
     it('should notify the omnibar when the current user data should be refreshed', (done) => {
-      startTrackingSpy.and.callFake(async (refreshUserCallback: () => Promise<void>) => {
-        await refreshUserCallback();
+      startTrackingSpy.and.callFake(
+        async (refreshUserCallback: () => Promise<void>) => {
+          await refreshUserCallback();
 
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
+          expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
             messageType: 'refresh-user',
-            token: testToken
-          }
-        );
+            token: testToken,
+          });
 
-        done();
-      });
+          done();
+        }
+      );
 
       loadOmnibar();
 
       fireMessageEvent({
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
     it('should notify the omnibar when the current user has logged out', (done) => {
-      startTrackingSpy.and.callFake(async (refreshUserCallback: () => Promise<void>) => {
-        await refreshUserCallback();
+      startTrackingSpy.and.callFake(
+        async (refreshUserCallback: () => Promise<void>) => {
+          await refreshUserCallback();
 
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
+          expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
             messageType: 'refresh-user',
-            token: undefined
-          }
-        );
+            token: undefined,
+          });
 
-        done();
-      });
+          done();
+        }
+      );
 
       getTokenFake = () => {
         return Promise.reject('The user is not logged in.');
@@ -1158,7 +1154,7 @@ describe('Omnibar', () => {
 
       fireMessageEvent({
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
@@ -1167,31 +1163,31 @@ describe('Omnibar', () => {
         items: [
           {
             id: 1,
-            title: 'Hi'
-          }
-        ]
+            title: 'Hi',
+          },
+        ],
       };
 
       const config: BBOmnibarConfig = {
         notifications: {
           onReady: (readyArgs) => {
             readyArgs.updateNotifications(notifications);
-          }
-        }
+          },
+        },
       };
 
       loadOmnibar(config);
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
 
       expect(postOmnibarMessageSpy.calls.argsFor(2)).toEqual([
         getIframeEl(),
         {
           messageType: 'notifications-update',
-          notifications
-        }
+          notifications,
+        },
       ]);
     });
 
@@ -1201,23 +1197,20 @@ describe('Omnibar', () => {
         nav: {
           services: [
             {
-              title: 'Test Service'
-            }
-          ]
+              title: 'Test Service',
+            },
+          ],
         },
         theme: {
-          backgroundColor: '#abc'
-        }
+          backgroundColor: '#abc',
+        },
       };
 
       postOmnibarMessageSpy.and.callFake(() => {
-        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-          getIframeEl(),
-          {
-            messageType: 'update',
-            updateArgs
-          }
-        );
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+          messageType: 'update',
+          updateArgs,
+        });
 
         done();
       });
@@ -1234,10 +1227,10 @@ describe('Omnibar', () => {
 
       fireMessageEvent({
         messageType: 'selected-service-update',
-        serviceName
+        serviceName,
       });
 
-      BBOmnibar.setTitle({titleParts: ['Dropdown', 'Components']});
+      BBOmnibar.setTitle({ titleParts: ['Dropdown', 'Components'] });
 
       expect(document.title).toBe('Dropdown - Components - Test Service');
     });
@@ -1249,21 +1242,18 @@ describe('Omnibar', () => {
         notifications: [
           {
             notificationId: '1',
-            shortMessage: 'Hello world'
-          }
-        ]
+            shortMessage: 'Hello world',
+          },
+        ],
       };
 
       postOmnibarMessageSpy.and.callFake(
-        (iframeEl: HTMLIFrameElement, data: any) => {
+        (iframeEl, data: { messageType: string }) => {
           if (data.messageType === 'push-notifications-update') {
-            expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-              getIframeEl(),
-              {
-                messageType: 'push-notifications-update',
-                pushNotifications: testNotifications
-              }
-            );
+            expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+              messageType: 'push-notifications-update',
+              pushNotifications: testNotifications,
+            });
 
             notificationsUpdatePosted = true;
           }
@@ -1272,7 +1262,9 @@ describe('Omnibar', () => {
 
       toastContainerShowNewSpy.and.callFake(() => {
         expect(notificationsUpdatePosted).toBe(true);
-        expect(toastContainerShowNewSpy).toHaveBeenCalledWith(testNotifications);
+        expect(toastContainerShowNewSpy).toHaveBeenCalledWith(
+          testNotifications
+        );
 
         done();
       });
@@ -1286,7 +1278,7 @@ describe('Omnibar', () => {
       loadOmnibar();
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
     });
 
@@ -1298,7 +1290,7 @@ describe('Omnibar', () => {
       const loadPromise = loadOmnibar();
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
 
       await loadPromise;
@@ -1316,7 +1308,7 @@ describe('Omnibar', () => {
 
         fireMessageEvent({
           messageType: 'get-token',
-          tokenRequestId: 124
+          tokenRequestId: 124,
         });
       });
 
@@ -1328,7 +1320,7 @@ describe('Omnibar', () => {
 
       fireMessageEvent({
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
@@ -1341,12 +1333,9 @@ describe('Omnibar', () => {
         async (args: BBOmnibarPushNotificationsConnectArgs) => {
           args.openPushNotificationsMenu();
 
-          expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-            getIframeEl(),
-            {
-              messageType: 'push-notifications-open'
-            }
-          );
+          expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+            messageType: 'push-notifications-open',
+          });
 
           done();
         }
@@ -1356,7 +1345,7 @@ describe('Omnibar', () => {
 
       fireMessageEvent({
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
@@ -1384,7 +1373,7 @@ describe('Omnibar', () => {
 
         const linkInfo: LinkInfo = {
           el,
-          removeSpy: spyOn(el, 'remove')
+          removeSpy: spyOn(el, 'remove'),
         };
 
         linkInfos.push(linkInfo);
@@ -1423,11 +1412,11 @@ describe('Omnibar', () => {
           branding: {
             images: {
               favIcon: {
-                url: customLogo
-              }
-            }
+                url: customLogo,
+              },
+            },
           },
-          messageType: 'branding-update'
+          messageType: 'branding-update',
         });
 
         validateLinkInfo(iconLink, customLogo, false);
@@ -1441,9 +1430,9 @@ describe('Omnibar', () => {
 
         fireMessageEvent({
           branding: {
-            images: {}
+            images: {},
           },
-          messageType: 'branding-update'
+          messageType: 'branding-update',
         });
 
         validateLinkInfo(iconLink, bbLogo, false);
@@ -1455,18 +1444,22 @@ describe('Omnibar', () => {
   });
 
   describe('pushNotificationsEnabled() method', () => {
-
-    let pushNotificationsEnabledSpy: jasmine.Spy<typeof BBOmnibarPushNotifications.pushNotificationsEnabled>;
+    let pushNotificationsEnabledSpy: jasmine.Spy<
+      typeof BBOmnibarPushNotifications.pushNotificationsEnabled
+    >;
 
     beforeEach(() => {
-      pushNotificationsEnabledSpy = spyOn(BBOmnibarPushNotifications, 'pushNotificationsEnabled');
+      pushNotificationsEnabledSpy = spyOn(
+        BBOmnibarPushNotifications,
+        'pushNotificationsEnabled'
+      );
     });
 
     it('should call BBOmnibarPushNotifications.pushNotificationsEnabled() with no parameters', () => {
       loadOmnibar({
         envId: '123',
         leId: 'xyz',
-        svcId: 'abc'
+        svcId: 'abc',
       });
 
       BBOmnibar.pushNotificationsEnabled();
@@ -1479,27 +1472,30 @@ describe('Omnibar', () => {
 
       expect(enabled).toBe(false);
     });
-
   });
 
   describe('vertical navigation', () => {
-
     it('should be loaded when the theme is modern and the URL contains a flag', async () => {
-      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?leftnav=1');
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
+        'https://example.com?leftnav=1'
+      );
       spyOn(BBOmnibarVertical, 'load');
 
       const config = {
         theme: {
-          name: 'modern'
-        }
+          name: 'modern',
+        },
       };
 
       const loadPromise = loadOmnibar(config);
 
-      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(config, getIframeEl());
+      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(
+        config,
+        getIframeEl()
+      );
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
 
       await loadPromise;
@@ -1507,33 +1503,36 @@ describe('Omnibar', () => {
       expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
         getIframeEl(),
         jasmine.objectContaining({
-          compactNavOnly: true
-        })
+          compactNavOnly: true,
+        }),
       ]);
 
       expect(pushNotificationsConnectSpy).toHaveBeenCalledWith(
         jasmine.objectContaining({
-          showVerticalNav: true
+          showVerticalNav: true,
         })
       );
     });
 
-    it('should be loaded when the theme is modern and the svcid is \'tcs\'', async () => {
+    it("should be loaded when the theme is modern and the svcid is 'tcs'", async () => {
       spyOn(BBOmnibarVertical, 'load');
 
       const config = {
         svcId: 'tcs',
         theme: {
-          name: 'modern'
-        }
+          name: 'modern',
+        },
       };
 
       const loadPromise = loadOmnibar(config);
 
-      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(config, getIframeEl());
+      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(
+        config,
+        getIframeEl()
+      );
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
 
       await loadPromise;
@@ -1541,25 +1540,27 @@ describe('Omnibar', () => {
       expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
         getIframeEl(),
         jasmine.objectContaining({
-          compactNavOnly: true
-        })
+          compactNavOnly: true,
+        }),
       ]);
 
       expect(pushNotificationsConnectSpy).toHaveBeenCalledWith(
         jasmine.objectContaining({
-          showVerticalNav: true
+          showVerticalNav: true,
         })
       );
     });
 
     it('should ignore the anchor portion of the URL if present', () => {
-      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?foo=bar#leftnav=1');
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
+        'https://example.com?foo=bar#leftnav=1'
+      );
       spyOn(BBOmnibarVertical, 'load');
 
       const config = {
         theme: {
-          name: 'modern'
-        }
+          name: 'modern',
+        },
       };
 
       loadOmnibar(config);
@@ -1570,28 +1571,30 @@ describe('Omnibar', () => {
     it('should notify the vertical omnibar when the current user data should be refreshed', (done) => {
       const refreshUserSpy = spyOn(BBOmnibarVertical, 'refreshUser');
 
-      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?leftnav=1');
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
+        'https://example.com?leftnav=1'
+      );
       spyOn(BBOmnibarVertical, 'load');
 
-      startTrackingSpy.and.callFake(async (refreshUserCallback: () => Promise<void>) => {
-        await refreshUserCallback();
+      startTrackingSpy.and.callFake(
+        async (refreshUserCallback: () => Promise<void>) => {
+          await refreshUserCallback();
 
-        expect(refreshUserSpy).toHaveBeenCalledWith(testToken);
+          expect(refreshUserSpy).toHaveBeenCalledWith(testToken);
 
-        done();
-      });
-
-      loadOmnibar(
-        {
-          theme: {
-            name: 'modern'
-          }
+          done();
         }
       );
 
+      loadOmnibar({
+        theme: {
+          name: 'modern',
+        },
+      });
+
       fireMessageEvent({
         messageType: 'get-token',
-        tokenRequestId: 123
+        tokenRequestId: 123,
       });
     });
 
@@ -1600,8 +1603,7 @@ describe('Omnibar', () => {
 
       pushNotificationsConnectSpy.and.callFake(async (args) => {
         args.customMessageCallback({
-          customMessageType: 'test',
-          value: 'test'
+          value: 'custom message',
         });
 
         expect(refreshSettingsSpy).toHaveBeenCalled();
@@ -1609,22 +1611,22 @@ describe('Omnibar', () => {
         done();
       });
 
-      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue('https://example.com?leftnav=1');
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
+        'https://example.com?leftnav=1'
+      );
       spyOn(BBOmnibarVertical, 'load');
 
       const config = {
         theme: {
-          name: 'modern'
-        }
+          name: 'modern',
+        },
       };
 
       loadOmnibar(config);
 
       fireMessageEvent({
-        messageType: 'ready'
+        messageType: 'ready',
       });
     });
-
   });
-
 });

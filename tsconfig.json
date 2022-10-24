@@ -6,19 +6,9 @@
     "noImplicitAny": true,
     "noUnusedLocals": true,
     "sourceMap": true,
-    "types": [
-      "jasmine",
-      "jasmine-ajax",
-      "node"
-    ],
-    "lib": [
-      "dom",
-      "es6"
-    ],
+    "types": ["jasmine", "jasmine-ajax", "node"],
+    "lib": ["dom", "es6"],
     "outDir": "dist"
   },
-  "exclude": [
-    "node_modules",
-    "**/*.spec.ts"
-  ]
+  "exclude": ["node_modules"]
 }

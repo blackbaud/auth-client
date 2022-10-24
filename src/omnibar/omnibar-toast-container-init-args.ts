@@ -1,18 +1,15 @@
 //#region imports
 
-import {
-  BBOmnibarNavigationItem
-} from './omnibar-navigation-item';
+import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 
 //#endregion
 
 export interface BBOmnibarToastContainerInitArgs {
-
   envId: string;
 
   leId: string;
 
-  pushNotificationsChangeCallback: (notifications: any[]) => void;
+  pushNotificationsChangeCallback: (notifications: unknown[]) => void;
 
   openMenuCallback: () => void;
 
@@ -23,5 +20,4 @@ export interface BBOmnibarToastContainerInitArgs {
   svcId: string;
 
   url: string;
-
 }

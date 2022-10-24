@@ -1,7 +1,6 @@
 import { BBAuthDomUtility } from './dom-utility';
 
 describe('DOM utility', () => {
-
   let testEls: HTMLElement[];
   let testStyleEls: HTMLStyleElement[];
 
@@ -27,7 +26,7 @@ describe('DOM utility', () => {
     testStyleEls = undefined;
   });
 
-  it('should add CSS elements to the document\'s head', () => {
+  it("should add CSS elements to the document's head", () => {
     const testCss = '.test-class { color: green }';
 
     const styleEl = BBAuthDomUtility.addCss(testCss);
@@ -65,7 +64,8 @@ describe('DOM utility', () => {
 
   it('should not error if an attempt is made to remove a non-existent element', () => {
     expect(() => BBAuthDomUtility.removeEl(undefined)).not.toThrowError();
-    expect(() => BBAuthDomUtility.removeEl(document.createElement('div'))).not.toThrowError();
+    expect(() =>
+      BBAuthDomUtility.removeEl(document.createElement('div'))
+    ).not.toThrowError();
   });
-
 });

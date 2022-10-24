@@ -1,78 +1,67 @@
 import * as jwtDecode from 'jwt-decode';
 
-import {
-  BBAuth
-} from '../auth';
+import { BBAuth } from '../auth';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBOmnibarPushNotificationsConnectArgs
-} from './omnibar-push-notifications-connect-args';
+import { BBOmnibarPushNotificationsConnectArgs } from './omnibar-push-notifications-connect-args';
 
-import {
-  BBOmnibarScriptLoader
-} from './omnibar-script-loader';
+import { BBOmnibarScriptLoader } from './omnibar-script-loader';
 
-import {
-  BBOmnibarToastContainer
-} from './omnibar-toast-container';
-
-declare const BBNotificationsClient: any;
+import { BBOmnibarToastContainer } from './omnibar-toast-container';
 
 let connectArgs: BBOmnibarPushNotificationsConnectArgs;
 let pushNotificationsConnected = false;
-let registerPromise: Promise<any>;
+let registerPromise: Promise<void>;
 
-const notificationSvcIds: {
-  [key: string]: {
-    requiresNotif: boolean
+const notificationSvcIds: Record<
+  string,
+  {
+    requiresNotif: boolean;
   }
-} = {
+> = {
   admin: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   chrch: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   donorcentrics: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   faith: {
-    requiresNotif: true
+    requiresNotif: true,
   },
   fenxt: {
-    requiresNotif: true
+    requiresNotif: true,
   },
   gsrch: {
-    requiresNotif: true
+    requiresNotif: true,
   },
   lst: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   marketplace: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   merchservices: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   renxt: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   skydev: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   skydevhome: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   skyux: {
-    requiresNotif: false
+    requiresNotif: false,
   },
   tcs: {
-    requiresNotif: true
-  }
+    requiresNotif: true,
+  },
 };
 
 async function initToastContainer(
@@ -86,7 +75,7 @@ async function initToastContainer(
     openMenuCallback: args.openPushNotificationsMenu,
     pushNotificationsChangeCallback: args.handlePushNotificationsChange,
     svcId: args.svcId,
-    url: BBAuthInterop.getCurrentUrl()
+    url: BBAuthInterop.getCurrentUrl(),
   });
 }
 
@@ -101,14 +90,14 @@ async function tokenContainsNotif(
       disableRedirect: true,
       envId,
       leId,
-      permissionScope: 'Notifications'
+      permissionScope: 'Notifications',
     });
   } catch (err) {
     return false;
   }
 
-  const decodedToken: any = jwtDecode(token);
-  let entitlements: string | string[] = decodedToken['1bb.entitlements'];
+  const decodedToken: Record<string, unknown> = jwtDecode(token);
+  let entitlements = decodedToken['1bb.entitlements'] as string | string[];
 
   if (entitlements) {
     entitlements = Array.isArray(entitlements) ? entitlements : [entitlements];
@@ -119,7 +108,6 @@ async function tokenContainsNotif(
 }
 
 export class BBOmnibarPushNotifications {
-
   public static readonly NOTIFICATIONS_CLIENT_URL =
     'https://sky.blackbaudcdn.net/static/notifications-client/1/notifications-client.global.min.js';
 
@@ -130,7 +118,7 @@ export class BBOmnibarPushNotifications {
       connectArgs = args;
       pushNotificationsConnected = true;
 
-      if ((window as any).BBNotificationsClient) {
+      if (window.BBNotificationsClient) {
         registerPromise = Promise.resolve();
       } else {
         registerPromise = BBOmnibarScriptLoader.registerScript(
@@ -140,25 +128,28 @@ export class BBOmnibarPushNotifications {
 
       await registerPromise;
 
-      BBNotificationsClient.BBNotifications.init({
-        tokenCallback: () => BBAuth.getToken({
-          disableRedirect: true,
-          envId: args.envId,
-          leId: args.leId
-        })
+      window.BBNotificationsClient.BBNotifications.init({
+        tokenCallback: () =>
+          BBAuth.getToken({
+            disableRedirect: true,
+            envId: args.envId,
+            leId: args.leId,
+          }),
       });
 
       const notificationsEnabled = await this.pushNotificationsEnabled();
 
       if (notificationsEnabled) {
         await initToastContainer(args);
-        BBNotificationsClient.BBNotifications.addListener(args.notificationsCallback);
+        window.BBNotificationsClient.BBNotifications.addListener(
+          args.notificationsCallback
+        );
       }
 
       if (args.showVerticalNav) {
-        BBNotificationsClient.BBNotifications.addCustomMessageListener({
+        window.BBNotificationsClient.BBNotifications.addCustomMessageListener({
           callback: args.customMessageCallback,
-          customMessageType: 'ui-config-global-settings-update'
+          customMessageType: 'ui-config-global-settings-update',
         });
       }
     }
@@ -172,14 +163,16 @@ export class BBOmnibarPushNotifications {
 
       await registerPromise;
 
-      BBNotificationsClient.BBNotifications.destroy();
+      window.BBNotificationsClient.BBNotifications.destroy();
       registerPromise = undefined;
       pushNotificationsConnected = false;
     }
   }
 
-  public static updateNotifications(notifications: any[]): void {
-    BBNotificationsClient.BBNotifications.updateNotifications(notifications);
+  public static updateNotifications(notifications: unknown[]): void {
+    window.BBNotificationsClient.BBNotifications.updateNotifications(
+      notifications
+    );
   }
 
   public static async pushNotificationsEnabled(): Promise<boolean> {
@@ -187,7 +180,10 @@ export class BBOmnibarPushNotifications {
       const notificationSvcId = notificationSvcIds[connectArgs.svcId];
 
       if (notificationSvcId) {
-        return !notificationSvcId.requiresNotif || tokenContainsNotif(connectArgs.envId, connectArgs.leId);
+        return (
+          !notificationSvcId.requiresNotif ||
+          tokenContainsNotif(connectArgs.envId, connectArgs.leId)
+        );
       }
     }
 

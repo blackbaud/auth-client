@@ -5,13 +5,13 @@ const ERROR_BASE_URL = 'https://host.nxt.blackbaud.com/errors/';
 
 const euc = encodeURIComponent;
 
-function paramsToQS(params: any) {
+function paramsToQS(params: Record<string, unknown>) {
   const qs = [];
 
   for (const p in params) {
     /* istanbul ignore else */
     if (params.hasOwnProperty(p)) {
-      qs.push(`${euc(p)}=${euc(params[p])}`);
+      qs.push(`${euc(p)}=${euc(params[p] as string | number | boolean)}`);
     }
   }
 
@@ -38,7 +38,9 @@ export class BBAuthNavigator {
     }
   }
 
-  public static redirectToSignin(signinRedirectParams?: any) {
+  public static redirectToSignin(
+    signinRedirectParams?: Record<string, unknown>
+  ) {
     let signinUrl = createSigninUrl();
 
     if (signinRedirectParams) {
@@ -50,7 +52,9 @@ export class BBAuthNavigator {
 
   public static redirectToSignoutForInactivity() {
     const signinUrl = createSigninUrl(true);
-    const signoutUrl = `${SIGNIN_BASE_URL}sign-out?redirectUrl=${euc(signinUrl)}`;
+    const signoutUrl = `${SIGNIN_BASE_URL}sign-out?redirectUrl=${euc(
+      signinUrl
+    )}`;
 
     this.navigate(signoutUrl);
   }
@@ -69,7 +73,9 @@ export class BBAuthNavigator {
         break;
     }
 
-    let url = `${ERROR_BASE_URL}${path}?source=auth-client&url=${euc(location.href)}`;
+    let url = `${ERROR_BASE_URL}${path}?source=auth-client&url=${euc(
+      location.href
+    )}`;
 
     if (errorCode) {
       url += `&code=${euc(errorCode)}`;

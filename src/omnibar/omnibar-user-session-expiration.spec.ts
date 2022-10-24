@@ -9,8 +9,9 @@ describe('Omnibar user session expiration', () => {
   let ttlPromiseOverride: Promise<number>;
 
   beforeAll(() => {
-    domainSpy = spyOn(BBAuthDomain, 'getSTSDomain').and
-      .returnValue('https://sts.sky.blackbaud.com');
+    domainSpy = spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue(
+      'https://sts.sky.blackbaud.com'
+    );
 
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
       switch (url.substr('https://sts.sky.blackbaud.com/session/'.length)) {
@@ -35,12 +36,8 @@ describe('Omnibar user session expiration', () => {
   it('should return a null expiration date if TTL is null', (done) => {
     authTtl = null;
 
-    BBOmnibarUserSessionExpiration.getSessionExpiration(
-      'abc',
-      123,
-      false
-    )
-      .then((expirationDate) => {
+    BBOmnibarUserSessionExpiration.getSessionExpiration('abc', 123, false).then(
+      (expirationDate) => {
         expect(expirationDate).toBeNull();
         expect(requestSpy).toHaveBeenCalledWith(
           'https://sts.sky.blackbaud.com/session/ttl',
@@ -48,7 +45,8 @@ describe('Omnibar user session expiration', () => {
           false
         );
         done();
-      });
+      }
+    );
   });
 
   it('should calculate the expiration based on the auth TTL if legacy TTL is not provided', (done) => {
@@ -60,12 +58,11 @@ describe('Omnibar user session expiration', () => {
       'abc',
       undefined,
       false
-    )
-      .then((expirationDate) => {
-        expect(expirationDate).toBe(150000);
-        expect(domainSpy).toHaveBeenCalled();
-        done();
-      });
+    ).then((expirationDate) => {
+      expect(expirationDate).toBe(150000);
+      expect(domainSpy).toHaveBeenCalled();
+      done();
+    });
   });
 
   it('should calculate the expiration date based on the lowest legacy TTL or auth TTL value', (done) => {
@@ -79,22 +76,18 @@ describe('Omnibar user session expiration', () => {
       // Legacy TTL is in milliseconds
       60 * 1000,
       false
-    )
-      .then((expirationDate1) => {
-        expect(expirationDate1).toBe(150000);
-        expect(domainSpy).toHaveBeenCalled();
-        BBOmnibarUserSessionExpiration.reset();
+    ).then((expirationDate1) => {
+      expect(expirationDate1).toBe(150000);
+      expect(domainSpy).toHaveBeenCalled();
+      BBOmnibarUserSessionExpiration.reset();
 
-        BBOmnibarUserSessionExpiration.getSessionExpiration(
-          'abc',
-          1,
-          false
-        )
-          .then((expirationDate2) => {
-            expect(expirationDate2).toBe(100001);
-            done();
-          });
-      });
+      BBOmnibarUserSessionExpiration.getSessionExpiration('abc', 1, false).then(
+        (expirationDate2) => {
+          expect(expirationDate2).toBe(100001);
+          done();
+        }
+      );
+    });
   });
 
   it('should cache the expiration date based on the refresh ID and allow anonymous flags', (done) => {
@@ -106,26 +99,24 @@ describe('Omnibar user session expiration', () => {
       'abc',
       undefined,
       false
-    )
-      .then((expirationDate) => {
-        expect(expirationDate).toBe(150000);
+    ).then((expirationDate) => {
+      expect(expirationDate).toBe(150000);
 
-        expect(domainSpy).toHaveBeenCalled();
-        // Simulate the passage of time which should not affect the cached expiration date.
-        nowSpy.and.returnValue(200000);
+      expect(domainSpy).toHaveBeenCalled();
+      // Simulate the passage of time which should not affect the cached expiration date.
+      nowSpy.and.returnValue(200000);
 
-        setTimeout(() => {
-          BBOmnibarUserSessionExpiration.getSessionExpiration(
-            'abc',
-            undefined,
-            false
-          )
-            .then((cachedExpirationDate) => {
-              expect(cachedExpirationDate).toBe(150000);
-              done();
-            });
-        }, 200);
-      });
+      setTimeout(() => {
+        BBOmnibarUserSessionExpiration.getSessionExpiration(
+          'abc',
+          undefined,
+          false
+        ).then((cachedExpirationDate) => {
+          expect(cachedExpirationDate).toBe(150000);
+          done();
+        });
+      }, 200);
+    });
   });
 
   it('should allow the cache to be cleared', (done) => {
@@ -137,44 +128,39 @@ describe('Omnibar user session expiration', () => {
       'abc',
       undefined,
       false
-    )
-      .then((expirationDate) => {
-        expect(expirationDate).toBe(150000);
+    ).then((expirationDate) => {
+      expect(expirationDate).toBe(150000);
 
-        BBOmnibarUserSessionExpiration.reset();
+      BBOmnibarUserSessionExpiration.reset();
 
-        // Simulate the passage of time which should change the expiration date since cache was cleared.
-        nowSpy.and.returnValue(200000);
+      // Simulate the passage of time which should change the expiration date since cache was cleared.
+      nowSpy.and.returnValue(200000);
 
-        setTimeout(() => {
-          BBOmnibarUserSessionExpiration.getSessionExpiration(
-            'abc',
-            undefined,
-            false
-          )
-            .then((newExpirationDate) => {
-              expect(newExpirationDate).toBe(250000);
-              expect(domainSpy).toHaveBeenCalled();
-              done();
-            });
-        }, 200);
-      });
+      setTimeout(() => {
+        BBOmnibarUserSessionExpiration.getSessionExpiration(
+          'abc',
+          undefined,
+          false
+        ).then((newExpirationDate) => {
+          expect(newExpirationDate).toBe(250000);
+          expect(domainSpy).toHaveBeenCalled();
+          done();
+        });
+      }, 200);
+    });
   });
 
   it('should treat a non-200 TTL response as null', (done) => {
-    ttlPromiseOverride = Promise
-      .reject(new Error('Not logged in'));
+    ttlPromiseOverride = Promise.reject(new Error('Not logged in'));
 
     BBOmnibarUserSessionExpiration.getSessionExpiration(
       'abc',
       undefined,
       false
-    )
-      .then((expirationDate) => {
-        expect(expirationDate).toBeNull();
-        expect(domainSpy).toHaveBeenCalled();
-        done();
-      });
+    ).then((expirationDate) => {
+      expect(expirationDate).toBeNull();
+      expect(domainSpy).toHaveBeenCalled();
+      done();
+    });
   });
-
 });

@@ -11,10 +11,10 @@ describe('Navigator', () => {
     navigateSpy.calls.reset();
   });
 
-  it('should add signin redirect parameters to the signin URL\'s query string', () => {
+  it("should add signin redirect parameters to the signin URL's query string", () => {
     BBAuthNavigator.redirectToSignin({
       a: '=',
-      b: '&'
+      b: '&',
     });
 
     expect(navigateSpy).toHaveBeenCalledWith(
@@ -29,11 +29,11 @@ describe('Navigator', () => {
 
     expect(navigateSpy).toHaveBeenCalledWith(
       'https://signin.blackbaud.com/signin/sign-out?redirectUrl=' +
-      encodeURIComponent(
-        'https://signin.blackbaud.com/signin/?redirectUrl=' +
-        encodeURIComponent(location.href) +
-        '&inactivity=1'
-      )
+        encodeURIComponent(
+          'https://signin.blackbaud.com/signin/?redirectUrl=' +
+            encodeURIComponent(location.href) +
+            '&inactivity=1'
+        )
     );
   });
 });

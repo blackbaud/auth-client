@@ -1,54 +1,46 @@
 //#region imports
 
-import {
-  BBAuthTokenIntegration
-} from './auth-token-integration';
+import { BBAuthTokenIntegration } from './auth-token-integration';
 
-import {
-  BBAuthGetTokenArgs
-} from './auth-get-token-args';
+import { BBAuthGetTokenArgs } from './auth-get-token-args';
 
-import {
-  BBAuthGetUrlArgs
-} from './auth-get-url-args';
+import { BBAuthGetUrlArgs } from './auth-get-url-args';
 
-import {
-  BBAuthTokenResponse
-} from './auth-token-response';
+import { BBAuthTokenResponse } from './auth-token-response';
 
-import {
-  BBAuthDomain
-} from './auth-domain';
+import { BBAuthDomain } from './auth-domain';
 
-import {
-  BBCsrfXhr
-} from '../shared/csrf-xhr';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 
 //#endregion
 
-const TOKENIZED_URL_REGEX = /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?\/(.*)/;
+const TOKENIZED_URL_REGEX =
+  /1bb:\/\/([a-z]{3})-([a-z0-9]{5})(-[a-z]{4}[0-9]{2})?\/(.*)/;
 
 function buildCacheKey(args: BBAuthGetTokenArgs) {
   const { envId, permissionScope, leId } = args;
 
-  return 'token|'
-    + (leId || '-')
-    + '|'
-    + (envId || '-')
-    + '|'
-    + (permissionScope || '-');
+  return (
+    'token|' +
+    (leId || '-') +
+    '|' +
+    (envId || '-') +
+    '|' +
+    (permissionScope || '-')
+  );
 }
 
 export class BBAuth {
   public static mock = false;
 
-  private static tokenCache: {
-    [key: string]: {
-      lastToken?: string,
-      expirationTime?: number,
-      pendingLookupPromise?: Promise<string>
+  public static tokenCache: Record<
+    string,
+    {
+      lastToken?: string;
+      expirationTime?: number;
+      pendingLookupPromise?: Promise<string>;
     }
-  } = {};
+  > = {};
 
   public static getUrl(
     tokenizedUrl: string,
@@ -74,19 +66,15 @@ export class BBAuth {
     return Promise.resolve(result);
   }
 
-  public static getToken(
-    args?: BBAuthGetTokenArgs
-  ): Promise<string> {
+  public static getToken(args?: BBAuthGetTokenArgs): Promise<string> {
     return BBAuth.getTokenInternal(args);
   }
 
-  public static getTTL(): Promise<any> {
-    return BBCsrfXhr.postWithCSRF(
-      BBAuthDomain.getSTSDomain() + '/session/ttl'
-    );
+  public static getTTL(): Promise<unknown> {
+    return BBCsrfXhr.postWithCSRF(BBAuthDomain.getSTSDomain() + '/session/ttl');
   }
 
-  public static renewSession(): Promise<any> {
+  public static renewSession(): Promise<unknown> {
     return BBCsrfXhr.postWithCSRF(
       BBAuthDomain.getSTSDomain() + '/session/renew'
     );
@@ -107,9 +95,8 @@ export class BBAuth {
 
     const cacheKey = buildCacheKey(args);
 
-    const cachedItem =
-      BBAuth.tokenCache[cacheKey] =
-      (BBAuth.tokenCache[cacheKey] || {});
+    const cachedItem = (BBAuth.tokenCache[cacheKey] =
+      BBAuth.tokenCache[cacheKey] || {});
 
     const now = new Date().valueOf();
 
@@ -117,7 +104,8 @@ export class BBAuth {
       !forceNewToken &&
       cachedItem.lastToken &&
       cachedItem.expirationTime &&
-      (cachedItem.expirationTime - now > 60 * 1000) /* Refresh if within 1 minute of expiration */
+      cachedItem.expirationTime - now >
+        60 * 1000 /* Refresh if within 1 minute of expiration */
     ) {
       // Return the stored token.
       return Promise.resolve(cachedItem.lastToken);
@@ -131,7 +119,8 @@ export class BBAuth {
         args.leId
       )
         .then((tokenResponse: BBAuthTokenResponse) => {
-          cachedItem.expirationTime = new Date().valueOf() + tokenResponse.expires_in * 1000;
+          cachedItem.expirationTime =
+            new Date().valueOf() + tokenResponse.expires_in * 1000;
           cachedItem.lastToken = tokenResponse.access_token;
           cachedItem.pendingLookupPromise = null;
 
