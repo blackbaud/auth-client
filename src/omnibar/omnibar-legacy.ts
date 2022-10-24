@@ -1,16 +1,15 @@
-declare const BBAUTH: any;
-
 import { BBOmnibarScriptLoader } from './omnibar-script-loader';
 
 function getJQuery() {
-  return (window as any).jQuery;
+  return window.jQuery;
 }
 
 export class BBOmnibarLegacy {
-  public static load(config: any): Promise<any> {
-    return new Promise<any>((resolve: any) => {
+  public static load(config: Record<string, unknown>): Promise<void> {
+    return new Promise<void>((resolve) => {
       const jquery = getJQuery();
-      const jqueryVersion = jquery && jquery.fn && jquery.fn.jquery;
+      const jqueryVersion = (jquery as { fn: { jquery: string } } | undefined)
+        ?.fn?.jquery;
 
       BBOmnibarScriptLoader.smartRegisterScript(
         'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js',
@@ -44,13 +43,12 @@ export class BBOmnibarLegacy {
             // and can pass in menuEl as a jQuery object, but not every host page will be using
             // jQuery.  As a courtesy, just ensure menuEl is a jQuery object before passing it
             // to load().
-            config.menuEl = getJQuery()(config.menuEl);
+            config.menuEl = (getJQuery() as (_: unknown) => unknown)(
+              config.menuEl
+            );
           }
 
-          BBAUTH.Omnibar.load(
-            omnibarEl,
-            config
-          );
+          window.BBAUTH.Omnibar.load(omnibarEl, config);
         });
     });
   }

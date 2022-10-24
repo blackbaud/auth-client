@@ -1,18 +1,10 @@
-import {
-  BBAuth
-} from '../auth';
+import { BBAuth } from '../auth';
 
-import {
-  BBCsrfXhr
-} from '../shared/csrf-xhr';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 
-import {
-  BBUserConfig
-} from './user-config';
+import { BBUserConfig } from './user-config';
 
-import {
-  BBUserSettings
-} from './user-settings';
+import { BBUserSettings } from './user-settings';
 
 describe('User settings', () => {
   let requestWithTokenSpy: jasmine.Spy<typeof BBCsrfXhr.requestWithToken>;
@@ -25,29 +17,27 @@ describe('User settings', () => {
     previousUpdateDelay = BBUserSettings.UPDATE_DELAY;
     previousGetSettingsTimeout = BBUserSettings.GET_SETTINGS_TIMEOUT;
 
-    (BBUserSettings as any).UPDATE_DELAY = 100;
-    (BBUserSettings as any).GET_SETTINGS_TIMEOUT = 100;
+    BBUserSettings.UPDATE_DELAY = 100;
+    BBUserSettings.GET_SETTINGS_TIMEOUT = 100;
   });
 
   afterEach(() => {
-    (BBUserSettings as any).UPDATE_DELAY = previousUpdateDelay;
-    (BBUserSettings as any).GET_SETTINGS_TIMEOUT = previousGetSettingsTimeout;
+    BBUserSettings.UPDATE_DELAY = previousUpdateDelay;
+    BBUserSettings.GET_SETTINGS_TIMEOUT = previousGetSettingsTimeout;
   });
 
   describe('when logged in', () => {
     beforeEach(() => {
-      spyOn(BBAuth, 'getToken')
-        .and
-        .returnValue(Promise.resolve('abc'));
+      spyOn(BBAuth, 'getToken').and.returnValue(Promise.resolve('abc'));
     });
 
     it('should get user settings from the web service', async () => {
       const response = {
         settings: {
           omnibar: {
-            vMin: true
-          }
-        }
+            vMin: true,
+          },
+        },
       };
 
       requestWithTokenSpy.and.returnValue(Promise.resolve(response));
@@ -63,11 +53,15 @@ describe('User settings', () => {
     });
 
     it('should give up on unresponsive requests to retrieve user settings', async (done) => {
-      requestWithTokenSpy.and.returnValue(new Promise(() => { /* */ }));
+      requestWithTokenSpy.and.returnValue(
+        new Promise(() => {
+          /* */
+        })
+      );
 
       let timedOut = false;
 
-      BBUserSettings.getSettings().catch(() => timedOut = true);
+      BBUserSettings.getSettings().catch(() => (timedOut = true));
 
       setTimeout(() => {
         expect(timedOut).toBe(true);
@@ -95,14 +89,11 @@ describe('User settings', () => {
       let errorOccurred = false;
 
       try {
-        await BBUserSettings.updateSettings(
-          '123',
-          {
-            omnibar: {
-              vMin: true
-            }
-          }
-        );
+        await BBUserSettings.updateSettings('123', {
+          omnibar: {
+            vMin: true,
+          },
+        });
       } catch (err) {
         errorOccurred = true;
       }
@@ -113,8 +104,8 @@ describe('User settings', () => {
     it('should update user settings by calling the web service after a delay', (done) => {
       const config: BBUserConfig = {
         omnibar: {
-          vMin: true
-        }
+          vMin: true,
+        },
       };
 
       requestWithTokenSpy.and.returnValue(Promise.resolve());
@@ -136,7 +127,7 @@ describe('User settings', () => {
           'PATCH',
           {
             correlationId: '125',
-            settings: config
+            settings: config,
           }
         );
 
@@ -150,9 +141,7 @@ describe('User settings', () => {
     let setItemSpy: jasmine.Spy<typeof localStorage.setItem>;
 
     beforeEach(() => {
-      spyOn(BBAuth, 'getToken')
-        .and
-        .callFake(() => Promise.reject());
+      spyOn(BBAuth, 'getToken').and.callFake(() => Promise.reject());
 
       getItemSpy = spyOn(localStorage, 'getItem');
       setItemSpy = spyOn(localStorage, 'setItem');
@@ -161,8 +150,8 @@ describe('User settings', () => {
     it('should get settings from local storage', async () => {
       const testSettings: BBUserConfig = {
         omnibar: {
-          vMin: true
-        }
+          vMin: true,
+        },
       };
 
       getItemSpy.and.returnValue(JSON.stringify(testSettings));
@@ -193,14 +182,11 @@ describe('User settings', () => {
 
       const newSettings: BBUserConfig = {
         omnibar: {
-          vMin: false
-        }
+          vMin: false,
+        },
       };
 
-      BBUserSettings.updateSettings(
-        '123',
-        newSettings
-      );
+      BBUserSettings.updateSettings('123', newSettings);
 
       setTimeout(() => {
         expect(setItemSpy).toHaveBeenCalledWith(
@@ -215,19 +201,16 @@ describe('User settings', () => {
     it('should patch existing settings in local storage by not overriting unspecified properties', (done) => {
       const existingSettings: BBUserConfig = {
         omnibar: {
-          vMin: true
-        }
+          vMin: true,
+        },
       };
 
       getItemSpy.and.returnValue(JSON.stringify(existingSettings));
       const newSettings: BBUserConfig = {
-        omnibar: { }
+        omnibar: {},
       };
 
-      BBUserSettings.updateSettings(
-        '123',
-        newSettings
-      );
+      BBUserSettings.updateSettings('123', newSettings);
 
       setTimeout(() => {
         expect(setItemSpy).toHaveBeenCalledWith(
@@ -246,24 +229,19 @@ describe('User settings', () => {
 
       const newSettings: BBUserConfig = {
         omnibar: {
-          vMin: false
-        }
+          vMin: false,
+        },
       };
 
       let rejected = false;
 
       try {
-        await BBUserSettings.updateSettings(
-          '123',
-          newSettings
-        );
+        await BBUserSettings.updateSettings('123', newSettings);
       } catch (err) {
         rejected = true;
       }
 
       expect(rejected).toBe(true);
     });
-
   });
-
 });

@@ -1,9 +1,7 @@
 import { BBAuthDomain } from './auth-domain';
 
 describe('Auth Get Domain', () => {
-
   describe('getRegisteredDomain', () => {
-
     it('returns registered domain when user is on the registered domain', () => {
       BBAuthDomain.CURRENT_DOMAIN = 'bbk12.com';
       expect(BBAuthDomain.getRegisteredDomain()).toBe('bbk12.com');

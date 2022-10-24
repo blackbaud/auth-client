@@ -1,13 +1,8 @@
-import {
-  BBOmnibarNavigation
-} from './omnibar-navigation';
+import { BBOmnibarNavigation } from './omnibar-navigation';
 
-import {
-  BBOmnibarTheme
-} from './theming';
+import { BBOmnibarTheme } from './theming';
 
 export interface BBOmnibarUpdateArgs {
-
   theme?: BBOmnibarTheme;
 
   compactNavOnly?: boolean;
@@ -15,7 +10,6 @@ export interface BBOmnibarUpdateArgs {
   nav?: BBOmnibarNavigation;
 
   help?: {
-    url: string
+    url: string;
   };
-
 }

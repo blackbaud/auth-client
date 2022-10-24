@@ -1,9 +1,5 @@
-import {
-  BBUserConfigOmnibar
-} from './user-config-omnibar';
+import { BBUserConfigOmnibar } from './user-config-omnibar';
 
 export interface BBUserConfig {
-
   omnibar?: BBUserConfigOmnibar;
-
 }

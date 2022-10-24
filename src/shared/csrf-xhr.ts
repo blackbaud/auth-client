@@ -1,25 +1,18 @@
-import {
-  BBAuthTokenError,
-  BBAuthTokenErrorCode
-} from '../auth';
+import { BBAuthTokenError, BBAuthTokenErrorCode } from '../auth';
 
-import {
-  BBAuthDomain
-} from '../auth/auth-domain';
+import { BBAuthDomain } from '../auth/auth-domain';
 
-import {
-  BBAuthNavigator
-} from './navigator';
+import { BBAuthNavigator } from './navigator';
 
 function post(
   url: string,
   header: {
-    name: string,
-    value: string
+    name: string;
+    value: string;
   },
-  body: any,
-  okCB: (response: any) => any,
-  unuthCB: (reason: BBAuthTokenError) => any
+  body: unknown,
+  okCB: (response: unknown) => unknown,
+  unuthCB: (reason: BBAuthTokenError) => unknown
 ) {
   const xhr = new XMLHttpRequest();
 
@@ -29,7 +22,7 @@ function post(
         case 0:
           unuthCB({
             code: BBAuthTokenErrorCode.Offline,
-            message: 'The user is offline.'
+            message: 'The user is offline.',
           });
           break;
         case 200:
@@ -38,13 +31,13 @@ function post(
         case 401:
           unuthCB({
             code: BBAuthTokenErrorCode.NotLoggedIn,
-            message: 'The user is not logged in.'
+            message: 'The user is not logged in.',
           });
           break;
         case 403:
           unuthCB({
             code: BBAuthTokenErrorCode.InvalidEnvironment,
-            message: 'The user is not a member of the specified environment.'
+            message: 'The user is not a member of the specified environment.',
           });
           break;
         default:
@@ -52,7 +45,7 @@ function post(
           if (xhr.status >= 400) {
             unuthCB({
               code: BBAuthTokenErrorCode.Unspecified,
-              message: 'An unknown error occurred.'
+              message: 'An unknown error occurred.',
             });
           }
           break;
@@ -75,7 +68,12 @@ function post(
   }
 }
 
-function addToRequestBody(body: any, key: string, value: string, condition?: boolean): any {
+function addToRequestBody(
+  body: Record<string, string>,
+  key: string,
+  value: string,
+  condition?: boolean
+): Record<string, string> {
   if (condition || (condition === undefined && value)) {
     body = body || {};
 
@@ -85,19 +83,30 @@ function addToRequestBody(body: any, key: string, value: string, condition?: boo
   return body;
 }
 
-function requestToken(url: string, csrfValue: string, envId?: string, permissionScope?: string, leId?: string) {
-  let body: any;
+function requestToken(
+  url: string,
+  csrfValue: string,
+  envId?: string,
+  permissionScope?: string,
+  leId?: string
+) {
+  let body: Record<string, string>;
 
   body = addToRequestBody(body, 'environment_id', envId);
   body = addToRequestBody(body, 'legal_entity_id', leId);
-  body = addToRequestBody(body, 'permission_scope', permissionScope, !!((envId || leId) && permissionScope));
+  body = addToRequestBody(
+    body,
+    'permission_scope',
+    permissionScope,
+    !!((envId || leId) && permissionScope)
+  );
 
-  return new Promise((resolve: any, reject: any) => {
+  return new Promise<unknown>((resolve, reject) => {
     post(
       url,
       {
         name: 'X-CSRF',
-        value: csrfValue
+        value: csrfValue,
       },
       body,
       (text: string) => {
@@ -112,7 +121,7 @@ function requestToken(url: string, csrfValue: string, envId?: string, permission
 export class BBCsrfXhr {
   public static request(
     url: string,
-    signinRedirectParams?: any,
+    signinRedirectParams?: Record<string, unknown>,
     disableRedirect?: boolean,
     envId?: string,
     permissionScope?: string,
@@ -122,27 +131,37 @@ export class BBCsrfXhr {
     if (permissionScope && !envId && !leId) {
       return Promise.reject({
         code: BBAuthTokenErrorCode.PermissionScopeNoEnvironment,
-        message: 'You must also specify an environment or legal entity when specifying a permission scope.'
+        message:
+          'You must also specify an environment or legal entity when specifying a permission scope.',
       });
     }
 
-    return new Promise((resolve: any, reject: any) => {
+    return new Promise((resolve, reject) => {
       // First get the CSRF token
 
-      new Promise((resolveCsrf: any, rejectCsrf: any) => {
+      new Promise((resolveCsrf, rejectCsrf) => {
         if (bypassCsrf) {
           resolveCsrf({
-            csrf_token: 'token_needed'
+            csrf_token: 'token_needed',
           });
         } else {
-          requestToken(BBAuthDomain.getSTSDomain() + '/session/csrf', 'token_needed')
+          requestToken(
+            BBAuthDomain.getSTSDomain() + '/session/csrf',
+            'token_needed'
+          )
             .then(resolveCsrf)
             .catch(rejectCsrf);
         }
       })
-        .then((csrfResponse: any) => {
+        .then((csrfResponse: Record<string, string>) => {
           // Next get the access token, and then pass it to the callback.
-          return requestToken(url, csrfResponse['csrf_token'], envId, permissionScope, leId);
+          return requestToken(
+            url,
+            csrfResponse['csrf_token'],
+            envId,
+            permissionScope,
+            leId
+          );
         })
         .then(resolve)
         .catch((reason: BBAuthTokenError) => {
@@ -162,56 +181,58 @@ export class BBCsrfXhr {
     });
   }
 
-  public static postWithCSRF(
-    url: string
-  ) {
-    return new Promise((resolve: any, reject: any) => {
+  public static postWithCSRF(url: string) {
+    return new Promise((resolve, reject) => {
       // First get the CSRF token
-      new Promise((resolveCsrf: any, rejectCsrf: any) => {
-          requestToken(BBAuthDomain.getSTSDomain() + '/session/csrf', 'token_needed')
-            .then(resolveCsrf)
-            .catch(rejectCsrf);
-      }).then((csrfResponse: any) => {
+      new Promise<Record<string, string>>((resolveCsrf, rejectCsrf) => {
+        requestToken(
+          BBAuthDomain.getSTSDomain() + '/session/csrf',
+          'token_needed'
+        )
+          .then(resolveCsrf)
+          .catch(rejectCsrf);
+      })
+        .then((csrfResponse) => {
           // Next issue the request with the csrf token
-          return new Promise((res: any, rej: any) => {
+          return new Promise((res, rej) => {
             post(
               url,
               {
                 name: 'X-CSRF',
-                value: csrfResponse['csrf_token']
+                value: csrfResponse['csrf_token'],
               },
               undefined,
-              (result: any) => {
+              (result) => {
                 res(result);
               },
               rej
             );
           });
         })
-      .then(resolve)
-      .catch((reason: BBAuthTokenError) => {
-        if (reason.code === BBAuthTokenErrorCode.Offline) {
-          reject(reason);
-        } else {
-          switch (reason.code) {
-            case BBAuthTokenErrorCode.NotLoggedIn:
-              BBAuthNavigator.redirectToSignin();
-              break;
-            default:
-              BBAuthNavigator.redirectToError(reason.code);
-              break;
+        .then(resolve)
+        .catch((reason: BBAuthTokenError) => {
+          if (reason.code === BBAuthTokenErrorCode.Offline) {
+            reject(reason);
+          } else {
+            switch (reason.code) {
+              case BBAuthTokenErrorCode.NotLoggedIn:
+                BBAuthNavigator.redirectToSignin();
+                break;
+              default:
+                BBAuthNavigator.redirectToError(reason.code);
+                break;
+            }
           }
-        }
-      });
+        });
     });
   }
 
-  public static requestWithToken(
+  public static requestWithToken<T = unknown>(
     url: string,
     token: string,
     verb = 'GET',
-    body?: any
-  ): Promise<any> {
+    body?: unknown
+  ): Promise<T> {
     return new Promise((resolve, reject) => {
       const xhr = new XMLHttpRequest();
 
@@ -219,7 +240,7 @@ export class BBCsrfXhr {
         if (xhr.readyState === 4) {
           switch (xhr.status) {
             case 200:
-              let result: any;
+              let result: T;
 
               if (xhr.responseText) {
                 result = JSON.parse(xhr.responseText);

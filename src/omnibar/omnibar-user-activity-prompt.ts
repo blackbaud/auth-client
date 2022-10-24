@@ -1,16 +1,10 @@
 //#region imports
 
-import {
-  BBAuthDomUtility
-} from '../shared/dom-utility';
+import { BBAuthDomUtility } from '../shared/dom-utility';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBOmnibarUserActivityPromptShowArgs
-} from './omnibar-user-activity-prompt-show-args';
+import { BBOmnibarUserActivityPromptShowArgs } from './omnibar-user-activity-prompt-show-args';
 
 //#endregion
 
@@ -27,12 +21,9 @@ function messageHandler(event: MessageEvent) {
 
   switch (message.messageType) {
     case 'ready':
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          messageType: 'host-ready'
-        }
-      );
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        messageType: 'host-ready',
+      });
 
       iframeEl.classList.add('sky-omnibar-inactivity-iframe-ready');
       break;
@@ -43,7 +34,6 @@ function messageHandler(event: MessageEvent) {
 }
 
 export class BBOmnibarUserActivityPrompt {
-
   public static url = 'https://host.nxt.blackbaud.com/omnibar/inactivity';
 
   public static show(args: BBOmnibarUserActivityPromptShowArgs) {
@@ -64,8 +54,7 @@ export class BBOmnibarUserActivityPrompt {
   .sky-omnibar-inactivity-iframe-ready {
     visibility: visible;
   }
-  `
-      );
+  `);
     }
 
     function addIframeEl() {
@@ -94,13 +83,9 @@ export class BBOmnibarUserActivityPrompt {
 
       BBAuthDomUtility.removeCss(styleEl);
 
-      iframeEl =
-        styleEl =
-        sessionRenewCallback =
-        undefined;
+      iframeEl = styleEl = sessionRenewCallback = undefined;
 
       window.removeEventListener('message', messageHandler);
     }
   }
-
 }

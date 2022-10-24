@@ -1,19 +1,10 @@
-import {
-  BBAuthNavigator
-} from '../shared/navigator';
+import { BBAuthNavigator } from '../shared/navigator';
 
-import {
-  BBCsrfXhr
-} from './csrf-xhr';
+import { BBCsrfXhr } from './csrf-xhr';
 
-import {
-  BBAuthTokenError,
-  BBAuthTokenErrorCode
-} from '../auth';
+import { BBAuthTokenError, BBAuthTokenErrorCode } from '../auth';
 
-import {
-  BBAuthDomain
-} from '../auth/auth-domain';
+import { BBAuthDomain } from '../auth/auth-domain';
 
 import 'jasmine-ajax';
 
@@ -29,7 +20,6 @@ describe('Auth token integration', () => {
   });
 
   beforeEach(() => {
-
     navigateSpy.and.stub();
     navigateSpy.calls.reset();
   });
@@ -40,7 +30,10 @@ describe('Auth token integration', () => {
 
   it('should redirect to the signin page if the user is not signed in', (done) => {
     navigateSpy.and.callFake((url: string) => {
-      expect(url).toBe('https://signin.blackbaud.com/signin/?redirectUrl=' + encodeURIComponent(location.href));
+      expect(url).toBe(
+        'https://signin.blackbaud.com/signin/?redirectUrl=' +
+          encodeURIComponent(location.href)
+      );
       done();
     });
 
@@ -49,7 +42,7 @@ describe('Auth token integration', () => {
 
     request.respondWith({
       responseText: undefined,
-      status: 401
+      status: 401,
     });
 
     expect(domainSpy).toHaveBeenCalled();
@@ -57,7 +50,10 @@ describe('Auth token integration', () => {
 
   it('should redirect to the signin page if the user is not signed in and posting with csrf', (done) => {
     navigateSpy.and.callFake((url: string) => {
-      expect(url).toBe('https://signin.blackbaud.com/signin/?redirectUrl=' + encodeURIComponent(location.href));
+      expect(url).toBe(
+        'https://signin.blackbaud.com/signin/?redirectUrl=' +
+          encodeURIComponent(location.href)
+      );
       done();
     });
 
@@ -66,57 +62,60 @@ describe('Auth token integration', () => {
 
     request.respondWith({
       responseText: undefined,
-      status: 401
+      status: 401,
     });
 
     expect(domainSpy).toHaveBeenCalled();
   });
 
   it('should not redirect to the signin page when redirecting is disabled', (done) => {
-    BBCsrfXhr.request('https://example.com/token', undefined, true)
-      .catch((reason: BBAuthTokenError) => {
+    BBCsrfXhr.request('https://example.com/token', undefined, true).catch(
+      (reason: BBAuthTokenError) => {
         expect(reason.code).toBe(BBAuthTokenErrorCode.NotLoggedIn);
         expect(reason.message).toBe('The user is not logged in.');
         done();
-      });
+      }
+    );
 
     const request = jasmine.Ajax.requests.mostRecent();
 
     request.respondWith({
       responseText: undefined,
-      status: 401
+      status: 401,
     });
   });
 
   it('should not redirect to the error page when the user is offline', (done) => {
-    BBCsrfXhr.request('https://example.com/token')
-      .catch((reason: BBAuthTokenError) => {
+    BBCsrfXhr.request('https://example.com/token').catch(
+      (reason: BBAuthTokenError) => {
         expect(reason.code).toBe(BBAuthTokenErrorCode.Offline);
         expect(reason.message).toBe('The user is offline.');
         done();
-      });
+      }
+    );
 
     const request = jasmine.Ajax.requests.mostRecent();
 
     request.respondWith({
       responseText: undefined,
-      status: 0
+      status: 0,
     });
   });
 
   it('should not redirect to the error page when the user is offline while posting with csrf', (done) => {
-    BBCsrfXhr.postWithCSRF('https://example.com/token')
-      .catch((reason: BBAuthTokenError) => {
+    BBCsrfXhr.postWithCSRF('https://example.com/token').catch(
+      (reason: BBAuthTokenError) => {
         expect(reason.code).toBe(BBAuthTokenErrorCode.Offline);
         expect(reason.message).toBe('The user is offline.');
         done();
-      });
+      }
+    );
 
     const request = jasmine.Ajax.requests.mostRecent();
 
     request.respondWith({
       responseText: undefined,
-      status: 0
+      status: 0,
     });
   });
 
@@ -124,8 +123,8 @@ describe('Auth token integration', () => {
     navigateSpy.and.callFake((url: string) => {
       expect(url).toBe(
         'https://host.nxt.blackbaud.com/errors/security?source=auth-client&url=' +
-        encodeURIComponent(location.href) +
-        '&code=invalid_env'
+          encodeURIComponent(location.href) +
+          '&code=invalid_env'
       );
 
       done();
@@ -137,7 +136,7 @@ describe('Auth token integration', () => {
 
     request.respondWith({
       responseText: undefined,
-      status: 403
+      status: 403,
     });
   });
 
@@ -145,8 +144,8 @@ describe('Auth token integration', () => {
     navigateSpy.and.callFake((url: string) => {
       expect(url).toBe(
         'https://host.nxt.blackbaud.com/errors/security?source=auth-client&url=' +
-        encodeURIComponent(location.href) +
-        '&code=invalid_env'
+          encodeURIComponent(location.href) +
+          '&code=invalid_env'
       );
 
       done();
@@ -158,7 +157,7 @@ describe('Auth token integration', () => {
 
     request.respondWith({
       responseText: undefined,
-      status: 403
+      status: 403,
     });
   });
 
@@ -166,7 +165,7 @@ describe('Auth token integration', () => {
     navigateSpy.and.callFake((url: string) => {
       expect(url).toBe(
         'https://host.nxt.blackbaud.com/errors/broken?source=auth-client&url=' +
-        encodeURIComponent(location.href)
+          encodeURIComponent(location.href)
       );
 
       done();
@@ -178,7 +177,7 @@ describe('Auth token integration', () => {
 
     request.respondWith({
       responseText: undefined,
-      status: 500
+      status: 500,
     });
   });
 
@@ -188,9 +187,9 @@ describe('Auth token integration', () => {
 
     csrfRequest.respondWith({
       responseText: JSON.stringify({
-        csrf_token: 'abc'
+        csrf_token: 'abc',
       }),
-      status: 200
+      status: 200,
     });
 
     // Wait for the token request to kick off.
@@ -203,15 +202,15 @@ describe('Auth token integration', () => {
         tokenRequest.respondWith({
           responseText: JSON.stringify({
             access_token: 'xyz',
-            expires_in: 12345
+            expires_in: 12345,
           }),
-          status: 200
+          status: 200,
         });
 
-        tokenPromise.then((tokenResponse: any) => {
+        tokenPromise.then((tokenResponse) => {
           expect(tokenResponse).toEqual({
             access_token: 'xyz',
-            expires_in: 12345
+            expires_in: 12345,
           });
 
           done();
@@ -221,14 +220,16 @@ describe('Auth token integration', () => {
   });
 
   it('should return session TTL if the user is signed in', (done) => {
-    const requestPromise = BBCsrfXhr.postWithCSRF('https://example.com/session/ttl');
+    const requestPromise = BBCsrfXhr.postWithCSRF(
+      'https://example.com/session/ttl'
+    );
     const csrfRequest = jasmine.Ajax.requests.mostRecent();
 
     csrfRequest.respondWith({
       responseText: JSON.stringify({
-        csrf_token: 'abc'
+        csrf_token: 'abc',
       }),
-      status: 200
+      status: 200,
     });
 
     // Wait for the TTL request to kick off.
@@ -239,10 +240,10 @@ describe('Auth token integration', () => {
 
         request.respondWith({
           responseText: '1234',
-          status: 200
+          status: 200,
         });
 
-        requestPromise.then((response: any) => {
+        requestPromise.then((response) => {
           expect(response).toEqual('1234');
           done();
         });
@@ -251,14 +252,16 @@ describe('Auth token integration', () => {
   });
 
   it('should renew the user session if the user is signed in', (done) => {
-    const requestPromise = BBCsrfXhr.postWithCSRF('https://example.com/session/renew');
+    const requestPromise = BBCsrfXhr.postWithCSRF(
+      'https://example.com/session/renew'
+    );
     const csrfRequest = jasmine.Ajax.requests.mostRecent();
 
     csrfRequest.respondWith({
       responseText: JSON.stringify({
-        csrf_token: 'abc'
+        csrf_token: 'abc',
       }),
-      status: 200
+      status: 200,
     });
 
     // Wait for the TTL request to kick off.
@@ -268,10 +271,10 @@ describe('Auth token integration', () => {
         clearInterval(intervalId);
 
         request.respondWith({
-          status: 200
+          status: 200,
         });
 
-        requestPromise.then((response: any) => {
+        requestPromise.then((response) => {
           expect(response).toEqual('');
           done();
         });
@@ -299,15 +302,15 @@ describe('Auth token integration', () => {
         tokenRequest.respondWith({
           responseText: JSON.stringify({
             access_token: 'xyz',
-            expires_in: 12345
+            expires_in: 12345,
           }),
-          status: 200
+          status: 200,
         });
 
-        tokenPromise.then((tokenResponse: any) => {
+        tokenPromise.then((tokenResponse) => {
           expect(tokenResponse).toEqual({
             access_token: 'xyz',
-            expires_in: 12345
+            expires_in: 12345,
           });
 
           done();
@@ -324,7 +327,7 @@ describe('Auth token integration', () => {
 
     request.respondWith({
       responseText: undefined,
-      status: 200
+      status: 200,
     });
 
     expect(parseSpy).not.toHaveBeenCalled();
@@ -334,42 +337,34 @@ describe('Auth token integration', () => {
     navigateSpy.and.callFake((url: string) => {
       expect(url).toBe(
         'https://signin.blackbaud.com/signin/?redirectUrl=' +
-        encodeURIComponent(location.href) +
-        '&%3Dfoo%3D=b%26r'
+          encodeURIComponent(location.href) +
+          '&%3Dfoo%3D=b%26r'
       );
       done();
     });
 
-    BBCsrfXhr.request(
-      'https://example.com/token',
-      {
-        '=foo=': 'b&r'
-      }
-    );
+    BBCsrfXhr.request('https://example.com/token', {
+      '=foo=': 'b&r',
+    });
 
     const request = jasmine.Ajax.requests.mostRecent();
 
     request.respondWith({
       responseText: undefined,
-      status: 401
+      status: 401,
     });
   });
 
   it('should add the environment ID to the request body', (done) => {
-    BBCsrfXhr.request(
-      'https://example.com/token',
-      undefined,
-      undefined,
-      'abc'
-    );
+    BBCsrfXhr.request('https://example.com/token', undefined, undefined, 'abc');
 
     const csrfRequest = jasmine.Ajax.requests.mostRecent();
 
     csrfRequest.respondWith({
       responseText: JSON.stringify({
-        csrf_token: 'abc'
+        csrf_token: 'abc',
       }),
-      status: 200
+      status: 200,
     });
 
     // Wait for the token request to kick off.
@@ -379,10 +374,10 @@ describe('Auth token integration', () => {
       if (tokenRequest.url === 'https://example.com/token') {
         clearInterval(intervalId);
 
-        const requestData: any = tokenRequest.data();
+        const requestData = tokenRequest.data();
 
         expect(requestData).toEqual({
-          environment_id: 'abc'
+          environment_id: 'abc',
         });
 
         done();
@@ -404,9 +399,9 @@ describe('Auth token integration', () => {
 
     csrfRequest.respondWith({
       responseText: JSON.stringify({
-        csrf_token: 'abc'
+        csrf_token: 'abc',
       }),
-      status: 200
+      status: 200,
     });
 
     // Wait for the token request to kick off.
@@ -415,11 +410,11 @@ describe('Auth token integration', () => {
       if (tokenRequest.url === 'https://example.com/token') {
         clearInterval(intervalId);
 
-        const requestData: any = tokenRequest.data();
+        const requestData = tokenRequest.data();
 
         expect(requestData).toEqual({
           environment_id: 'abc',
-          legal_entity_id: 'def'
+          legal_entity_id: 'def',
         });
 
         done();
@@ -440,9 +435,9 @@ describe('Auth token integration', () => {
 
     csrfRequest.respondWith({
       responseText: JSON.stringify({
-        csrf_token: 'abc'
+        csrf_token: 'abc',
       }),
-      status: 200
+      status: 200,
     });
 
     // Wait for the token request to kick off.
@@ -452,11 +447,11 @@ describe('Auth token integration', () => {
       if (tokenRequest.url === 'https://example.com/token') {
         clearInterval(intervalId);
 
-        const requestData: any = tokenRequest.data();
+        const requestData = tokenRequest.data();
 
         expect(requestData).toEqual({
           environment_id: 'abc',
-          permission_scope: '123'
+          permission_scope: '123',
         });
 
         done();
@@ -472,9 +467,12 @@ describe('Auth token integration', () => {
       undefined,
       '123'
     ).catch((reason: BBAuthTokenError) => {
-      expect(reason.code).toBe(BBAuthTokenErrorCode.PermissionScopeNoEnvironment);
-      expect(reason.message)
-        .toBe('You must also specify an environment or legal entity when specifying a permission scope.');
+      expect(reason.code).toBe(
+        BBAuthTokenErrorCode.PermissionScopeNoEnvironment
+      );
+      expect(reason.message).toBe(
+        'You must also specify an environment or legal entity when specifying a permission scope.'
+      );
       done();
     });
   });
@@ -483,7 +481,7 @@ describe('Auth token integration', () => {
     function validateRequestWithToken(
       done: DoneFn,
       verb = 'GET',
-      data?: any
+      data?: Record<string, string>
     ): void {
       BBCsrfXhr.requestWithToken(
         'https://example.com/token',
@@ -492,7 +490,7 @@ describe('Auth token integration', () => {
         data
       ).then((response) => {
         expect(response).toEqual({
-          success: true
+          success: true,
         });
 
         done();
@@ -507,9 +505,9 @@ describe('Auth token integration', () => {
         expect(request.data()).toEqual(data);
       }
 
-      const expectedHeaders: { [key: string]: string } = {
+      const expectedHeaders: Record<string, string> = {
         Accept: 'application/json',
-        Authorization: 'Bearer abc'
+        Authorization: 'Bearer abc',
       };
 
       if (data) {
@@ -520,9 +518,9 @@ describe('Auth token integration', () => {
 
       request.respondWith({
         responseText: JSON.stringify({
-          success: true
+          success: true,
         }),
-        status: 200
+        status: 200,
       });
     }
 
@@ -531,30 +529,19 @@ describe('Auth token integration', () => {
     });
 
     it('should support PATCH', (done) => {
-      validateRequestWithToken(
-        done,
-        'PATCH',
-        {
-          foo: 'test'
-        }
-      );
+      validateRequestWithToken(done, 'PATCH', {
+        foo: 'test',
+      });
     });
 
     it('should support POST', (done) => {
-      validateRequestWithToken(
-        done,
-        'POST',
-        {
-          foo: 'test'
-        }
-      );
+      validateRequestWithToken(done, 'POST', {
+        foo: 'test',
+      });
     });
 
     it('should handle errors', (done) => {
-      BBCsrfXhr.requestWithToken(
-        'https://example.com/token',
-        'abc'
-      ).then(
+      BBCsrfXhr.requestWithToken('https://example.com/token', 'abc').then(
         () => {
           /* do nothing */
         },
@@ -566,17 +553,16 @@ describe('Auth token integration', () => {
       const request = jasmine.Ajax.requests.mostRecent();
 
       request.respondWith({
-        status: 401
+        status: 401,
       });
     });
 
     it('should handle empty response text', (done) => {
-      BBCsrfXhr.requestWithToken(
-        'https://example.com/token',
-        'abc'
-      ).then(() => {
-        done();
-      });
+      BBCsrfXhr.requestWithToken('https://example.com/token', 'abc').then(
+        () => {
+          done();
+        }
+      );
 
       const request = jasmine.Ajax.requests.mostRecent();
 
@@ -584,10 +570,8 @@ describe('Auth token integration', () => {
 
       request.respondWith({
         responseText: undefined,
-        status: 200
+        status: 200,
       });
     });
-
   });
-
 });

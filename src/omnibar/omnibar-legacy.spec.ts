@@ -3,16 +3,15 @@ import { BBOmnibarLegacy } from './omnibar-legacy';
 import { BBOmnibarScriptLoader } from './omnibar-script-loader';
 
 describe('Omnibar', () => {
-
   let registerScriptSpy: jasmine.Spy;
-  let fakeAuth: any;
+  let fakeAuth: typeof window.BBAUTH;
 
   beforeAll(() => {
     registerScriptSpy = spyOn(
       BBOmnibarScriptLoader,
       'registerScript'
     ).and.callFake(() => {
-      (window as any).BBAUTH = fakeAuth;
+      window.BBAUTH = fakeAuth;
 
       return Promise.resolve();
     });
@@ -23,33 +22,35 @@ describe('Omnibar', () => {
 
     fakeAuth = {
       Omnibar: {
-        load: jasmine.createSpy('load').and.callFake((omnibarEl: any, config: any) => {
-          config.afterLoad();
-        })
-      }
+        load: jasmine
+          .createSpy('load')
+          .and.callFake((_, config: { afterLoad: () => void }) => {
+            config.afterLoad();
+          }),
+      },
     };
   });
 
   afterEach(() => {
     registerScriptSpy.calls.reset();
-    (window as any).jQuery = undefined;
+    window.jQuery = undefined;
   });
 
   it('should register the required JavaScript libraries', (done) => {
     BBOmnibarLegacy.load({
-      serviceName: 'test'
+      serviceName: 'test',
     }).then(() => {
-      expect(registerScriptSpy.calls.argsFor(0)).toEqual(
-        ['https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js']
-      );
+      expect(registerScriptSpy.calls.argsFor(0)).toEqual([
+        'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js',
+      ]);
 
-      expect(registerScriptSpy.calls.argsFor(1)).toEqual(
-        ['https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js']
-      );
+      expect(registerScriptSpy.calls.argsFor(1)).toEqual([
+        'https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js',
+      ]);
 
-      expect(registerScriptSpy.calls.argsFor(2)).toEqual(
-        ['https://signin.blackbaud.com/Omnibar.min.js']
-      );
+      expect(registerScriptSpy.calls.argsFor(2)).toEqual([
+        'https://signin.blackbaud.com/Omnibar.min.js',
+      ]);
 
       done();
     });
@@ -57,22 +58,22 @@ describe('Omnibar', () => {
 
   it('should not register jQuery if a higher or equal version is already registered', (done) => {
     // defining a jQuery verion
-    (window as any).jQuery = {
+    window.jQuery = {
       fn: {
-          jquery: '3.2.1'
-        }
+        jquery: '3.2.1',
+      },
     };
 
     BBOmnibarLegacy.load({
-      serviceName: 'test'
+      serviceName: 'test',
     }).then(() => {
-      expect(registerScriptSpy.calls.argsFor(0)).toEqual(
-        ['https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js']
-      );
+      expect(registerScriptSpy.calls.argsFor(0)).toEqual([
+        'https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js',
+      ]);
 
-      expect(registerScriptSpy.calls.argsFor(1)).toEqual(
-        ['https://signin.blackbaud.com/Omnibar.min.js']
-      );
+      expect(registerScriptSpy.calls.argsFor(1)).toEqual([
+        'https://signin.blackbaud.com/Omnibar.min.js',
+      ]);
 
       done();
     });
@@ -80,9 +81,11 @@ describe('Omnibar', () => {
 
   it('should add the required omnibar elements to the page', (done) => {
     BBOmnibarLegacy.load({
-      serviceName: 'test'
+      serviceName: 'test',
     }).then(() => {
-      expect(document.querySelectorAll('.bb-omnibar-height-padding')).not.toBeNull();
+      expect(
+        document.querySelectorAll('.bb-omnibar-height-padding')
+      ).not.toBeNull();
 
       done();
     });
@@ -90,26 +93,26 @@ describe('Omnibar', () => {
 
   it('should register jQuery if current version is less than the minimum version', (done) => {
     // defining a jQuery version
-    (window as any).jQuery = {
+    window.jQuery = {
       fn: {
-          jquery: '1.10.0'
-        }
+        jquery: '1.10.0',
+      },
     };
 
     BBOmnibarLegacy.load({
-      serviceName: 'test'
+      serviceName: 'test',
     }).then(() => {
-      expect(registerScriptSpy.calls.argsFor(0)).toEqual(
-        ['https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js']
-      );
+      expect(registerScriptSpy.calls.argsFor(0)).toEqual([
+        'https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.js',
+      ]);
 
-      expect(registerScriptSpy.calls.argsFor(1)).toEqual(
-        ['https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js']
-      );
+      expect(registerScriptSpy.calls.argsFor(1)).toEqual([
+        'https://cdnjs.cloudflare.com/ajax/libs/easyXDM/2.4.17.1/easyXDM.min.js',
+      ]);
 
-      expect(registerScriptSpy.calls.argsFor(2)).toEqual(
-        ['https://signin.blackbaud.com/Omnibar.min.js']
-      );
+      expect(registerScriptSpy.calls.argsFor(2)).toEqual([
+        'https://signin.blackbaud.com/Omnibar.min.js',
+      ]);
 
       done();
     });
@@ -117,9 +120,11 @@ describe('Omnibar', () => {
 
   it('should add the required omnibar elements to the page', (done) => {
     BBOmnibarLegacy.load({
-      serviceName: 'test'
+      serviceName: 'test',
     }).then(() => {
-      expect(document.querySelectorAll('.bb-omnibar-height-padding')).not.toBeNull();
+      expect(
+        document.querySelectorAll('.bb-omnibar-height-padding')
+      ).not.toBeNull();
 
       done();
     });
@@ -129,30 +134,32 @@ describe('Omnibar', () => {
     const menuEl = {};
     const jQueryMenuEl = {};
 
-    (window as any).jQuery = () => jQueryMenuEl;
+    window.jQuery = () => jQueryMenuEl;
 
-    fakeAuth.Omnibar.load.and.callFake((omnibarEl: any, config: any) => {
-      expect(config.menuEl).toBe(jQueryMenuEl);
+    (fakeAuth.Omnibar.load as jasmine.Spy).and.callFake(
+      (_: unknown, config: { menuEl: unknown }) => {
+        expect(config.menuEl).toBe(jQueryMenuEl);
 
-      done();
-    });
+        done();
+      }
+    );
 
     BBOmnibarLegacy.load({
       menuEl,
-      serviceName: 'test'
+      serviceName: 'test',
     });
   });
 
   it('should pass the expected config to the base omnibar load method', (done) => {
     BBOmnibarLegacy.load({
-      serviceName: 'test'
+      serviceName: 'test',
     }).then(() => {
       expect(fakeAuth.Omnibar.load).toHaveBeenCalledWith(
         document.body.querySelector('[data-omnibar-el]'),
         {
-          'afterLoad': jasmine.any(Function),
-          'serviceName': 'test',
-          'z-index': 1000
+          afterLoad: jasmine.any(Function),
+          serviceName: 'test',
+          'z-index': 1000,
         }
       );
 
@@ -165,13 +172,12 @@ describe('Omnibar', () => {
       expect(fakeAuth.Omnibar.load).toHaveBeenCalledWith(
         document.body.querySelector('[data-omnibar-el]'),
         {
-          'afterLoad': jasmine.any(Function),
-          'z-index': 1000
+          afterLoad: jasmine.any(Function),
+          'z-index': 1000,
         }
       );
 
       done();
     });
   });
-
 });

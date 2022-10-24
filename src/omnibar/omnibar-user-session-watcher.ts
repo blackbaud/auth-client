@@ -28,7 +28,7 @@ function parseOrigin(url: string) {
   return undefined;
 }
 
-function postLegacyKeepAliveMessage(message: any) {
+function postLegacyKeepAliveMessage(message: unknown) {
   if (legacyKeepAliveIFrame) {
     BBAuthInterop.postOmnibarMessage(
       legacyKeepAliveIFrame,
@@ -60,7 +60,8 @@ function createIFrame(cls: string, url: string): HTMLIFrameElement {
 }
 
 function createWatcherIFrame() {
-  const url = BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN +
+  const url =
+    BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN +
     '/SessionWatcher.html?origin=' +
     encodeURIComponent(location.origin);
 
@@ -78,7 +79,13 @@ function createLegacyKeepAliveIFrame() {
 
 function processSessionWatcherMessage(event: MessageEvent) {
   if (typeof event.data === 'string') {
-    let data: any;
+    let data: {
+      messageType: string;
+      message: {
+        sessionId: string;
+        refreshId: string;
+      };
+    };
 
     try {
       data = JSON.parse(event.data);
@@ -107,7 +114,7 @@ function processSessionWatcherMessage(event: MessageEvent) {
 
       if (state.refreshId !== undefined && refreshId !== state.refreshId) {
         postLegacyKeepAliveMessage({
-          messageType: 'session-refresh'
+          messageType: 'session-refresh',
         });
       }
 
@@ -147,7 +154,8 @@ function messageListener(event: MessageEvent) {
 }
 
 export class BBOmnibarUserSessionWatcher {
-  public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN = BBAuthDomain.getSTSDomain();
+  public static IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN =
+    BBAuthDomain.getSTSDomain();
 
   public static start(
     allowAnonymous: boolean,
@@ -197,6 +205,6 @@ export class BBOmnibarUserSessionWatcher {
       currentLegacyKeepAliveUrl =
       currentLegacySigninUrl =
       currentStateChange =
-      undefined;
+        undefined;
   }
 }

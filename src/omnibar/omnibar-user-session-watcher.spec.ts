@@ -17,24 +17,28 @@ describe('Omnibar user session watcher', () => {
         data: JSON.stringify({
           message: {
             refreshId,
-            sessionId
+            sessionId,
           },
-          messageType: 'session_change'
+          messageType: 'session_change',
         }),
-        origin: BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
+        origin:
+          BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN,
       })
     );
   }
 
-  function postLegacyKeepAliveReady(legacyTtl: number, legacySigninUrl?: string) {
+  function postLegacyKeepAliveReady(
+    legacyTtl: number,
+    legacySigninUrl?: string
+  ) {
     window.dispatchEvent(
       new MessageEvent('message', {
         data: {
           messageType: 'ready',
           signinUrl: legacySigninUrl,
-          ttl: legacyTtl
+          ttl: legacyTtl,
         },
-        origin: TEST_LEGACY_KEEP_ALIVE_ORIGIN
+        origin: TEST_LEGACY_KEEP_ALIVE_ORIGIN,
       })
     );
   }
@@ -105,7 +109,7 @@ describe('Omnibar user session watcher', () => {
     legacyKeepAliveIFrameEl = undefined;
   });
 
-  it('should call the specified callback when the current user\'s info changes' , () => {
+  it("should call the specified callback when the current user's info changes", () => {
     startWatching();
 
     postSessionChange('abc', '123');
@@ -117,13 +121,13 @@ describe('Omnibar user session watcher', () => {
     expect(refreshUserCallbackSpy).toHaveBeenCalled();
   });
 
-  it('should notify the caller when the legacy TTL value has changed' , () => {
+  it('should notify the caller when the legacy TTL value has changed', () => {
     startWatching(false, TEST_LEGACY_KEEP_ALIVE_ORIGIN + '/legacy');
 
     postLegacyKeepAliveReady(123);
 
     expect(stateChangeSpy).toHaveBeenCalledWith({
-      legacyTtl: 123
+      legacyTtl: 123,
     });
 
     stateChangeSpy.calls.reset();
@@ -131,11 +135,11 @@ describe('Omnibar user session watcher', () => {
     postLegacyKeepAliveReady(456);
 
     expect(stateChangeSpy).toHaveBeenCalledWith({
-      legacyTtl: 456
+      legacyTtl: 456,
     });
   });
 
-  it('should notify the legacy keep-alive IFRAME when the user\'s session is refreshed' , () => {
+  it("should notify the legacy keep-alive IFRAME when the user's session is refreshed", () => {
     startWatching(false, TEST_LEGACY_KEEP_ALIVE_ORIGIN + '/legacy');
 
     const postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
@@ -148,13 +152,13 @@ describe('Omnibar user session watcher', () => {
     expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
       getLegacyKeepAliveIFrame()[0],
       {
-        messageType: 'session-refresh'
+        messageType: 'session-refresh',
       },
       TEST_LEGACY_KEEP_ALIVE_ORIGIN
     );
   });
 
-  it('should attempt to post a message to the legacy keep-alive IFRAME if it doesn\'t exist' , () => {
+  it("should attempt to post a message to the legacy keep-alive IFRAME if it doesn't exist", () => {
     startWatching(false);
 
     const postOmnibarMessageSpy = spyOn(BBAuthInterop, 'postOmnibarMessage');
@@ -174,18 +178,17 @@ describe('Omnibar user session watcher', () => {
       new MessageEvent('message', {
         data: JSON.stringify({
           message: {
-            sessionId: undefined
+            sessionId: undefined,
           },
-          messageType: 'session_change'
+          messageType: 'session_change',
         }),
-        origin: BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
+        origin:
+          BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN,
       })
     );
 
     expect(navigateSpy).toHaveBeenCalledWith(
-      SIGNIN_URL +
-      '?redirectUrl=' +
-      encodeURIComponent(location.href)
+      SIGNIN_URL + '?redirectUrl=' + encodeURIComponent(location.href)
     );
   });
 
@@ -198,11 +201,12 @@ describe('Omnibar user session watcher', () => {
       new MessageEvent('message', {
         data: JSON.stringify({
           message: {
-            sessionId: undefined
+            sessionId: undefined,
           },
-          messageType: 'session_change'
+          messageType: 'session_change',
         }),
-        origin: BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
+        origin:
+          BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN,
       })
     );
 
@@ -238,45 +242,53 @@ describe('Omnibar user session watcher', () => {
     window.dispatchEvent(
       new MessageEvent('message', {
         data: {
-          foo: 'bar'
+          foo: 'bar',
         },
-        origin: BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
+        origin:
+          BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN,
       })
     );
 
     window.dispatchEvent(
       new MessageEvent('message', {
         data: 'asdf',
-        origin: BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
+        origin:
+          BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN,
       })
     );
 
     window.dispatchEvent(
       new MessageEvent('message', {
         data: JSON.stringify({
-          messageType: 'foo'
+          messageType: 'foo',
         }),
-        origin: BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN
+        origin:
+          BBOmnibarUserSessionWatcher.IDENTITY_SECURITY_TOKEN_SERVICE_ORIGIN,
       })
     );
 
     window.dispatchEvent(
       new MessageEvent('message', {
         data: JSON.stringify({
-          messageType: 'session_change'
+          messageType: 'session_change',
         }),
-        origin: undefined
+        origin: undefined,
       })
     );
   });
 
   it('should restart watching when the legacy keep alive URL changes', () => {
-    const sessionWatcherStopSpy = spyOn(BBOmnibarUserSessionWatcher, 'stop').and.callThrough();
+    const sessionWatcherStopSpy = spyOn(
+      BBOmnibarUserSessionWatcher,
+      'stop'
+    ).and.callThrough();
 
     function validateWatch(callCount: number, legacyIFramePresent: boolean) {
       expect(sessionWatcherStopSpy.calls.count()).toBe(callCount);
 
-      const iframeEl = document.querySelector('.sky-omnibar-iframe-legacy-keep-alive') as HTMLIFrameElement;
+      const iframeEl = document.querySelector(
+        '.sky-omnibar-iframe-legacy-keep-alive'
+      ) as HTMLIFrameElement;
 
       if (legacyIFramePresent) {
         expect(iframeEl).not.toBeNull();
@@ -298,5 +310,4 @@ describe('Omnibar user session watcher', () => {
     startWatching(false, undefined);
     validateWatch(3, false);
   });
-
 });

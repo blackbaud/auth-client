@@ -1,5 +1,4 @@
 export interface BBAuthGetTokenArgs {
-
   envId?: string;
 
   leId?: string;
@@ -9,5 +8,4 @@ export interface BBAuthGetTokenArgs {
   forceNewToken?: boolean;
 
   disableRedirect?: boolean;
-
 }

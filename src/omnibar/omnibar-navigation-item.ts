@@ -1,6 +1,4 @@
-import {
-  BBOmnibarNavigationItemDisplayStyle
-} from './omnibar-navigation-item-display-style';
+import { BBOmnibarNavigationItemDisplayStyle } from './omnibar-navigation-item-display-style';
 
 export interface BBOmnibarNavigationItem {
   title: string;
@@ -11,7 +9,7 @@ export interface BBOmnibarNavigationItem {
 
   items?: BBOmnibarNavigationItem[];
 
-  data?: any;
+  data?: unknown;
 
   displayStyle?: BBOmnibarNavigationItemDisplayStyle;
 }

@@ -1,41 +1,32 @@
-import {
-  BBAuth
-} from '../auth';
+import { BBAuth } from '../auth';
 
-import {
-  BBCsrfXhr
-} from '../shared/csrf-xhr';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 
-import {
-  BBUserConfig
-} from './user-config';
+import { BBUserConfig } from './user-config';
 
 const URL = 'https://sky-pusa01.app.blackbaud.net/uicfg/settings/user';
 
-let updateTimeoutId: any;
+let updateTimeoutId: ReturnType<typeof setTimeout>;
 
 export class BBUserSettings {
+  public static UPDATE_DELAY = 1000;
 
-  public static readonly UPDATE_DELAY = 1000;
+  public static GET_SETTINGS_TIMEOUT = 5000;
 
-  public static readonly GET_SETTINGS_TIMEOUT = 5000;
-
-  public static readonly LOCAL_STORAGE_KEY = 'auth-client-local-user-settings';
+  public static LOCAL_STORAGE_KEY = 'auth-client-local-user-settings';
 
   public static async getSettings(): Promise<BBUserConfig> {
     return new Promise(async (resolve, reject) => {
       try {
         const token = await BBAuth.getToken({
-          disableRedirect: true
+          disableRedirect: true,
         });
 
         const timeoutId = setTimeout(reject, this.GET_SETTINGS_TIMEOUT);
 
         try {
-          const value: { settings: BBUserConfig } = await BBCsrfXhr.requestWithToken(
-            URL,
-            token
-          );
+          const value: { settings: BBUserConfig } =
+            await BBCsrfXhr.requestWithToken(URL, token);
 
           clearTimeout(timeoutId);
           resolve(value.settings);
@@ -53,8 +44,11 @@ export class BBUserSettings {
     });
   }
 
-  public static async updateSettings(correlationId: string, settings: BBUserConfig): Promise<void> {
-    return new Promise((resolve, reject) => {
+  public static async updateSettings(
+    correlationId: string,
+    settings: BBUserConfig
+  ): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       if (updateTimeoutId) {
         clearTimeout(updateTimeoutId);
         updateTimeoutId = undefined;
@@ -65,21 +59,16 @@ export class BBUserSettings {
 
         try {
           const token = await BBAuth.getToken({
-            disableRedirect: true
+            disableRedirect: true,
           });
 
           try {
-            const result = await BBCsrfXhr.requestWithToken(
-              URL,
-              token,
-              'PATCH',
-              {
-                correlationId,
-                settings
-              }
-            );
+            await BBCsrfXhr.requestWithToken(URL, token, 'PATCH', {
+              correlationId,
+              settings,
+            });
 
-            resolve(result);
+            resolve();
           } catch (err) {
             reject(err);
           }
@@ -98,7 +87,10 @@ export class BBUserSettings {
 
             Object.assign(existingSettings.omnibar, settings.omnibar);
 
-            localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify(existingSettings));
+            localStorage.setItem(
+              this.LOCAL_STORAGE_KEY,
+              JSON.stringify(existingSettings)
+            );
           } catch (err) {
             reject();
           }
@@ -110,5 +102,4 @@ export class BBUserSettings {
   private static getLocalSettings(): BBUserConfig {
     return JSON.parse(localStorage.getItem(this.LOCAL_STORAGE_KEY));
   }
-
 }

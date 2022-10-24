@@ -2,7 +2,6 @@ import { BBOmnibarUserActivityProcessArgs } from './omnibar-user-activity-proces
 import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
 
 describe('Omnibar user activity processor', () => {
-
   let closeInactivityPromptSpy: jasmine.Spy;
   let renewSessionSpy: jasmine.Spy;
   let redirectForInactivitySpy: jasmine.Spy;
@@ -20,7 +19,7 @@ describe('Omnibar user activity processor', () => {
       minRenewalAge: undefined,
       redirectForInactivity: redirectForInactivitySpy,
       renewSession: renewSessionSpy,
-      showInactivityPrompt: showInactivityPromptSpy
+      showInactivityPrompt: showInactivityPromptSpy,
     };
   }
 
@@ -131,5 +130,4 @@ describe('Omnibar user activity processor', () => {
 
     expect(showInactivityPromptSpy).not.toHaveBeenCalled();
   });
-
 });

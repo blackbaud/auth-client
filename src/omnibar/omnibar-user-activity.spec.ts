@@ -5,6 +5,7 @@ import { BBOmnibarUserActivity } from './omnibar-user-activity';
 import { BBOmnibarUserActivityProcessArgs } from './omnibar-user-activity-process-args';
 import { BBOmnibarUserActivityProcessor } from './omnibar-user-activity-processor';
 import { BBOmnibarUserSessionExpiration } from './omnibar-user-session-expiration';
+import { BBOmnibarUserSessionState } from './omnibar-user-session-state';
 import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
 
 const TEST_TIMEOUT = 50;
@@ -22,13 +23,10 @@ describe('Omnibar user activity', () => {
 
   function moveMouse(clientX: number, clientY: number) {
     document.dispatchEvent(
-      new MouseEvent(
-        'mousemove',
-        {
-          clientX,
-          clientY
-        }
-      )
+      new MouseEvent('mousemove', {
+        clientX,
+        clientY,
+      })
     );
   }
 
@@ -57,11 +55,10 @@ describe('Omnibar user activity', () => {
     shouldTrack: boolean,
     done: DoneFn
   ) {
-    const activityLog: any[] = [];
+    const activityLog: number[] = [];
 
-    spyOn(BBOmnibarUserActivityProcessor, 'process')
-      .and
-      .callFake((args: BBOmnibarUserActivityProcessArgs) => {
+    spyOn(BBOmnibarUserActivityProcessor, 'process').and.callFake(
+      (args: BBOmnibarUserActivityProcessArgs) => {
         if (args.lastActivity !== activityLog[activityLog.length - 1]) {
           activityLog.push(args.lastActivity);
         }
@@ -93,7 +90,7 @@ describe('Omnibar user activity', () => {
   }
 
   function validateNullExpirationBehavior(done: DoneFn) {
-    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = .005;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = 0.005;
 
     setTimeout(() => {
       expect(showInactivityCallbackSpy).not.toHaveBeenCalled();
@@ -104,12 +101,16 @@ describe('Omnibar user activity', () => {
   }
 
   beforeAll(() => {
-    getSessionExpirationSpy = spyOn(BBOmnibarUserSessionExpiration, 'getSessionExpiration').and.callFake(() => {
+    getSessionExpirationSpy = spyOn(
+      BBOmnibarUserSessionExpiration,
+      'getSessionExpiration'
+    ).and.callFake(() => {
       return Promise.resolve(expirationDate);
     });
 
-    myDomain = spyOn(BBAuthDomain, 'getSTSDomain').and
-      .returnValue('https://sts.sky.blackbaud.com');
+    myDomain = spyOn(BBAuthDomain, 'getSTSDomain').and.returnValue(
+      'https://sts.sky.blackbaud.com'
+    );
 
     requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
       switch (url.substr('https://sts.sky.blackbaud.com/session/'.length)) {
@@ -121,7 +122,10 @@ describe('Omnibar user activity', () => {
       return Promise.resolve();
     });
 
-    redirectForInactivitySpy = spyOn(BBAuthNavigator, 'redirectToSignoutForInactivity');
+    redirectForInactivitySpy = spyOn(
+      BBAuthNavigator,
+      'redirectToSignoutForInactivity'
+    );
     refreshUserCallbackSpy = jasmine.createSpy('refreshUserCallback');
     showInactivityCallbackSpy = jasmine.createSpy('showInactivityCallback');
     hideInactivityCallbackSpy = jasmine.createSpy('refreshUserCallback');
@@ -140,7 +144,7 @@ describe('Omnibar user activity', () => {
     BBOmnibarUserActivity.ACTIVITY_TIMER_INTERVAL = TEST_TIMEOUT / 2;
     BBOmnibarUserActivity.MIN_RENEWAL_RETRY = TEST_TIMEOUT - 20;
     BBOmnibarUserActivity.MIN_RENEWAL_AGE = 0;
-    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = (.015 * 1000) - 5;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = 0.015 * 1000 - 5;
     BBOmnibarUserActivity.MAX_SESSION_AGE = TEST_TIMEOUT * 2;
 
     renewWasCalled = false;
@@ -150,7 +154,7 @@ describe('Omnibar user activity', () => {
     BBOmnibarUserActivity.stopTracking();
   });
 
-  it('should renew the user\'s session as soon as activity starts to be tracked', () => {
+  it("should renew the user's session as soon as activity starts to be tracked", () => {
     startTracking();
 
     validateRenewCall();
@@ -166,25 +170,17 @@ describe('Omnibar user activity', () => {
   });
 
   it('should track activity when the user presses a key', (done) => {
+    validateActivityTracking(pressKey, pressKey, true, done);
+  });
+
+  it('should track activity when the mouse move event has fired but the mouse did not actually move', (done) => {
     validateActivityTracking(
-      pressKey,
-      pressKey,
-      true,
+      () => moveMouse(1, 1),
+      () => moveMouse(1, 1),
+      false,
       done
     );
   });
-
-  it(
-    'should track activity when the mouse move event has fired but the mouse did not actually move',
-    (done) => {
-      validateActivityTracking(
-        () => moveMouse(1, 1),
-        () => moveMouse(1, 1),
-        false,
-        done
-      );
-    }
-  );
 
   it('should not start tracking again if tracking has already started', () => {
     const startWatchingSpy = spyOn(BBOmnibarUserSessionWatcher, 'start');
@@ -220,26 +216,23 @@ describe('Omnibar user activity', () => {
     validateRenewCall();
   });
 
-  it(
-    'should not renew the user\'s session if the min renewal retry time has not been reached',
-    (done) => {
-      startTracking();
+  it("should not renew the user's session if the min renewal retry time has not been reached", (done) => {
+    startTracking();
 
-      renewWasCalled = false;
+    renewWasCalled = false;
 
-      BBOmnibarUserActivity.MIN_RENEWAL_RETRY = TEST_TIMEOUT + 500000;
+    BBOmnibarUserActivity.MIN_RENEWAL_RETRY = TEST_TIMEOUT + 500000;
 
-      setTimeout(() => {
-        BBOmnibarUserActivity.userRenewedSession();
+    setTimeout(() => {
+      BBOmnibarUserActivity.userRenewedSession();
 
-        validateRenewCall(false);
+      validateRenewCall(false);
 
-        done();
-      }, TEST_TIMEOUT);
-    }
-  );
+      done();
+    }, TEST_TIMEOUT);
+  });
 
-  it('should not renew the user\'s session on startup if allow anonymous is true', () => {
+  it("should not renew the user's session on startup if allow anonymous is true", () => {
     startTracking(true);
 
     validateRenewCall(false);
@@ -264,7 +257,8 @@ describe('Omnibar user activity', () => {
 
     expirationDate = Date.now() + 10;
 
-    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION = BBOmnibarUserActivity.MAX_SESSION_AGE;
+    BBOmnibarUserActivity.INACTIVITY_PROMPT_DURATION =
+      BBOmnibarUserActivity.MAX_SESSION_AGE;
 
     setTimeout(() => {
       expect(showInactivityCallbackSpy).toHaveBeenCalled();
@@ -281,54 +275,51 @@ describe('Omnibar user activity', () => {
   });
 
   it('should pick up state changes from session watcher', (done) => {
-    let currentStateChange: (args: any) => void;
+    let currentStateChange: (state: BBOmnibarUserSessionState) => void;
 
-    spyOn(BBOmnibarUserSessionWatcher, 'start')
-      .and
-      .callFake((
-        allowAnonymous: boolean,
-        legacyKeepAliveUrl: string,
-        refreshUserCallback: () => void,
-        stateChange: (args: any) => void
+    spyOn(BBOmnibarUserSessionWatcher, 'start').and.callFake(
+      (
+        _allowAnonymous,
+        _legacyKeepAliveUrl,
+        _refreshUserCallback,
+        stateChange
       ) => {
         currentStateChange = stateChange;
-      });
+      }
+    );
 
-    getSessionExpirationSpy
-      .and
-      .callFake((
-        refreshId: string,
-        legacyTtl: number
-      ) => {
+    getSessionExpirationSpy.and.callFake(
+      (refreshId: string, legacyTtl: number) => {
         expect(refreshId).toBe('123');
         expect(legacyTtl).toBe(456);
         done();
         return Promise.resolve(123);
-      });
+      }
+    );
 
     startTracking();
 
     currentStateChange({
       legacyTtl: 456,
-      refreshId: '123'
+      refreshId: '123',
     });
   });
 
   it('should navigate to the legacy signin URL on session expiration when specified', (done) => {
-    let currentStateChange: (args: any) => void;
+    let currentStateChange: (state: BBOmnibarUserSessionState) => void;
 
     const navigateSpy = spyOn(BBAuthNavigator, 'navigate');
 
-    spyOn(BBOmnibarUserSessionWatcher, 'start')
-      .and
-      .callFake((
-        allowAnonymous: boolean,
-        legacyKeepAliveUrl: string,
-        refreshUserCallback: () => void,
-        stateChange: (args: any) => void
+    spyOn(BBOmnibarUserSessionWatcher, 'start').and.callFake(
+      (
+        _allowAnonymous,
+        _legacyKeepAliveUrl,
+        _refreshUserCallback,
+        stateChange
       ) => {
         currentStateChange = stateChange;
-      });
+      }
+    );
 
     BBOmnibarUserActivity.MAX_SESSION_AGE = TEST_TIMEOUT / 2;
 
@@ -337,7 +328,7 @@ describe('Omnibar user activity', () => {
     currentStateChange({
       legacySigninUrl: 'https://example.com/legacy',
       legacyTtl: 456,
-      refreshId: '123'
+      refreshId: '123',
     });
 
     setTimeout(() => {

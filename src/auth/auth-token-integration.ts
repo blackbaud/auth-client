@@ -1,16 +1,10 @@
 //#region imports
 
-import {
-  BBCsrfXhr
-} from '../shared/csrf-xhr';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 
-import {
-  BBAuthCrossDomainIframe
-} from './auth-cross-domain-iframe';
+import { BBAuthCrossDomainIframe } from './auth-cross-domain-iframe';
 
-import {
-  BBAuthDomain
-} from './auth-domain';
+import { BBAuthDomain } from './auth-domain';
 
 //#endregion
 
@@ -20,14 +14,16 @@ export class BBAuthTokenIntegration {
     envId?: string,
     permissionScope?: string,
     leId?: string
-  ): Promise<any> {
-
-    if (BBAuthDomain.getRegisteredDomain() === undefined && !this.hostNameEndsWith('blackbaud.com')) {
+  ): Promise<unknown> {
+    if (
+      BBAuthDomain.getRegisteredDomain() === undefined &&
+      !this.hostNameEndsWith('blackbaud.com')
+    ) {
       return BBAuthCrossDomainIframe.getToken({
         disableRedirect,
         envId,
         leId,
-        permissionScope
+        permissionScope,
       });
     }
 

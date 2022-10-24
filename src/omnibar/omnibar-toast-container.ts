@@ -1,20 +1,12 @@
 //#region imports
 
-import {
-  BBAuth
-} from '../auth/auth';
+import { BBAuth } from '../auth/auth';
 
-import {
-  BBAuthDomUtility
-} from '../shared/dom-utility';
+import { BBAuthDomUtility } from '../shared/dom-utility';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBOmnibarToastContainerInitArgs
-} from './omnibar-toast-container-init-args';
+import { BBOmnibarToastContainerInitArgs } from './omnibar-toast-container-init-args';
 
 //#endregion
 
@@ -31,41 +23,34 @@ let initArgs: BBOmnibarToastContainerInitArgs;
 let currentUrl: string;
 
 function handleGetToken(
-  tokenRequestId: any,
+  tokenRequestId: string,
   disableRedirect: boolean
 ): void {
   BBAuth.getToken({
-    disableRedirect
-  })
-    .then(
-      (token: string) => {
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            messageType: 'token',
-            token,
-            tokenRequestId
-          }
-        );
-      },
-      (reason: any) => {
-        BBAuthInterop.postOmnibarMessage(
-          iframeEl,
-          {
-            messageType: 'token-fail',
-            reason,
-            tokenRequestId
-          }
-        );
-      }
-    );
+    disableRedirect,
+  }).then(
+    (token: string) => {
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        messageType: 'token',
+        token,
+        tokenRequestId,
+      });
+    },
+    (reason) => {
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        messageType: 'token-fail',
+        reason,
+        tokenRequestId,
+      });
+    }
+  );
 }
 
 function getContainerEl(): HTMLDivElement {
   /* istanbul ignore else */
   if (!iframeEl) {
     styleEl = BBAuthDomUtility.addCss(
-`
+      `
 .${CLS_TOAST_CONTAINER} {
   border: none;
   display: none;
@@ -111,18 +96,17 @@ function getElHeight(selector: string): number {
 }
 
 function getOmnibarHeight(): number {
-  return getElHeight('.sky-omnibar-iframe') + getElHeight('.sky-omnibar-environment');
+  return (
+    getElHeight('.sky-omnibar-iframe') + getElHeight('.sky-omnibar-environment')
+  );
 }
 
 function postLocationChangeMessage(): void {
   if (iframeEl) {
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        href: currentUrl,
-        messageType: 'location-change'
-      }
-    );
+    BBAuthInterop.postOmnibarMessage(iframeEl, {
+      href: currentUrl,
+      messageType: 'location-change',
+    });
   }
 }
 
@@ -135,25 +119,19 @@ function messageHandler(event: MessageEvent): void {
 
   switch (message.messageType) {
     case 'toast-ready':
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          messageType: 'host-ready'
-        }
-      );
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        messageType: 'host-ready',
+      });
 
       // Even though the toast container doesn't care about omnibar navigation per se, it does need
       // the environment ID/legal entity ID/service ID values for analytics. Since the omnibar uses
       // the 'nav-ready' message type to post these values, use that same pattern here.
-      BBAuthInterop.postOmnibarMessage(
-        iframeEl,
-        {
-          envId: initArgs.envId,
-          leId: initArgs.leId,
-          messageType: 'nav-ready',
-          svcId: initArgs.svcId
-        }
-      );
+      BBAuthInterop.postOmnibarMessage(iframeEl, {
+        envId: initArgs.envId,
+        leId: initArgs.leId,
+        messageType: 'nav-ready',
+        svcId: initArgs.svcId,
+      });
 
       postLocationChangeMessage();
 
@@ -162,10 +140,7 @@ function messageHandler(event: MessageEvent): void {
       initResolve();
       break;
     case 'get-token':
-      handleGetToken(
-        message.tokenRequestId,
-        message.disableRedirect
-      );
+      handleGetToken(message.tokenRequestId, message.disableRedirect);
       break;
     case 'navigate-url':
       initArgs.navigateUrlCallback(message.url);
@@ -176,7 +151,8 @@ function messageHandler(event: MessageEvent): void {
     case 'toast-container-change':
       if (message.height > 0) {
         iframeEl.style.height = message.height + 'px';
-        iframeEl.style.top = (getOmnibarHeight() + TOAST_CONTAINER_PADDING) + 'px';
+        iframeEl.style.top =
+          getOmnibarHeight() + TOAST_CONTAINER_PADDING + 'px';
 
         iframeEl.classList.remove(CLS_TOAST_CONTAINER_EMPTY);
       } else {
@@ -194,8 +170,7 @@ function messageHandler(event: MessageEvent): void {
 }
 
 export class BBOmnibarToastContainer {
-
-  public static readonly CONTAINER_URL = 'https://host.nxt.blackbaud.com/omnibar/toast';
+  public static CONTAINER_URL = 'https://host.nxt.blackbaud.com/omnibar/toast';
 
   public static init(args: BBOmnibarToastContainerInitArgs): Promise<void> {
     initArgs = args;
@@ -212,14 +187,11 @@ export class BBOmnibarToastContainer {
     return initPromise;
   }
 
-  public static showNewNotifications(notifications: any): void {
-    BBAuthInterop.postOmnibarMessage(
-      iframeEl,
-      {
-        messageType: 'push-notifications-update',
-        pushNotifications: notifications
-      }
-    );
+  public static showNewNotifications(notifications: unknown): void {
+    BBAuthInterop.postOmnibarMessage(iframeEl, {
+      messageType: 'push-notifications-update',
+      pushNotifications: notifications,
+    });
   }
 
   public static updateUrl(url: string): void {
@@ -243,9 +215,8 @@ export class BBOmnibarToastContainer {
       initPromise =
       initResolve =
       styleEl =
-      undefined;
+        undefined;
 
     window.removeEventListener('message', messageHandler);
   }
-
 }

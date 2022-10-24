@@ -1,14 +1,11 @@
-import {
-  BBOmnibarNavigationItem
-} from './omnibar-navigation-item';
+import { BBOmnibarNavigationItem } from './omnibar-navigation-item';
 
 export interface BBOmnibarPushNotificationsConnectArgs {
-
-  customMessageCallback: any;
+  customMessageCallback(message: { value: string }): void;
 
   envId: string;
 
-  handlePushNotificationsChange: (notifications: any[]) => void;
+  handlePushNotificationsChange: (notifications: unknown[]) => void;
 
   handleNavigate: (navItem: BBOmnibarNavigationItem) => void;
 
@@ -16,12 +13,11 @@ export interface BBOmnibarPushNotificationsConnectArgs {
 
   leId: string;
 
-  notificationsCallback: (message: any) => void;
+  notificationsCallback: (message: unknown) => void;
 
   openPushNotificationsMenu: () => void;
 
   showVerticalNav: boolean;
 
   svcId: string;
-
 }

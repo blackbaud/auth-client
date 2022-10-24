@@ -1,31 +1,16 @@
-import {
-  BBAuth,
-  BBAuthTokenErrorCode
-} from '../auth';
+import { BBAuth, BBAuthTokenErrorCode } from '../auth';
 
-import {
-  BBAuthInterop
-} from '../shared/interop';
+import { BBAuthInterop } from '../shared/interop';
 
-import {
-  BBCsrfXhr
-} from '../shared/csrf-xhr';
+import { BBCsrfXhr } from '../shared/csrf-xhr';
 
-import {
-  BBAuthNavigator
-} from '../shared/navigator';
+import { BBAuthNavigator } from '../shared/navigator';
 
-import {
-  BBContextArgs
-} from './context-args';
+import { BBContextArgs } from './context-args';
 
-import {
-  BBContextProvider
-} from './context-provider';
+import { BBContextProvider } from './context-provider';
 
-import {
-  BBContextDestinations
-} from './context-destinations';
+import { BBContextDestinations } from './context-destinations';
 
 describe('Context provider', () => {
   let messageIsFromOmnibarReturnValue: boolean;
@@ -34,17 +19,27 @@ describe('Context provider', () => {
   let testDestinationsMultiple: BBContextDestinations;
   let testDestinationsNone: BBContextDestinations;
 
-  let postOmnibarMessageSpy: jasmine.Spy<typeof BBAuthInterop.postOmnibarMessage>;
-  let messageIsFromOmnibarSpy: jasmine.Spy<typeof BBAuthInterop.messageIsFromOmnibar>;
+  let postOmnibarMessageSpy: jasmine.Spy<
+    typeof BBAuthInterop.postOmnibarMessage
+  >;
+  let messageIsFromOmnibarSpy: jasmine.Spy<
+    typeof BBAuthInterop.messageIsFromOmnibar
+  >;
   let redirectToErrorSpy: jasmine.Spy<typeof BBAuthNavigator.redirectToError>;
 
   let getTokenFake: () => Promise<string>;
 
   function getIframeEl(): HTMLIFrameElement {
-    return document.querySelector('.sky-omnibar-welcome-iframe') as HTMLIFrameElement;
+    return document.querySelector(
+      '.sky-omnibar-welcome-iframe'
+    ) as HTMLIFrameElement;
   }
 
-  function fireMessageEvent(data: any, includeSource = true, hostId = 'context-provider') {
+  function fireMessageEvent(
+    data: Record<string, unknown>,
+    includeSource = true,
+    hostId = 'context-provider'
+  ) {
     data.hostId = hostId;
 
     if (includeSource) {
@@ -53,17 +48,22 @@ describe('Context provider', () => {
 
     window.dispatchEvent(
       new MessageEvent('message', {
-        data
+        data,
       })
     );
   }
 
-  function replyWithDestinations(svcId: string, referringUrl: string, navigation: BBContextDestinations) {
+  function replyWithDestinations(
+    svcId: string,
+    referringUrl: string,
+    navigation: BBContextDestinations
+  ) {
     getTokenFake = () => Promise.resolve('some_token');
 
     spyOn(BBCsrfXhr, 'requestWithToken').and.callFake(
-      (url: string, token: string): Promise<BBContextDestinations> => {
-        let expectedUrl = 'https://nav-pusa01.app.blackbaud.net/navaf/user/destinations?svcid=' +
+      <T>(url: string, token: string): Promise<T> => {
+        let expectedUrl =
+          'https://nav-pusa01.app.blackbaud.net/navaf/user/destinations?svcid=' +
           encodeURIComponent(svcId);
 
         if (referringUrl) {
@@ -74,7 +74,7 @@ describe('Context provider', () => {
 
         expect(token).toBe('some_token');
 
-        return Promise.resolve(navigation);
+        return Promise.resolve(navigation) as Promise<T>;
       }
     );
   }
@@ -92,7 +92,9 @@ describe('Context provider', () => {
     });
   }
 
-  async function ensureContextWithCatch(args: BBContextArgs): Promise<BBContextArgs> {
+  async function ensureContextWithCatch(
+    args: BBContextArgs
+  ): Promise<BBContextArgs> {
     try {
       return await BBContextProvider.ensureContext(args);
     } catch (err) {
@@ -117,10 +119,7 @@ describe('Context provider', () => {
 
     redirectToErrorSpy = spyOn(BBAuthNavigator, 'redirectToError');
 
-    spyOn(
-      BBAuth,
-      'getToken'
-    ).and.callFake(() => {
+    spyOn(BBAuth, 'getToken').and.callFake(() => {
       return getTokenFake();
     });
 
@@ -132,26 +131,26 @@ describe('Context provider', () => {
       items: [
         {
           entitlementName: 'Entitlement 1',
-          url: 'https://example.com/entitlement-1'
-        }
-      ]
+          url: 'https://example.com/entitlement-1',
+        },
+      ],
     };
 
     testDestinationsMultiple = {
       items: [
         {
           entitlementName: 'Entitlement 1',
-          url: 'https://example.com/entitlement-1'
+          url: 'https://example.com/entitlement-1',
         },
         {
           entitlementName: 'Entitlement 2',
-          url: 'https://example.com/entitlement-2'
-        }
-      ]
+          url: 'https://example.com/entitlement-2',
+        },
+      ],
     };
 
     testDestinationsNone = {
-      items: []
+      items: [],
     };
   });
 
@@ -163,13 +162,13 @@ describe('Context provider', () => {
     postOmnibarMessageSpy.calls.reset();
 
     fireMessageEvent({
-      messageType: 'welcome-cancel'
+      messageType: 'welcome-cancel',
     });
   });
 
   it('should automatically resolve if environment ID is not required', async (done) => {
     const args = await ensureContextWithCatch({
-      envIdRequired: false
+      envIdRequired: false,
     });
 
     expect(args.envId).toBeUndefined();
@@ -179,7 +178,7 @@ describe('Context provider', () => {
   it('should automatically resolve if environment ID is required but provided', async (done) => {
     const args = await ensureContextWithCatch({
       envId: '123',
-      envIdRequired: true
+      envIdRequired: true,
     });
 
     expect(args.envId).toBe('123');
@@ -187,18 +186,14 @@ describe('Context provider', () => {
   });
 
   it('should redirect to an error page if environment ID is required but the user is not in an environment', (done) => {
-    replyWithDestinations(
-      'abc',
-      '',
-      {
-        context: {},
-        items: []
-      }
-    );
+    replyWithDestinations('abc', '', {
+      context: {},
+      items: [],
+    });
 
     ensureContextWithCatch({
       envIdRequired: true,
-      svcId: 'abc'
+      svcId: 'abc',
     });
 
     setTimeout(() => {
@@ -210,41 +205,30 @@ describe('Context provider', () => {
     });
   });
 
-  it(
-    'should not redirect if disableRedirect and environment ID is required but the user is not in an environment',
-    async (done) => {
-      replyWithDestinations(
-        'abc',
-        '',
-        {
-          context: {},
-          items: []
-        }
-      );
+  it('should not redirect if disableRedirect and environment ID is required but the user is not in an environment', async (done) => {
+    replyWithDestinations('abc', '', {
+      context: {},
+      items: [],
+    });
 
-      const args = {
-        disableRedirect: true,
-        envIdRequired: true,
-        svcId: 'abc'
-      };
+    const args = {
+      disableRedirect: true,
+      envIdRequired: true,
+      svcId: 'abc',
+    };
 
-      expectAsync(BBContextProvider.ensureContext(args)).toBeRejectedWith(
-        BBAuthTokenErrorCode.InvalidEnvironment
-      );
-
-      done();
-    }
-  );
-
-  it('should redirect to an error page if environment ID is required but service ID is not specified', () => {
-    replyWithDestinations(
-      'abc',
-      '',
-      testDestinationsNone
+    expectAsync(BBContextProvider.ensureContext(args)).toBeRejectedWith(
+      BBAuthTokenErrorCode.InvalidEnvironment
     );
 
+    done();
+  });
+
+  it('should redirect to an error page if environment ID is required but service ID is not specified', () => {
+    replyWithDestinations('abc', '', testDestinationsNone);
+
     ensureContextWithCatch({
-      envIdRequired: true
+      envIdRequired: true,
     });
 
     expect(redirectToErrorSpy).toHaveBeenCalledWith(
@@ -253,15 +237,11 @@ describe('Context provider', () => {
   });
 
   it('should automatically resolve if the user is only in one environment', async (done) => {
-    replyWithDestinations(
-      'abc',
-      '',
-      testDestinationsSingle
-    );
+    replyWithDestinations('abc', '', testDestinationsSingle);
 
     const args = await ensureContextWithCatch({
       envIdRequired: true,
-      svcId: 'abc'
+      svcId: 'abc',
     });
 
     expect(args.url).toBe('https://example.com/entitlement-1');
@@ -278,20 +258,22 @@ describe('Context provider', () => {
     const contextPromise = ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc',
-      url: 'https://example.com'
+      url: 'https://example.com',
     });
 
     const iframeEl = await whenIframeLoaded();
 
-    expect(iframeEl.src).toBe('about:blank?hosted=1&svcid=abc&hostid=context-provider&url=https%3A%2F%2Fexample.com');
+    expect(iframeEl.src).toBe(
+      'about:blank?hosted=1&svcid=abc&hostid=context-provider&url=https%3A%2F%2Fexample.com'
+    );
 
     fireMessageEvent({
-      messageType: 'ready'
+      messageType: 'ready',
     });
 
     fireMessageEvent({
       envId: '2',
-      messageType: 'welcome-environment-selected'
+      messageType: 'welcome-environment-selected',
     });
 
     const args = await contextPromise;
@@ -311,18 +293,18 @@ describe('Context provider', () => {
     const contextPromise = BBContextProvider.ensureContext({
       envIdRequired: true,
       svcId: 'abc',
-      url: 'https://example.com'
+      url: 'https://example.com',
     });
 
     await whenIframeLoaded();
 
     fireMessageEvent({
-      messageType: 'ready'
+      messageType: 'ready',
     });
 
     fireMessageEvent({
       envId: '2',
-      messageType: 'welcome-cancel'
+      messageType: 'welcome-cancel',
     });
 
     try {
@@ -334,58 +316,47 @@ describe('Context provider', () => {
   });
 
   it('should notify the welcome page when a requested token is available', async (done) => {
-    replyWithDestinations(
-      'abc',
-      '',
-      testDestinationsMultiple
-    );
+    replyWithDestinations('abc', '', testDestinationsMultiple);
 
     ensureContextWithCatch({
       envIdRequired: true,
-      svcId: 'abc'
+      svcId: 'abc',
     });
 
     await whenIframeLoaded();
 
     fireMessageEvent({
-      messageType: 'ready'
+      messageType: 'ready',
     });
 
     postOmnibarMessageSpy.and.callFake(() => {
-      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-        getIframeEl(),
-        {
-          messageType: 'token',
-          token: 'some_token',
-          tokenRequestId: 123
-        }
-      );
+      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+        messageType: 'token',
+        token: 'some_token',
+        tokenRequestId: 123,
+      });
 
       done();
     });
 
     fireMessageEvent({
       messageType: 'get-token',
-      tokenRequestId: 123
+      tokenRequestId: 123,
     });
   });
 
   it('should notify the welcome page when a requested token is not available', async (done) => {
-    replyWithDestinations(
-      'abc',
-      '',
-      testDestinationsMultiple
-    );
+    replyWithDestinations('abc', '', testDestinationsMultiple);
 
     ensureContextWithCatch({
       envIdRequired: true,
-      svcId: 'abc'
+      svcId: 'abc',
     });
 
     await whenIframeLoaded();
 
     fireMessageEvent({
-      messageType: 'ready'
+      messageType: 'ready',
     });
 
     getTokenFake = () => {
@@ -393,14 +364,11 @@ describe('Context provider', () => {
     };
 
     postOmnibarMessageSpy.and.callFake(() => {
-      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-        getIframeEl(),
-        {
-          messageType: 'token-fail',
-          reason: 'The user is not logged in.',
-          tokenRequestId: 123
-        }
-      );
+      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+        messageType: 'token-fail',
+        reason: 'The user is not logged in.',
+        tokenRequestId: 123,
+      });
 
       done();
     });
@@ -408,7 +376,7 @@ describe('Context provider', () => {
     fireMessageEvent({
       disableRedirect: false,
       messageType: 'get-token',
-      tokenRequestId: 123
+      tokenRequestId: 123,
     });
   });
 
@@ -424,14 +392,17 @@ describe('Context provider', () => {
     ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc',
-      url: 'https://example.com'
+      url: 'https://example.com',
     });
 
     await whenIframeLoaded();
 
-    fireMessageEvent({
-      messageType: 'ready'
-    }, false);
+    fireMessageEvent(
+      {
+        messageType: 'ready',
+      },
+      false
+    );
 
     expect(postOmnibarMessageSpy).not.toHaveBeenCalled();
 
@@ -448,20 +419,20 @@ describe('Context provider', () => {
     ensureContextWithCatch({
       envIdRequired: true,
       svcId: 'abc',
-      url: 'https://example.com'
+      url: 'https://example.com',
     });
 
     await whenIframeLoaded();
 
     fireMessageEvent({
-      messageType: 'ready'
+      messageType: 'ready',
     });
 
     postOmnibarMessageSpy.calls.reset();
 
     fireMessageEvent(
       {
-        messageType: 'get-token'
+        messageType: 'get-token',
       },
       true,
       'omnibar'

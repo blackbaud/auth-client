@@ -1,13 +1,10 @@
 //#region imports
 
-import {
-  BBOmnibarThemeAccent
-} from './omnibar-theme-accent';
+import { BBOmnibarThemeAccent } from './omnibar-theme-accent';
 
 //#endregion
 
 export interface BBOmnibarTheme {
-
   backgroundColor?: string;
 
   textColor?: string;
@@ -21,5 +18,4 @@ export interface BBOmnibarTheme {
   name?: string;
 
   mode?: string;
-
 }

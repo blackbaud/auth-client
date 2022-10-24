@@ -26,11 +26,11 @@ function isVersionMet(min: string, cur: string): boolean {
 }
 
 export class BBOmnibarScriptLoader {
-  public static registerScript(url: string): Promise<any> {
-    return new Promise<any>((resolve: any, reject: any) => {
+  public static registerScript(url: string): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
       const scriptEl = document.createElement('script');
 
-      scriptEl.onload = resolve;
+      scriptEl.onload = () => resolve();
       scriptEl.onerror = reject;
 
       scriptEl.src = url;
@@ -43,7 +43,7 @@ export class BBOmnibarScriptLoader {
     url: string,
     minVersion: string,
     currentVersion?: string
-  ): Promise<any> {
+  ): Promise<void> {
     if (currentVersion && isVersionMet(minVersion, currentVersion)) {
       return Promise.resolve();
     }
