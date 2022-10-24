@@ -1,7 +1,13 @@
+# 2.60.0 (2022-10-24)
+
+- Added callback for when the omnibar's size changes. [#224](https://github.com/blackbaud/auth-client/pull/224)
+
 # 2.59.0 (2022-10-14)
-- Added admin as a push notification svcid [#223](https://github.com/blackbaud/auth-client/pull/223) (Thanks @Blackbaud-VeehaKhanna)
+
+- Added admin as a push notification svcid. [#223](https://github.com/blackbaud/auth-client/pull/223) (Thanks @Blackbaud-VeehaKhanna)
 
 # 2.58.0 (2022-10-07)
+
 - Added TMFA Mirror url to auth domain whitelist. [#221](https://github.com/blackbaud/auth-client/pull/221) (Thanks @Blackbaud-VeehaKhanna)
 
 # 2.57.0 (2022-08-04)
@@ -48,12 +54,12 @@
 
 - Added additional domain to the auth domain whitelist. [#202](https://github.com/blackbaud/auth-client/pull/202) (Thanks @Blackbaud-AlexisCoulter)
 
-
 # 2.48.1 (2021-08-06)
 
 - Fixed the background watcher iframe to no longer take up vertical space. [#199](https://github.com/blackbaud/auth-client/pull/199)
 
 # 2.48.0 (2021-06-08)
+
 - Added additional domain to the auth domain whitelist. [#198](https://github.com/blackbaud/auth-client/pull/198) (Thanks @Blackbaud-VeehaKhanna)
 
 # 2.47.0 (2021-06-03)
@@ -270,17 +276,17 @@
 
 # 2.1.0 (2017-11-08)
 
-- Added ability to specify an environment ID when retrieving a token.  When not a member of the specified environment, the user will be redirected to an error page.  Specifying an environment ID also adds the environment ID to the JWT token so that consumers of the token can know the user is part of the specified environment.  Note that previously an environment ID could be specified but only when combined with a permission scope. [#59](https://github.com/blackbaud/auth-client/pull/55)
+- Added ability to specify an environment ID when retrieving a token. When not a member of the specified environment, the user will be redirected to an error page. Specifying an environment ID also adds the environment ID to the JWT token so that consumers of the token can know the user is part of the specified environment. Note that previously an environment ID could be specified but only when combined with a permission scope. [#59](https://github.com/blackbaud/auth-client/pull/55)
 
 # 2.0.0 (2017-10-24)
 
 - The 2.0.0 release introduces a few breaking changes, so upgrading to it will require changes to your code.
 
- - The `experimental` omnibar config option has been removed, and what was formerly referred to as the "experimental" omnibar is now the default omnibar.  To load the legacy omnibar (equivalent to not specifying the `experimental` flag in auth-client 1.x), use the new `BBOmnibarLegacy` class and call its `load()` rather than the `load()` method on `BBOmnibar`.
+- The `experimental` omnibar config option has been removed, and what was formerly referred to as the "experimental" omnibar is now the default omnibar. To load the legacy omnibar (equivalent to not specifying the `experimental` flag in auth-client 1.x), use the new `BBOmnibarLegacy` class and call its `load()` rather than the `load()` method on `BBOmnibar`.
 
- - `BBAuth.getToken()` now only accepts an `args` parameter of type `BBAuthGetTokenArgs`.  Previously, the method overloaded the first argument to accept either an `args` parameter or a `forceNewToken` boolean parameter as well as a second `disableRedirect` parameter.  `forceNewToken` and `disableRedirect` should now be specified on the `args` object.
+- `BBAuth.getToken()` now only accepts an `args` parameter of type `BBAuthGetTokenArgs`. Previously, the method overloaded the first argument to accept either an `args` parameter or a `forceNewToken` boolean parameter as well as a second `disableRedirect` parameter. `forceNewToken` and `disableRedirect` should now be specified on the `args` object.
 
- - Several TypeScript config/DTO-style `class`es have been converted to `interface`s.  This keeps these types from being reified (i.e. generating a runtime artifact after transpilation to JavaScript) and results in a smaller bundle.  This should have no effect on your code unless you're doing something unusual like calling one of these type's constructors.
+- Several TypeScript config/DTO-style `class`es have been converted to `interface`s. This keeps these types from being reified (i.e. generating a runtime artifact after transpilation to JavaScript) and results in a smaller bundle. This should have no effect on your code unless you're doing something unusual like calling one of these type's constructors.
 
 # 1.18.0 (2017-10-13)
 
@@ -385,9 +391,9 @@
 
 # 1.1.0 (2017-04-17)
 
- - Updated logic for loading jQuery so that a newer version of jQuery already loaded onto the page does not get overwritten with an older version required by omnibar. [#8](https://github.com/blackbaud/auth-client/pull/8) (Thanks @Blackbaud-RoseWhipple!)
- - Added ability to retrieve a mock token for consumers testing non-production code. [#9](https://github.com/blackbaud/auth-client/pull/9)
+- Updated logic for loading jQuery so that a newer version of jQuery already loaded onto the page does not get overwritten with an older version required by omnibar. [#8](https://github.com/blackbaud/auth-client/pull/8) (Thanks @Blackbaud-RoseWhipple!)
+- Added ability to retrieve a mock token for consumers testing non-production code. [#9](https://github.com/blackbaud/auth-client/pull/9)
 
 # 1.0.0 (2017-04-11)
 
- - Version 1.0
+- Version 1.0
