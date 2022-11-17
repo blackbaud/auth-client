@@ -4,9 +4,6 @@ module.exports = function (config) {
   require('./shared.karma.conf')(config);
 
   config.set({
-    browsers: [
-      'ChromeHeadless'
-    ]
+    browsers: ['ChromeHeadless'],
   });
-
 };

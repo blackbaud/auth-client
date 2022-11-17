@@ -155,7 +155,7 @@ describe('Omnibar', () => {
       serviceName: 'test',
     }).then(() => {
       expect(fakeAuth.Omnibar.load).toHaveBeenCalledWith(
-        document.body.querySelector('[data-omnibar-el]'),
+        document.body.querySelector('[data-omnibar-el]') as HTMLElement,
         {
           afterLoad: jasmine.any(Function),
           serviceName: 'test',
@@ -170,7 +170,7 @@ describe('Omnibar', () => {
   it('should support an undefined config', (done) => {
     BBOmnibarLegacy.load(undefined).then(() => {
       expect(fakeAuth.Omnibar.load).toHaveBeenCalledWith(
-        document.body.querySelector('[data-omnibar-el]'),
+        document.body.querySelector('[data-omnibar-el]') as HTMLElement,
         {
           afterLoad: jasmine.any(Function),
           'z-index': 1000,

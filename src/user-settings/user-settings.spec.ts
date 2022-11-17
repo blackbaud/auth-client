@@ -52,7 +52,7 @@ describe('User settings', () => {
       expect(settings).toEqual(response.settings);
     });
 
-    it('should give up on unresponsive requests to retrieve user settings', async (done) => {
+    it('should give up on unresponsive requests to retrieve user settings', (done) => {
       requestWithTokenSpy.and.returnValue(
         new Promise(() => {
           /* */
