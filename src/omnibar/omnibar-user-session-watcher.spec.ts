@@ -150,7 +150,7 @@ describe('Omnibar user session watcher', () => {
     postSessionChange('def', '123');
 
     expect(postOmnibarMessageSpy).toHaveBeenCalledWith(
-      getLegacyKeepAliveIFrame()[0],
+      getLegacyKeepAliveIFrame()[0] as HTMLIFrameElement,
       {
         messageType: 'session-refresh',
       },

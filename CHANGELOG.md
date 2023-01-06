@@ -1,3 +1,7 @@
+# 2.61.0 (2023-01-06)
+
+- Updated dev dependencies with known vulnarabilities. [#227](https://github.com/blackbaud/auth-client/pull/227)
+
 # 2.60.0 (2022-10-24)
 
 - Added callback for when the omnibar's size changes. [#224](https://github.com/blackbaud/auth-client/pull/224)

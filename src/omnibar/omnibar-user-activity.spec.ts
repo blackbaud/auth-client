@@ -11,7 +11,6 @@ import { BBOmnibarUserSessionWatcher } from './omnibar-user-session-watcher';
 const TEST_TIMEOUT = 50;
 
 describe('Omnibar user activity', () => {
-  let requestSpy: jasmine.Spy;
   let redirectForInactivitySpy: jasmine.Spy;
   let refreshUserCallbackSpy: jasmine.Spy;
   let showInactivityCallbackSpy: jasmine.Spy;
@@ -34,9 +33,14 @@ describe('Omnibar user activity', () => {
     document.dispatchEvent(new KeyboardEvent('keypress'));
   }
 
-  function validateRenewCall(called = true) {
-    expect(renewWasCalled).toBe(called);
-    expect(myDomain).toHaveBeenCalled();
+  function validateRenewCall(renewCalled = true, stsDomainCalled = true) {
+    expect(renewWasCalled).toBe(renewCalled);
+
+    if (stsDomainCalled) {
+      expect(myDomain).toHaveBeenCalled();
+    } else {
+      expect(myDomain).not.toHaveBeenCalled();
+    }
   }
 
   function startTracking(allowAnonymous = false, legacyKeepAliveUrl?: string) {
@@ -100,7 +104,7 @@ describe('Omnibar user activity', () => {
     }, TEST_TIMEOUT);
   }
 
-  beforeAll(() => {
+  beforeEach(() => {
     getSessionExpirationSpy = spyOn(
       BBOmnibarUserSessionExpiration,
       'getSessionExpiration'
@@ -112,7 +116,7 @@ describe('Omnibar user activity', () => {
       'https://sts.sky.blackbaud.com'
     );
 
-    requestSpy = spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
+    spyOn(BBCsrfXhr, 'request').and.callFake((url: string) => {
       switch (url.substr('https://sts.sky.blackbaud.com/session/'.length)) {
         case 'renew':
           renewWasCalled = true;
@@ -129,15 +133,6 @@ describe('Omnibar user activity', () => {
     refreshUserCallbackSpy = jasmine.createSpy('refreshUserCallback');
     showInactivityCallbackSpy = jasmine.createSpy('showInactivityCallback');
     hideInactivityCallbackSpy = jasmine.createSpy('refreshUserCallback');
-  });
-
-  beforeEach(() => {
-    requestSpy.calls.reset();
-    redirectForInactivitySpy.calls.reset();
-    refreshUserCallbackSpy.calls.reset();
-    showInactivityCallbackSpy.calls.reset();
-    hideInactivityCallbackSpy.calls.reset();
-    getSessionExpirationSpy.calls.reset();
 
     expirationDate = Date.now() + 15;
 
@@ -235,7 +230,7 @@ describe('Omnibar user activity', () => {
   it("should not renew the user's session on startup if allow anonymous is true", () => {
     startTracking(true);
 
-    validateRenewCall(false);
+    validateRenewCall(false, false);
   });
 
   it('should stop tracking activity', (done) => {

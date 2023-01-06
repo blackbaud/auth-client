@@ -2,28 +2,29 @@ const path = require('path');
 
 module.exports = {
   mode: 'development',
-
-  entry: './index.ts',
-
   devtool: 'inline-source-map',
-
+  output: {
+    path: path.resolve(__dirname, '..', '..', '.karma_temp'),
+  },
   resolve: {
     extensions: ['.ts', '.js'],
     modules: [path.resolve(__dirname, '..', '..', 'src'), 'node_modules'],
   },
-
+  watchOptions: {
+    ignored: ['**/dist', '**/.kamra_temp'],
+  },
   module: {
     rules: [
       {
-        test: /\.ts$/,
-        loaders: ['ts-loader'],
-      },
-      {
-        enforce: 'post',
         test: /\.(js|ts)$/,
-        loader: 'istanbul-instrumenter-loader!source-map-inline-loader',
+        loader: '@jsdevtools/coverage-istanbul-loader',
         include: path.resolve(__dirname, '..', '..', 'src'),
         exclude: [/\.(e2e|spec)\.ts$/, /node_modules/, /index\.ts/],
+      },
+      {
+        exclude: /(node_modules)/,
+        test: /\.ts$/,
+        loader: 'ts-loader',
       },
     ],
   },

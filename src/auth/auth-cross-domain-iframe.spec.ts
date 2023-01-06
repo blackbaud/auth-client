@@ -184,7 +184,7 @@ describe('Auth Cross Domain Iframe', () => {
       });
     });
 
-    it('handles errors', (done) => {
+    it('handles errors', async () => {
       fakeIframe = BBAuthDomUtility.addIframe(
         '',
         'auth-cross-domain-iframe',
@@ -193,9 +193,11 @@ describe('Auth Cross Domain Iframe', () => {
 
       iframeMock(fakeIframe, true);
 
-      BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {
-        disableRedirect: true,
-      }).catch(done); // if this is caught, it must have thrown the reject
+      await expectAsync(
+        BBAuthCrossDomainIframe.getTokenFromIframe(fakeIframe, {
+          disableRedirect: true,
+        })
+      ).toBeRejected();
     });
 
     it('only calls the iframe once if the getToken is called', (done) => {

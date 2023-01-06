@@ -1301,6 +1301,7 @@ describe('Omnibar', () => {
     it('should disconnect push notifications when the user logs out', (done) => {
       pushNotificationsConnectSpy.and.callFake(async () => {
         pushNotificationsDisconnectSpy.and.callFake(async () => {
+          pushNotificationsDisconnectSpy.and.stub();
           done();
         });
 

@@ -278,7 +278,7 @@ describe('Omnibar vertical', () => {
       ]);
     });
 
-    it('should notify the omnibar when a requested token is available', async (done) => {
+    it('should notify the omnibar when a requested token is available', (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
         expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
           messageType: 'token',
@@ -289,15 +289,15 @@ describe('Omnibar vertical', () => {
         done();
       });
 
-      await loadOmnibarVertical();
-
-      fireMessageEvent({
-        messageType: 'get-token',
-        tokenRequestId: 123,
+      loadOmnibarVertical().then(() => {
+        fireMessageEvent({
+          messageType: 'get-token',
+          tokenRequestId: 123,
+        });
       });
     });
 
-    it('should notify the omnibar when a requested token is not available', async (done) => {
+    it('should notify the omnibar when a requested token is not available', (done) => {
       postOmnibarMessageSpy.and.callFake(() => {
         expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
           messageType: 'token-fail',
@@ -312,12 +312,12 @@ describe('Omnibar vertical', () => {
         return Promise.reject('The user is not logged in.');
       };
 
-      await loadOmnibarVertical();
-
-      fireMessageEvent({
-        disableRedirect: false,
-        messageType: 'get-token',
-        tokenRequestId: 123,
+      loadOmnibarVertical().then(() => {
+        fireMessageEvent({
+          disableRedirect: false,
+          messageType: 'get-token',
+          tokenRequestId: 123,
+        });
       });
     });
 

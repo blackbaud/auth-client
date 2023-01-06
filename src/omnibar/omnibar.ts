@@ -324,18 +324,20 @@ async function connectPushNotifications(
     }
   }
 
-  await BBOmnibarPushNotifications.connect({
-    customMessageCallback,
-    envId: omnibarConfig.envId,
-    handleNavigate,
-    handleNavigateUrl,
-    handlePushNotificationsChange,
-    leId: omnibarConfig.leId,
-    notificationsCallback,
-    openPushNotificationsMenu,
-    showVerticalNav: showVerticalNav(),
-    svcId: omnibarConfig.svcId,
-  });
+  if (omnibarConfig) {
+    await BBOmnibarPushNotifications.connect({
+      customMessageCallback,
+      envId: omnibarConfig.envId,
+      handleNavigate,
+      handleNavigateUrl,
+      handlePushNotificationsChange,
+      leId: omnibarConfig.leId,
+      notificationsCallback,
+      openPushNotificationsMenu,
+      showVerticalNav: showVerticalNav(),
+      svcId: omnibarConfig.svcId,
+    });
+  }
 }
 
 function disconnectPushNotifications(): void {

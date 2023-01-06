@@ -166,23 +166,21 @@ describe('Context provider', () => {
     });
   });
 
-  it('should automatically resolve if environment ID is not required', async (done) => {
+  it('should automatically resolve if environment ID is not required', async () => {
     const args = await ensureContextWithCatch({
       envIdRequired: false,
     });
 
     expect(args.envId).toBeUndefined();
-    done();
   });
 
-  it('should automatically resolve if environment ID is required but provided', async (done) => {
+  it('should automatically resolve if environment ID is required but provided', async () => {
     const args = await ensureContextWithCatch({
       envId: '123',
       envIdRequired: true,
     });
 
     expect(args.envId).toBe('123');
-    done();
   });
 
   it('should redirect to an error page if environment ID is required but the user is not in an environment', (done) => {
@@ -205,7 +203,7 @@ describe('Context provider', () => {
     });
   });
 
-  it('should not redirect if disableRedirect and environment ID is required but the user is not in an environment', async (done) => {
+  it('should not redirect if disableRedirect and environment ID is required but the user is not in an environment', async () => {
     replyWithDestinations('abc', '', {
       context: {},
       items: [],
@@ -217,11 +215,9 @@ describe('Context provider', () => {
       svcId: 'abc',
     };
 
-    expectAsync(BBContextProvider.ensureContext(args)).toBeRejectedWith(
+    await expectAsync(BBContextProvider.ensureContext(args)).toBeRejectedWith(
       BBAuthTokenErrorCode.InvalidEnvironment
     );
-
-    done();
   });
 
   it('should redirect to an error page if environment ID is required but service ID is not specified', () => {
@@ -236,7 +232,7 @@ describe('Context provider', () => {
     );
   });
 
-  it('should automatically resolve if the user is only in one environment', async (done) => {
+  it('should automatically resolve if the user is only in one environment', async () => {
     replyWithDestinations('abc', '', testDestinationsSingle);
 
     const args = await ensureContextWithCatch({
@@ -245,10 +241,9 @@ describe('Context provider', () => {
     });
 
     expect(args.url).toBe('https://example.com/entitlement-1');
-    done();
   });
 
-  it('should show the welcome screen if the user is in more than one environment', async (done) => {
+  it('should show the welcome screen if the user is in more than one environment', async () => {
     replyWithDestinations(
       'abc',
       'https://example.com',
@@ -279,11 +274,9 @@ describe('Context provider', () => {
     const args = await contextPromise;
 
     expect(args.envId).toBe('2');
-
-    done();
   });
 
-  it('should close the welcome screen if the user cancels', async (done) => {
+  it('should close the welcome screen if the user cancels', async () => {
     replyWithDestinations(
       'abc',
       'https://example.com',
@@ -307,15 +300,12 @@ describe('Context provider', () => {
       messageType: 'welcome-cancel',
     });
 
-    try {
-      await contextPromise;
-    } catch (ex) {
-      expect(ex.reason).toBe('canceled');
-      done();
-    }
+    await expectAsync(contextPromise).toBeRejectedWith({
+      reason: 'canceled',
+    });
   });
 
-  it('should notify the welcome page when a requested token is available', async (done) => {
+  it('should notify the welcome page when a requested token is available', (done) => {
     replyWithDestinations('abc', '', testDestinationsMultiple);
 
     ensureContextWithCatch({
@@ -323,29 +313,29 @@ describe('Context provider', () => {
       svcId: 'abc',
     });
 
-    await whenIframeLoaded();
-
-    fireMessageEvent({
-      messageType: 'ready',
-    });
-
-    postOmnibarMessageSpy.and.callFake(() => {
-      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
-        messageType: 'token',
-        token: 'some_token',
-        tokenRequestId: 123,
+    whenIframeLoaded().then(() => {
+      fireMessageEvent({
+        messageType: 'ready',
       });
 
-      done();
-    });
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+          messageType: 'token',
+          token: 'some_token',
+          tokenRequestId: 123,
+        });
 
-    fireMessageEvent({
-      messageType: 'get-token',
-      tokenRequestId: 123,
+        done();
+      });
+
+      fireMessageEvent({
+        messageType: 'get-token',
+        tokenRequestId: 123,
+      });
     });
   });
 
-  it('should notify the welcome page when a requested token is not available', async (done) => {
+  it('should notify the welcome page when a requested token is not available', (done) => {
     replyWithDestinations('abc', '', testDestinationsMultiple);
 
     ensureContextWithCatch({
@@ -353,34 +343,34 @@ describe('Context provider', () => {
       svcId: 'abc',
     });
 
-    await whenIframeLoaded();
-
-    fireMessageEvent({
-      messageType: 'ready',
-    });
-
-    getTokenFake = () => {
-      return Promise.reject('The user is not logged in.');
-    };
-
-    postOmnibarMessageSpy.and.callFake(() => {
-      expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
-        messageType: 'token-fail',
-        reason: 'The user is not logged in.',
-        tokenRequestId: 123,
+    whenIframeLoaded().then(() => {
+      fireMessageEvent({
+        messageType: 'ready',
       });
 
-      done();
-    });
+      getTokenFake = () => {
+        return Promise.reject('The user is not logged in.');
+      };
 
-    fireMessageEvent({
-      disableRedirect: false,
-      messageType: 'get-token',
-      tokenRequestId: 123,
+      postOmnibarMessageSpy.and.callFake(() => {
+        expect(postOmnibarMessageSpy).toHaveBeenCalledWith(getIframeEl(), {
+          messageType: 'token-fail',
+          reason: 'The user is not logged in.',
+          tokenRequestId: 123,
+        });
+
+        done();
+      });
+
+      fireMessageEvent({
+        disableRedirect: false,
+        messageType: 'get-token',
+        tokenRequestId: 123,
+      });
     });
   });
 
-  it('should ignore messages that do not originate from the welcome page', async (done) => {
+  it('should ignore messages that do not originate from the welcome page', async () => {
     messageIsFromOmnibarReturnValue = false;
 
     replyWithDestinations(
@@ -405,11 +395,9 @@ describe('Context provider', () => {
     );
 
     expect(postOmnibarMessageSpy).not.toHaveBeenCalled();
-
-    done();
   });
 
-  it('should ignore messages that do not originate from this hostId', async (done) => {
+  it('should ignore messages that do not originate from this hostId', async () => {
     replyWithDestinations(
       'abc',
       'https://example.com',
@@ -439,7 +427,5 @@ describe('Context provider', () => {
     );
 
     expect(postOmnibarMessageSpy).not.toHaveBeenCalled();
-
-    done();
   });
 });
