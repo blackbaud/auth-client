@@ -207,6 +207,25 @@ describe('Omnibar vertical', () => {
     validateMinimized(true);
   });
 
+  it("should gracefully handle minimizing the left nav when the iFrame isn't in the DOM", async () => {
+    const config = jasmine.createSpyObj<BBOmnibarConfig>('config', [
+      'onResize',
+    ]);
+
+    await loadOmnibarVertical(config);
+
+    const iFrameWrapper = document.querySelector(
+      '.sky-omnibar-vertical-iframe-wrapper'
+    );
+    iFrameWrapper.remove();
+
+    expect(() => {
+      fireMessageEvent({
+        messageType: 'minimize',
+      });
+    }).not.toThrowError();
+  });
+
   it("should load the left nav with default settings if the user's global settings fail to load", async () => {
     userSettingsReturnValue = Promise.reject();
 
