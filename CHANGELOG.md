@@ -1,3 +1,7 @@
+# 2.61.1 (2023-01-23)
+
+- Added a check that the left nav iFrame exists before minimizing it. [#228](https://github.com/blackbaud/auth-client/pull/228)
+
 # 2.61.0 (2023-01-06)
 
 - Updated dev dependencies with known vulnarabilities. [#227](https://github.com/blackbaud/auth-client/pull/227)
