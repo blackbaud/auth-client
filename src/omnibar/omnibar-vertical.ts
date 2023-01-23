@@ -34,14 +34,16 @@ function updateSize(): void {
   if (omnibarConfig.onResize) {
     let size = 0;
 
-    const wrapperStyle = getComputedStyle(
-      document.querySelector(`.${CLS_IFRAME_WRAPPER}`)
-    );
+    const iFrameEl = document.querySelector(`.${CLS_IFRAME_WRAPPER}`);
 
-    if (wrapperStyle.display !== 'none') {
-      size = document.body.classList.contains(CLS_BODY_MINIMIZED)
-        ? WIDTH_MIN
-        : WIDTH_MAX;
+    if (iFrameEl) {
+      const wrapperStyle = getComputedStyle(iFrameEl);
+
+      if (wrapperStyle.display !== 'none') {
+        size = document.body.classList.contains(CLS_BODY_MINIMIZED)
+          ? WIDTH_MIN
+          : WIDTH_MAX;
+      }
     }
 
     omnibarConfig.onResize({

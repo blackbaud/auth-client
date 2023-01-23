@@ -196,13 +196,17 @@ describe('Omnibar vertical', () => {
   });
 
   it("should respect the user's global settings", async () => {
+    const config = jasmine.createSpyObj<BBOmnibarConfig>('config', [
+      'onResize',
+    ]);
+
     userSettingsReturnValue = Promise.resolve({
       omnibar: {
         vMin: true,
       },
     });
 
-    await loadOmnibarVertical();
+    await loadOmnibarVertical(config);
 
     validateMinimized(true);
   });
