@@ -1,3 +1,7 @@
+# 2.61.2 (2023-02-03)
+
+- Updated `raw-loader` to address security vulnerabilities. [#229](https://github.com/blackbaud/auth-client/pull/229)
+
 # 2.61.1 (2023-01-23)
 
 - Added a check that the left nav iFrame exists before minimizing it. [#228](https://github.com/blackbaud/auth-client/pull/228)
