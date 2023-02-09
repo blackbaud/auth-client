@@ -16,8 +16,8 @@ const CLS_BODY = 'sky-omnibar-vertical-body';
 const CLS_BODY_MINIMIZED = 'sky-omnibar-vertical-body-minimized';
 const CLS_IFRAME_WRAPPER = 'sky-omnibar-vertical-iframe-wrapper';
 
-const WIDTH_MAX = 300;
-const WIDTH_MIN = 90;
+const WIDTH_MAX = 250;
+const WIDTH_MIN = 60;
 
 const settingsUpdatesToIgnore = new Set<string>();
 
@@ -229,6 +229,8 @@ function messageHandler(event: MessageEvent): void {
         services: nav && nav.services,
         svcId: omnibarConfig.svcId,
         theme: omnibarConfig.theme,
+        widthMinimized: WIDTH_MIN,
+        widthExpanded: WIDTH_MAX,
       });
 
       postLocationChangeMessage();
