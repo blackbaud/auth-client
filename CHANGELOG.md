@@ -1,3 +1,7 @@
+# 2.62.0 (2023-02-22)
+
+- Updated the maximized and minimized vertical omnibar sizes and passed them to vertical omnibar. [#230](https://github.com/blackbaud/auth-client/pull/230)
+
 # 2.61.1 (2023-01-23)
 
 - Added a check that the left nav iFrame exists before minimizing it. [#228](https://github.com/blackbaud/auth-client/pull/228)
