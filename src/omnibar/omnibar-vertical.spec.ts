@@ -279,7 +279,7 @@ describe('Omnibar vertical', () => {
           svcId,
           theme: undefined,
           widthMinimized: 60,
-          widthExpanded: 250,
+          widthMaximized: 250,
         },
       ]);
     });
