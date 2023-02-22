@@ -99,7 +99,7 @@ describe('Omnibar vertical', () => {
     const wrapperEl = getIframeWrapperEl();
 
     expect(getComputedStyle(wrapperEl).width).toBe(
-      minimized ? '90px' : '300px'
+      minimized ? '60px' : '250px'
     );
   }
 
@@ -278,6 +278,8 @@ describe('Omnibar vertical', () => {
           ],
           svcId,
           theme: undefined,
+          widthMinimized: 60,
+          widthMaximized: 250,
         },
       ]);
     });
@@ -388,19 +390,19 @@ describe('Omnibar vertical', () => {
 
       await loadOmnibarVertical(config);
 
-      validateOnResize(config, 300);
+      validateOnResize(config, 250);
 
       fireMessageEvent({
         messageType: 'minimize',
       });
 
-      validateOnResize(config, 90);
+      validateOnResize(config, 60);
 
       fireMessageEvent({
         messageType: 'maximize',
       });
 
-      validateOnResize(config, 300);
+      validateOnResize(config, 250);
     });
 
     it("should call the config's onResize() callback on XS media breakpoint", async () => {
@@ -443,7 +445,7 @@ describe('Omnibar vertical', () => {
       iframeWrapper.style.display = 'initial';
       mediaListener(new MediaQueryListEvent('change', { matches: false }));
 
-      validateOnResize(config, 300);
+      validateOnResize(config, 250);
     });
 
     it('should navigate by URL', async () => {

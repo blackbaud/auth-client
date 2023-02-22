@@ -16,8 +16,8 @@ const CLS_BODY = 'sky-omnibar-vertical-body';
 const CLS_BODY_MINIMIZED = 'sky-omnibar-vertical-body-minimized';
 const CLS_IFRAME_WRAPPER = 'sky-omnibar-vertical-iframe-wrapper';
 
-const WIDTH_MAX = 300;
-const WIDTH_MIN = 90;
+const OMNBAR_VERTICAL_WIDTH_MAXIMIZED = 250;
+const OMINIBAR_VERTICAL_WIDTH_MINIMIZED = 60;
 
 const settingsUpdatesToIgnore = new Set<string>();
 
@@ -41,8 +41,8 @@ function updateSize(): void {
 
       if (wrapperStyle.display !== 'none') {
         size = document.body.classList.contains(CLS_BODY_MINIMIZED)
-          ? WIDTH_MIN
-          : WIDTH_MAX;
+          ? OMINIBAR_VERTICAL_WIDTH_MINIMIZED
+          : OMNBAR_VERTICAL_WIDTH_MAXIMIZED;
       }
     }
 
@@ -98,7 +98,7 @@ function addStyleEl(): void {
   left: 0;
   bottom: 0;
   box-shadow: 0px 2px 10px 0px rgba(0, 0, 0, 0.05);
-  width: ${WIDTH_MAX}px;
+  width: ${OMNBAR_VERTICAL_WIDTH_MAXIMIZED}px;
   z-index: 999;
 }
 
@@ -107,7 +107,7 @@ function addStyleEl(): void {
 }
 
 .${CLS_BODY_MINIMIZED} .${CLS_IFRAME_WRAPPER}:not(.${CLS_EXPANDED}) {
-  width: ${WIDTH_MIN}px;
+  width: ${OMINIBAR_VERTICAL_WIDTH_MINIMIZED}px;
 }
 
 .sky-omnibar-vertical-iframe {
@@ -126,11 +126,11 @@ function addStyleEl(): void {
 
 @media (min-width: 768px) {
   .${CLS_BODY} {
-    margin-left: ${WIDTH_MAX}px;
+    margin-left: ${OMNBAR_VERTICAL_WIDTH_MAXIMIZED}px;
   }
 
   .${CLS_BODY_MINIMIZED} {
-    margin-left: ${WIDTH_MIN}px;
+    margin-left: ${OMINIBAR_VERTICAL_WIDTH_MINIMIZED}px;
   }
 }
 
@@ -229,6 +229,8 @@ function messageHandler(event: MessageEvent): void {
         services: nav && nav.services,
         svcId: omnibarConfig.svcId,
         theme: omnibarConfig.theme,
+        widthMinimized: OMINIBAR_VERTICAL_WIDTH_MINIMIZED,
+        widthMaximized: OMNBAR_VERTICAL_WIDTH_MAXIMIZED,
       });
 
       postLocationChangeMessage();
