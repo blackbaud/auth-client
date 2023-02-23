@@ -125,12 +125,12 @@ function parseQuerystring(): Record<string, string> {
     if (qs.indexOf('#') >= 0) {
       qs = qs.split('#')[0];
     }
-    qs.split('&').forEach((p) => {
+    for (const p of qs.split('&')) {
       const param = p.split('=');
       const key = param[0];
       const value = param[1];
       queryParams[key] = value;
-    });
+    }
   }
   return queryParams;
 }
