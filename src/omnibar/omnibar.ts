@@ -64,7 +64,7 @@ function addIframeEl(): void {
 
 function isModernTheme(): boolean {
   const qs = parseQuerystring();
-  if (qs.forceModern === '1') {
+  if (qs.modernnav === '1') {
     return true;
   }
 

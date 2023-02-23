@@ -1638,7 +1638,7 @@ describe('Omnibar', () => {
   describe('modern theme', () => {
     it('should be loaded when the theme is default and the URL contains a flag to force modern', async () => {
       spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
-        'https://example.com?forceModern=1'
+        'https://example.com?modernnav=1'
       );
       spyOn(BBOmnibarVertical, 'load');
 
