@@ -1,3 +1,7 @@
+# 2.63.0 (2023-02-24)
+
+- Added ability to preview omnibar in modern theme. [#232](https://github.com/blackbaud/auth-client/pull/232)
+
 # 2.62.0 (2023-02-22)
 
 - Updated the maximized and minimized vertical omnibar sizes and passed them to vertical omnibar. [#230](https://github.com/blackbaud/auth-client/pull/230)
