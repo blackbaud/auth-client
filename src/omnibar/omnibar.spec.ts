@@ -62,6 +62,10 @@ describe('Omnibar', () => {
     ) as HTMLDivElement;
   }
 
+  function getEnvironmentEl(): HTMLDivElement {
+    return document.querySelector('.sky-omnibar-environment') as HTMLDivElement;
+  }
+
   function fireMessageEvent(
     data: Record<string, unknown>,
     includeSource = true,
@@ -1628,6 +1632,33 @@ describe('Omnibar', () => {
       fireMessageEvent({
         messageType: 'ready',
       });
+    });
+  });
+
+  describe('modern theme', () => {
+    it('should be loaded when the theme is default and the URL contains a flag to force modern', async () => {
+      spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
+        'https://example.com?modernnav=1'
+      );
+      spyOn(BBOmnibarVertical, 'load');
+
+      const config = {
+        theme: {
+          name: 'default',
+        },
+      };
+
+      const loadPromise = loadOmnibar(config);
+
+      fireMessageEvent({
+        messageType: 'ready',
+      });
+
+      await loadPromise;
+
+      expect(getEnvironmentEl()).toHaveClass(
+        'sky-omnibar-environment-theme-modern'
+      );
     });
   });
 });

@@ -63,6 +63,11 @@ function addIframeEl(): void {
 }
 
 function isModernTheme(): boolean {
+  const qs = parseQuerystring();
+  if (qs.modernnav === '1') {
+    return true;
+  }
+
   const theme = omnibarConfig.theme;
   return theme && theme.name === 'modern';
 }
@@ -106,18 +111,28 @@ function showVerticalNav(): boolean {
       return true;
     }
 
-    let qs = BBAuthInterop.getCurrentUrl().split('?')[1];
-
-    if (qs) {
-      if (qs.indexOf('#') >= 0) {
-        qs = qs.split('#')[0];
-      }
-
-      return qs.split('&').indexOf('leftnav=1') >= 0;
-    }
+    const qs = parseQuerystring();
+    return qs.leftnav === '1';
   }
 
   return false;
+}
+
+function parseQuerystring(): Record<string, string> {
+  const queryParams: Record<string, string> = {};
+  let qs = BBAuthInterop.getCurrentUrl().split('?')[1];
+  if (qs) {
+    if (qs.indexOf('#') >= 0) {
+      qs = qs.split('#')[0];
+    }
+    for (const p of qs.split('&')) {
+      const param = p.split('=');
+      const key = param[0];
+      const value = param[1];
+      queryParams[key] = value;
+    }
+  }
+  return queryParams;
 }
 
 function addStyleEl(): void {
