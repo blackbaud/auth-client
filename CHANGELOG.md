@@ -1,3 +1,7 @@
+# 2.64.0 (2023-03-21)
+
+- Added Grants Connect to thirdPartyDomainSTSUrlMappings. [#234](https://github.com/blackbaud/auth-client/pull/234)
+
 # 2.63.0 (2023-02-24)
 
 - Added ability to preview omnibar in modern theme. [#232](https://github.com/blackbaud/auth-client/pull/232)
