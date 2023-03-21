@@ -88,11 +88,13 @@ export class BBAuthInterop {
 
   public static postLocationChangeMessage(
     iframeEl: HTMLIFrameElement,
-    url: string
+    url: string,
+    category?: string
   ): void {
     if (iframeEl) {
       BBAuthInterop.postOmnibarMessage(iframeEl, {
         href: url,
+        category,
         messageType: 'location-change',
       });
     }
@@ -113,5 +115,9 @@ export class BBAuthInterop {
 
   public static getCurrentUrl(): string {
     return document.location.href;
+  }
+
+  public static getCurrentPath(): string {
+    return document.location.pathname;
   }
 }

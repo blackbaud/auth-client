@@ -56,4 +56,8 @@ export interface BBOmnibarConfig {
   verticalUrl?: string;
 
   onResize?: (resizeArgs: BBOmnibarResizeArgs) => void;
+
+  getRouteInfo?: (args: { href: string; pathname: string }) => {
+    category?: string;
+  };
 }
