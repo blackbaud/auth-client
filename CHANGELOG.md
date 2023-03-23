@@ -1,3 +1,7 @@
+# 2.64.0 (2023-03-23)
+
+- Added call to `getRouteInfo` to get a route's category. [#235](https://github.com/blackbaud/auth-client/pull/235)
+
 # 2.63.0 (2023-02-24)
 
 - Added ability to preview omnibar in modern theme. [#232](https://github.com/blackbaud/auth-client/pull/232)
