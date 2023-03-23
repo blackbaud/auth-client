@@ -1012,7 +1012,7 @@ describe('Omnibar', () => {
       }
 
       loadOmnibar({
-        getRouteInfo: () => {
+        getRouteDetails: () => {
           return { category: 'test' };
         },
       });
