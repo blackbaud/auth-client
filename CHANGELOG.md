@@ -1,3 +1,7 @@
+# 2.64.1 (2023-03-23)
+
+- Updated incorrect function call from `getRouteInfo` to `getRouteDetails`. [#237](https://github.com/blackbaud/auth-client/pull/237)
+
 # 2.64.0 (2023-03-23)
 
 - Added call to `getRouteInfo` to get a route's category. [#235](https://github.com/blackbaud/auth-client/pull/235)

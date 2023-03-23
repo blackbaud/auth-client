@@ -268,7 +268,10 @@ function handleStateChange(): void {
   const url = BBAuthInterop.getCurrentUrl();
   const path = BBAuthInterop.getCurrentPath();
 
-  const routeInfo = omnibarConfig.getRouteInfo?.({ href: url, pathname: path });
+  const routeInfo = omnibarConfig.getRouteDetails?.({
+    href: url,
+    pathname: path,
+  });
 
   BBAuthInterop.postLocationChangeMessage(iframeEl, url, routeInfo?.category);
 

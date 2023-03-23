@@ -57,7 +57,7 @@ export interface BBOmnibarConfig {
 
   onResize?: (resizeArgs: BBOmnibarResizeArgs) => void;
 
-  getRouteInfo?: (args: { href: string; pathname: string }) => {
+  getRouteDetails?: (args: { href: string; pathname: string }) => {
     category?: string;
   };
 }
