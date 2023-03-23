@@ -266,11 +266,14 @@ function expandIframe(): void {
 
 function handleStateChange(): void {
   const url = BBAuthInterop.getCurrentUrl();
+  const path = BBAuthInterop.getCurrentPath();
 
-  BBAuthInterop.postLocationChangeMessage(iframeEl, url);
+  const routeInfo = omnibarConfig.getRouteInfo?.({ href: url, pathname: path });
+
+  BBAuthInterop.postLocationChangeMessage(iframeEl, url, routeInfo?.category);
 
   BBOmnibarToastContainer.updateUrl(url);
-  BBOmnibarVertical.updateUrl(url);
+  BBOmnibarVertical.updateUrl(url, routeInfo?.category);
 }
 
 async function handleSearch(searchArgs: BBOmnibarSearchArgs): Promise<void> {

@@ -1006,11 +1006,16 @@ describe('Omnibar', () => {
 
         expect(postOmnibarMessageSpy).toHaveBeenCalledWith(iframeEl, {
           href: location.href,
+          category: 'test',
           messageType: 'location-change',
         });
       }
 
-      loadOmnibar();
+      loadOmnibar({
+        getRouteInfo: () => {
+          return { category: 'test' };
+        },
+      });
 
       const iframeEl = getIframeEl();
 

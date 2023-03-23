@@ -23,6 +23,7 @@ const settingsUpdatesToIgnore = new Set<string>();
 
 let currentSettings: BBUserConfig;
 let currentUrl: string;
+let currentCategory: string | undefined;
 let iframeEl: HTMLIFrameElement;
 let iframeWrapperEl: HTMLDivElement;
 let omnibarConfig: BBOmnibarConfig;
@@ -161,7 +162,11 @@ function removeWindowMediaListener(): void {
 }
 
 function postLocationChangeMessage(): void {
-  BBAuthInterop.postLocationChangeMessage(iframeEl, currentUrl);
+  BBAuthInterop.postLocationChangeMessage(
+    iframeEl,
+    currentUrl,
+    currentCategory
+  );
 }
 
 function minimize(): void {
@@ -294,8 +299,9 @@ export class BBOmnibarVertical {
     });
   }
 
-  public static updateUrl(url: string): void {
+  public static updateUrl(url: string, category?: string): void {
     currentUrl = url;
+    currentCategory = category;
 
     postLocationChangeMessage();
   }
