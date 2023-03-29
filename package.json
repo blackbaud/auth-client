@@ -1,6 +1,6 @@
 {
   "name": "@blackbaud/auth-client",
-  "version": "2.64.1",
+  "version": "2.64.2",
   "description": "Provides methods for obtaining an authentication token from the Blackbaud authentication service.",
   "main": "dist/bundles/auth-client.umd.js",
   "module": "index.ts",

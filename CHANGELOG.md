@@ -1,3 +1,7 @@
+# 2.64.2 (2023-03-29)
+
+- Added GrantsConnect urls to auth domain whitelist. [#238](https://github.com/blackbaud/auth-client/pull/238) (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.64.1 (2023-03-23)
 
 - Updated incorrect function call from `getRouteInfo` to `getRouteDetails`. [#237](https://github.com/blackbaud/auth-client/pull/237)
