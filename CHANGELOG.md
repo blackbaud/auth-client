@@ -1,4 +1,4 @@
-# 2.63.1 (2023-03-21)
+# 2.64.0 (2023-03-21)
 
 - Added Grants Connect to thirdPartyDomainSTSUrlMappings. [#234](https://github.com/blackbaud/auth-client/pull/234)
 
