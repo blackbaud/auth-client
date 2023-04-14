@@ -1,4 +1,8 @@
-# 2.64.2 (2023-03-29)
+# 2.66.0 (2023-04-11)
+
+- Added `edu` and `highered` to the list of valid service IDs for notifications. [#239](https://github.com/blackbaud/auth-client/pull/239)
+
+# 2.65.0 (2023-03-29)
 
 - Added GrantsConnect urls to auth domain whitelist. [#238](https://github.com/blackbaud/auth-client/pull/238) (Thanks @Blackbaud-VeehaKhanna)
 

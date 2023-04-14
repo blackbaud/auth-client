@@ -62,6 +62,12 @@ const notificationSvcIds: Record<
   tcs: {
     requiresNotif: true,
   },
+  edu: {
+    requiresNotif: false,
+  },
+  highered: {
+    requiresNotif: false,
+  }
 };
 
 async function initToastContainer(
