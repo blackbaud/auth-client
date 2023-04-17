@@ -1,3 +1,7 @@
+# 2.67.0 (2023-03-29)
+
+- Added Payments dev url to auth domain whitelist. [#240](https://github.com/blackbaud/auth-client/pull/240) (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.66.0 (2023-04-11)
 
 - Added `edu` and `highered` to the list of valid service IDs for notifications. [#239](https://github.com/blackbaud/auth-client/pull/239)
