@@ -35,6 +35,9 @@ const notificationSvcIds: Record<
   fenxt: {
     requiresNotif: true,
   },
+  gmk: {
+    requiresNotif: false,
+  },
   gsrch: {
     requiresNotif: true,
   },
@@ -67,7 +70,7 @@ const notificationSvcIds: Record<
   },
   highered: {
     requiresNotif: false,
-  }
+  },
 };
 
 async function initToastContainer(
