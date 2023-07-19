@@ -50,6 +50,9 @@ const notificationSvcIds: Record<
   merchservices: {
     requiresNotif: false,
   },
+  mpebill: {
+    requiresNotif: false,
+  },
   renxt: {
     requiresNotif: false,
   },

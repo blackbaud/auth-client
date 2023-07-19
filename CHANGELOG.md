@@ -1,3 +1,7 @@
+# 2.69.0 (2023-07-19)
+
+- Added `mpebill` to the list of valid service IDs for notifications. [#243](https://github.com/blackbaud/auth-client/pull/243/)
+
 # 2.68.0 (2023-04-27)
 
 - Added `gmk` to the list of valid service IDs for notifications. [#242](https://github.com/blackbaud/auth-client/pull/242/)
