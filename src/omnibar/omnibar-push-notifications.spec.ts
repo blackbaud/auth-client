@@ -299,5 +299,6 @@ describe('Omnibar push notifications', () => {
     await testSvcId('gsrch', true, true);
     await testSvcId('gmk', false, true);
     await testSvcId('mpebill', false, true);
+    await testSvcId('rxr', false, true);
   });
 });

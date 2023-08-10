@@ -1,3 +1,7 @@
+# 2.70.0 (2023-08-10)
+
+- Added `rxr` to the list of valid service IDs for notifications. [#244](https://github.com/blackbaud/auth-client/pull/244/)
+
 # 2.69.0 (2023-07-19)
 
 - Added `mpebill` to the list of valid service IDs for notifications. [#243](https://github.com/blackbaud/auth-client/pull/243/)
