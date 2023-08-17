@@ -1,3 +1,15 @@
+# 2.69.0 (2023-07-19)
+
+- Added `mpebill` to the list of valid service IDs for notifications. [#243](https://github.com/blackbaud/auth-client/pull/243/)
+
+# 2.68.0 (2023-04-27)
+
+- Added `gmk` to the list of valid service IDs for notifications. [#242](https://github.com/blackbaud/auth-client/pull/242/)
+
+# 2.67.0 (2023-03-29)
+
+- Added Payments dev url to auth domain whitelist. [#240](https://github.com/blackbaud/auth-client/pull/240) (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.66.0 (2023-04-11)
 
 - Added `edu` and `highered` to the list of valid service IDs for notifications. [#239](https://github.com/blackbaud/auth-client/pull/239)

@@ -35,6 +35,9 @@ const notificationSvcIds: Record<
   fenxt: {
     requiresNotif: true,
   },
+  gmk: {
+    requiresNotif: false,
+  },
   gsrch: {
     requiresNotif: true,
   },
@@ -45,6 +48,9 @@ const notificationSvcIds: Record<
     requiresNotif: false,
   },
   merchservices: {
+    requiresNotif: false,
+  },
+  mpebill: {
     requiresNotif: false,
   },
   renxt: {
@@ -67,7 +73,7 @@ const notificationSvcIds: Record<
   },
   highered: {
     requiresNotif: false,
-  }
+  },
 };
 
 async function initToastContainer(
