@@ -1,3 +1,7 @@
+# 2.70.0 (2023-08-17)
+
+- Added BBTM urls to auth domain whitelist. [#244](https://github.com/blackbaud/auth-client/pull/244) (Thanks @Blackbaud-VeehaKhanna)
+-
 # 2.69.0 (2023-07-19)
 
 - Added `mpebill` to the list of valid service IDs for notifications. [#243](https://github.com/blackbaud/auth-client/pull/243/)
