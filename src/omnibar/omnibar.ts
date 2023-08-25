@@ -107,8 +107,10 @@ function collapseIframe(): void {
 
 function showVerticalNav(): boolean {
   if (isModernTheme()) {
-    if (omnibarConfig.svcId === 'tcs') {
-      return true;
+    switch (omnibarConfig.svcId) {
+      case 'cid':
+      case 'tcs':
+        return true;
     }
 
     const qs = parseQuerystring();
