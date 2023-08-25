@@ -1490,7 +1490,7 @@ describe('Omnibar', () => {
     >;
 
     beforeEach(() => {
-      loadSpy = spyOn(BBOmnibarVertical, 'load').and.callThrough();
+      loadSpy = spyOn(BBOmnibarVertical, 'load');
     });
 
     async function validateVerticalNavExists(svcId?: string): Promise<void> {
