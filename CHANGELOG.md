@@ -1,3 +1,7 @@
+# 2.71.1 (2023-11-01)
+
+- Remove `encodeURIComponent` aliases for better static code analysis. [#247](https://github.com/blackbaud/auth-client/pull/247)
+
 # 2.71.0 (2023-08-25)
 
 - Display vertical nav for `cid`. [#246](https://github.com/blackbaud/auth-client/pull/246)
