@@ -27,7 +27,10 @@ const thirdPartyDomainSTSUrlMappings: { [domain: string]: string } = {
   'smarttuition.com': 'https://account.smarttuition.com',
   'yourcausegrants.com':'https://sts.yourcausegrants.com',
   'yourcausegrantsqa.com': 'https://sts.yourcausegrantsqa.com',
-  'yourcausegrantsuat.com': 'https://sts.yourcausegrantsuat.com'
+  'yourcausegrantsuat.com': 'https://sts.yourcausegrantsuat.com',
+  'qa-nonprofitplatform-ui.blackbaud.net': 'https://npoc.qa-nonprofitplatform-ui.blackbaud.net',
+  'uat-nonprofitplatform-ui.blackbaud.net': 'https://npoc.uat-nonprofitplatform-ui.blackbaud.net',
+  'nonprofit.yourcause.com':'https://npoc.nonprofit.yourcause.com',
 };
 const defaultSTSUrl = 'https://sts.sky.blackbaud.com';
 
