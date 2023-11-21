@@ -1,3 +1,7 @@
+# 2.72.0 (2023-11-21)
+
+- Remove legacy omnibar code [#249](https://github.com/blackbaud/auth-client/pull/249)
+
 # 2.71.1 (2023-11-01)
 
 - Remove `encodeURIComponent` aliases for better static code analysis. [#247](https://github.com/blackbaud/auth-client/pull/247)
