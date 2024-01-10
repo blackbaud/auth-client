@@ -1,6 +1,6 @@
 # 2.72.0 (2024-01-10)
 
-- Added NPOc url to auth domain whitelist. [#249](https://github.com/blackbaud/auth-client/pull/249) (Thanks @Blackbaud-VeehaKhanna)
+- Added NPOc url to auth domain whitelist. [#250](https://github.com/blackbaud/auth-client/pull/250) (Thanks @Blackbaud-VeehaKhanna)
 
 # 2.71.1 (2023-11-01)
 
