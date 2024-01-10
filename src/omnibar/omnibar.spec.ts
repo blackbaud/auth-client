@@ -1485,87 +1485,68 @@ describe('Omnibar', () => {
   });
 
   describe('vertical navigation', () => {
+    let loadSpy: jasmine.Spy<
+      (config: BBOmnibarConfig, afterEl: HTMLElement) => Promise<void>
+    >;
+
+    beforeEach(() => {
+      loadSpy = spyOn(BBOmnibarVertical, 'load');
+    });
+
+    async function validateVerticalNavExists(svcId?: string): Promise<void> {
+      loadSpy.calls.reset();
+
+      const config = {
+        svcId,
+        theme: {
+          name: 'modern',
+        },
+      };
+
+      const loadPromise = loadOmnibar(config);
+
+      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(
+        config,
+        getIframeEl()
+      );
+
+      fireMessageEvent({
+        messageType: 'ready',
+      });
+
+      await loadPromise;
+
+      expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
+        getIframeEl(),
+        jasmine.objectContaining({
+          compactNavOnly: true,
+        }),
+      ]);
+
+      expect(pushNotificationsConnectSpy).toHaveBeenCalledWith(
+        jasmine.objectContaining({
+          showVerticalNav: true,
+        })
+      );
+    }
+
     it('should be loaded when the theme is modern and the URL contains a flag', async () => {
       spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
         'https://example.com?leftnav=1'
       );
-      spyOn(BBOmnibarVertical, 'load');
 
-      const config = {
-        theme: {
-          name: 'modern',
-        },
-      };
-
-      const loadPromise = loadOmnibar(config);
-
-      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(
-        config,
-        getIframeEl()
-      );
-
-      fireMessageEvent({
-        messageType: 'ready',
-      });
-
-      await loadPromise;
-
-      expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
-        getIframeEl(),
-        jasmine.objectContaining({
-          compactNavOnly: true,
-        }),
-      ]);
-
-      expect(pushNotificationsConnectSpy).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          showVerticalNav: true,
-        })
-      );
+      await validateVerticalNavExists();
     });
 
-    it("should be loaded when the theme is modern and the svcid is 'tcs'", async () => {
-      spyOn(BBOmnibarVertical, 'load');
-
-      const config = {
-        svcId: 'tcs',
-        theme: {
-          name: 'modern',
-        },
-      };
-
-      const loadPromise = loadOmnibar(config);
-
-      expect(BBOmnibarVertical.load).toHaveBeenCalledWith(
-        config,
-        getIframeEl()
-      );
-
-      fireMessageEvent({
-        messageType: 'ready',
-      });
-
-      await loadPromise;
-
-      expect(postOmnibarMessageSpy.calls.argsFor(1)).toEqual([
-        getIframeEl(),
-        jasmine.objectContaining({
-          compactNavOnly: true,
-        }),
-      ]);
-
-      expect(pushNotificationsConnectSpy).toHaveBeenCalledWith(
-        jasmine.objectContaining({
-          showVerticalNav: true,
-        })
-      );
+    it('should load based on service ID when the theme is modern', async () => {
+      await validateVerticalNavExists('cid');
+      await validateVerticalNavExists('tcs');
     });
 
     it('should ignore the anchor portion of the URL if present', () => {
       spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
         'https://example.com?foo=bar#leftnav=1'
       );
-      spyOn(BBOmnibarVertical, 'load');
 
       const config = {
         theme: {
@@ -1584,7 +1565,6 @@ describe('Omnibar', () => {
       spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
         'https://example.com?leftnav=1'
       );
-      spyOn(BBOmnibarVertical, 'load');
 
       startTrackingSpy.and.callFake(
         async (refreshUserCallback: () => Promise<void>) => {
@@ -1624,7 +1604,6 @@ describe('Omnibar', () => {
       spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
         'https://example.com?leftnav=1'
       );
-      spyOn(BBOmnibarVertical, 'load');
 
       const config = {
         theme: {
@@ -1645,7 +1624,6 @@ describe('Omnibar', () => {
       spyOn(BBAuthInterop, 'getCurrentUrl').and.returnValue(
         'https://example.com?modernnav=1'
       );
-      spyOn(BBOmnibarVertical, 'load');
 
       const config = {
         theme: {

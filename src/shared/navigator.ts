@@ -3,15 +3,17 @@ import { BBAuthTokenErrorCode } from '../auth';
 const SIGNIN_BASE_URL = 'https://signin.blackbaud.com/signin/';
 const ERROR_BASE_URL = 'https://host.nxt.blackbaud.com/errors/';
 
-const euc = encodeURIComponent;
-
 function paramsToQS(params: Record<string, unknown>) {
   const qs = [];
 
   for (const p in params) {
     /* istanbul ignore else */
     if (params.hasOwnProperty(p)) {
-      qs.push(`${euc(p)}=${euc(params[p] as string | number | boolean)}`);
+      qs.push(
+        `${encodeURIComponent(p)}=${encodeURIComponent(
+          params[p] as string | number | boolean
+        )}`
+      );
     }
   }
 
@@ -19,7 +21,9 @@ function paramsToQS(params: Record<string, unknown>) {
 }
 
 function createSigninUrl(inactive?: boolean) {
-  let url = `${SIGNIN_BASE_URL}?redirectUrl=${euc(location.href)}`;
+  let url = `${SIGNIN_BASE_URL}?redirectUrl=${encodeURIComponent(
+    location.href
+  )}`;
 
   if (inactive) {
     url += '&inactivity=1';
@@ -52,7 +56,7 @@ export class BBAuthNavigator {
 
   public static redirectToSignoutForInactivity() {
     const signinUrl = createSigninUrl(true);
-    const signoutUrl = `${SIGNIN_BASE_URL}sign-out?redirectUrl=${euc(
+    const signoutUrl = `${SIGNIN_BASE_URL}sign-out?redirectUrl=${encodeURIComponent(
       signinUrl
     )}`;
 
@@ -73,12 +77,12 @@ export class BBAuthNavigator {
         break;
     }
 
-    let url = `${ERROR_BASE_URL}${path}?source=auth-client&url=${euc(
+    let url = `${ERROR_BASE_URL}${path}?source=auth-client&url=${encodeURIComponent(
       location.href
     )}`;
 
     if (errorCode) {
-      url += `&code=${euc(errorCode)}`;
+      url += `&code=${encodeURIComponent(errorCode)}`;
     }
 
     this.navigate(url);

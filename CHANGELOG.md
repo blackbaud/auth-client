@@ -1,3 +1,16 @@
+# 2.71.1 (2023-11-01)
+
+- Remove `encodeURIComponent` aliases for better static code analysis. [#247](https://github.com/blackbaud/auth-client/pull/247)
+
+# 2.71.0 (2023-08-25)
+
+- Display vertical nav for `cid`. [#246](https://github.com/blackbaud/auth-client/pull/246)
+
+# 2.70.0 (2023-08-17)
+
+- Added BBTM urls to auth domain whitelist. [#245](https://github.com/blackbaud/auth-client/pull/245) (Thanks @Blackbaud-VeehaKhanna)
+-
+
 # 2.69.0 (2023-07-19)
 
 - Added `mpebill` to the list of valid service IDs for notifications. [#243](https://github.com/blackbaud/auth-client/pull/243/)
