@@ -1,3 +1,7 @@
+# 2.72.0 (2024-01-10)
+
+- Added NPOc url to auth domain whitelist. [#251](https://github.com/blackbaud/auth-client/pull/251) (Thanks @Blackbaud-VeehaKhanna) 
+
 # 2.71.1 (2023-11-01)
 
 - Remove `encodeURIComponent` aliases for better static code analysis. [#247](https://github.com/blackbaud/auth-client/pull/247)
@@ -9,7 +13,6 @@
 # 2.70.0 (2023-08-17)
 
 - Added BBTM urls to auth domain whitelist. [#245](https://github.com/blackbaud/auth-client/pull/245) (Thanks @Blackbaud-VeehaKhanna)
--
 
 # 2.69.0 (2023-07-19)
 
