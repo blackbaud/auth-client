@@ -1,6 +1,10 @@
+# 2.73.0 (2024-01-11)
+
+- Display vertical nav for `1bbfun`. [#252](https://github.com/blackbaud/auth-client/pull/252)
+
 # 2.72.0 (2024-01-10)
 
-- Added NPOc url to auth domain whitelist. [#251](https://github.com/blackbaud/auth-client/pull/251) (Thanks @Blackbaud-VeehaKhanna) 
+- Added NPOc url to auth domain whitelist. [#251](https://github.com/blackbaud/auth-client/pull/251) (Thanks @Blackbaud-VeehaKhanna)
 
 # 2.71.1 (2023-11-01)
 
