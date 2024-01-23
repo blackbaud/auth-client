@@ -108,6 +108,7 @@ function collapseIframe(): void {
 function showVerticalNav(): boolean {
   if (isModernTheme()) {
     switch (omnibarConfig.svcId) {
+      case '1bbfun':
       case 'cid':
       case 'tcs':
         return true;

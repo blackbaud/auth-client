@@ -1539,6 +1539,7 @@ describe('Omnibar', () => {
     });
 
     it('should load based on service ID when the theme is modern', async () => {
+      await validateVerticalNavExists('1bbfun');
       await validateVerticalNavExists('cid');
       await validateVerticalNavExists('tcs');
     });
