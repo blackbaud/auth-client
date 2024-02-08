@@ -2,8 +2,5 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
   "prettier.requireConfig": true,
-  "editor.rulers": [
-    120
-  ],
-  "WhiteSource Advise.Diff.BaseBranch": "master"
+  "editor.rulers": [120]
 }
