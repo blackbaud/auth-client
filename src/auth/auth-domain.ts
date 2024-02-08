@@ -21,6 +21,8 @@ const thirdPartyDomainSTSUrlMappings: { [domain: string]: string } = {
   'myschooldemo.com': 'https://sts-sso.myschooldemo.com',
   'myschooltraining.com': 'https://sts-sso.myschooltraining.com',
   'nonprofit.yourcause.com':'https://npoc.nonprofit.yourcause.com',
+  'npo.yourcausetest.com' : 'https://npoc.npo.yourcausetest.com',
+  'npo.yourcauseuat.com': 'https://npoc.npo.yourcauseuat.com',
   'sharedservices-dev.com': 'https://sts.sharedservices-dev.com',
   'smartaidforparents-com-stage.smarttuition.net':
     'https://account.smartaidforparents-com-stage.smarttuition.net',

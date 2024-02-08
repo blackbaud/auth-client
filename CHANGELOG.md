@@ -1,3 +1,7 @@
+# 2.74.0 (2024-01-23)
+
+- Added NPO test urls to auth domain whitelist [#253](https://github.com/blackbaud/auth-client/pull/253) (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.73.0 (2024-01-11)
 
 - Display vertical nav for `1bbfun`. [#252](https://github.com/blackbaud/auth-client/pull/252)
