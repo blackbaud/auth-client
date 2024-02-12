@@ -1,3 +1,7 @@
+# 2.75.0 (2024-02-08)
+
+- Added NPO dev url to auth domain whitelist [#254](https://github.com/blackbaud/auth-client/pull/254) (Thanks @Blackbaud-VeehaKhanna)
+
 # 2.74.0 (2024-01-23)
 
 - Added NPO test urls to auth domain whitelist [#253](https://github.com/blackbaud/auth-client/pull/253) (Thanks @Blackbaud-VeehaKhanna)
