@@ -116,7 +116,8 @@ export class BBAuth {
         disableRedirect,
         args.envId,
         args.permissionScope,
-        args.leId
+        args.leId,
+        args.svcId
       )
         .then((tokenResponse: BBAuthTokenResponse) => {
           cachedItem.expirationTime =

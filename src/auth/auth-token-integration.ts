@@ -13,7 +13,8 @@ export class BBAuthTokenIntegration {
     disableRedirect?: boolean,
     envId?: string,
     permissionScope?: string,
-    leId?: string
+    leId?: string,
+    svcId?: string
   ): Promise<unknown> {
     if (
       BBAuthDomain.getRegisteredDomain() === undefined &&
@@ -24,6 +25,7 @@ export class BBAuthTokenIntegration {
         envId,
         leId,
         permissionScope,
+        svcId
       });
     }
 
@@ -34,7 +36,8 @@ export class BBAuthTokenIntegration {
       envId,
       permissionScope,
       leId,
-      true
+      true,
+      svcId
     );
   }
 
