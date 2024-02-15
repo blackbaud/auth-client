@@ -1,6 +1,6 @@
 # 2.76.0 (2024-02-15)
 
-- Add svc_id to request token
+- Add svc_id to request token [#255](https://github.com/blackbaud/auth-client/pull/255)
 
 # 2.75.0 (2024-02-08)
 
