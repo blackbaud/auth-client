@@ -101,7 +101,7 @@ function requestToken(
     permissionScope,
     !!((envId || leId) && permissionScope)
   );
-  body = addToRequestBody(body, 'svc_id', svcId, !!(envId || leId));
+  body = addToRequestBody(body, 'svc_id', svcId, !!((envId || leId) && svcId));
 
   return new Promise<unknown>((resolve, reject) => {
     post(

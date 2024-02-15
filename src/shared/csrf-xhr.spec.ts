@@ -428,7 +428,10 @@ describe('Auth token integration', () => {
       undefined,
       undefined,
       'abc',
-      '123'
+      '123',
+      undefined,
+      undefined,
+      '' /* Ignore blank svcid */
     );
 
     const csrfRequest = jasmine.Ajax.requests.mostRecent();
