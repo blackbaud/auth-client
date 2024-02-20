@@ -1,3 +1,7 @@
+# 2.76.0 (2024-02-15)
+
+- Add svc_id to request token [#255](https://github.com/blackbaud/auth-client/pull/255)
+
 # 2.75.0 (2024-02-08)
 
 - Added NPO dev url to auth domain whitelist [#254](https://github.com/blackbaud/auth-client/pull/254) (Thanks @Blackbaud-VeehaKhanna)

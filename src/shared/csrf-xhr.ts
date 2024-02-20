@@ -88,7 +88,8 @@ function requestToken(
   csrfValue: string,
   envId?: string,
   permissionScope?: string,
-  leId?: string
+  leId?: string,
+  svcId?: string
 ) {
   let body: Record<string, string>;
 
@@ -100,6 +101,7 @@ function requestToken(
     permissionScope,
     !!((envId || leId) && permissionScope)
   );
+  body = addToRequestBody(body, 'svc_id', svcId, !!((envId || leId) && svcId));
 
   return new Promise<unknown>((resolve, reject) => {
     post(
@@ -126,7 +128,8 @@ export class BBCsrfXhr {
     envId?: string,
     permissionScope?: string,
     leId?: string,
-    bypassCsrf?: boolean
+    bypassCsrf?: boolean,
+    svcId?: string
   ) {
     if (permissionScope && !envId && !leId) {
       return Promise.reject({
@@ -160,7 +163,8 @@ export class BBCsrfXhr {
             csrfResponse['csrf_token'],
             envId,
             permissionScope,
-            leId
+            leId,
+            svcId
           );
         })
         .then(resolve)

@@ -198,6 +198,7 @@ describe('Auth', () => {
         true,
         undefined,
         undefined,
+        undefined,
         undefined
       );
       done();
@@ -213,6 +214,7 @@ describe('Auth', () => {
         undefined,
         'abc',
         '123',
+        undefined,
         undefined
       );
       done();
@@ -227,7 +229,8 @@ describe('Auth', () => {
         undefined,
         undefined,
         undefined,
-        'bar'
+        'bar',
+        undefined
       );
       done();
     });
@@ -239,7 +242,31 @@ describe('Auth', () => {
       leId: 'baz',
       permissionScope: '123',
     }).then(() => {
-      expect(getTokenSpy).toHaveBeenCalledWith(undefined, 'abc', '123', 'baz');
+      expect(getTokenSpy).toHaveBeenCalledWith(
+        undefined,
+        'abc',
+        '123',
+        'baz',
+        undefined
+      );
+      done();
+    });
+  });
+
+  it('should pass legal entity ID, environment ID, permission scope, and svc ID', (done) => {
+    BBAuth.getToken({
+      envId: 'abc',
+      leId: 'baz',
+      permissionScope: '123',
+      svcId: 'cool-svc',
+    }).then(() => {
+      expect(getTokenSpy).toHaveBeenCalledWith(
+        undefined,
+        'abc',
+        '123',
+        'baz',
+        'cool-svc'
+      );
       done();
     });
   });

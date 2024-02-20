@@ -37,7 +37,8 @@ describe('Auth token integration', () => {
         undefined,
         undefined,
         undefined,
-        true
+        true,
+        undefined
       );
     });
 
@@ -51,7 +52,8 @@ describe('Auth token integration', () => {
         'abc',
         '123',
         undefined,
-        true
+        true,
+        undefined
       );
     });
 
@@ -65,7 +67,23 @@ describe('Auth token integration', () => {
         'abc',
         '123',
         'xyz',
-        true
+        true,
+        undefined
+      );
+    });
+
+    it('should request a token with envId, permissionScope, leId, and svcid', () => {
+      BBAuthTokenIntegration.getToken(true, 'abc', '123', 'xyz', 'cool-svc');
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        'https://sts.sky.blackbaud.com/oauth2/token',
+        undefined,
+        true,
+        'abc',
+        '123',
+        'xyz',
+        true,
+        'cool-svc'
       );
     });
   });
@@ -87,6 +105,7 @@ describe('Auth token integration', () => {
         envId: undefined,
         leId: undefined,
         permissionScope: undefined,
+        svcId: undefined,
       });
     });
   });
@@ -115,7 +134,8 @@ describe('Auth token integration', () => {
         undefined,
         undefined,
         undefined,
-        true
+        true,
+        undefined
       );
     });
 
@@ -129,7 +149,8 @@ describe('Auth token integration', () => {
         'abc',
         '123',
         undefined,
-        true
+        true,
+        undefined
       );
     });
 
@@ -143,7 +164,23 @@ describe('Auth token integration', () => {
         'abc',
         '123',
         'xyz',
-        true
+        true,
+        undefined
+      );
+    });
+
+    it('should request a token with envId, permissionScope, leId, and svcId', () => {
+      BBAuthTokenIntegration.getToken(true, 'abc', '123', 'xyz', 'cool-svc');
+
+      expect(requestSpy).toHaveBeenCalledWith(
+        'https://myRegisteredThirdPartySTS.com/oauth2/token',
+        undefined,
+        true,
+        'abc',
+        '123',
+        'xyz',
+        true,
+        'cool-svc'
       );
     });
   });

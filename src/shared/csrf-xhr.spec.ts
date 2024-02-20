@@ -428,7 +428,10 @@ describe('Auth token integration', () => {
       undefined,
       undefined,
       'abc',
-      '123'
+      '123',
+      undefined,
+      undefined,
+      '' /* Ignore blank svcid */
     );
 
     const csrfRequest = jasmine.Ajax.requests.mostRecent();
@@ -453,6 +456,155 @@ describe('Auth token integration', () => {
           environment_id: 'abc',
           permission_scope: '123',
         });
+
+        done();
+      }
+    });
+  });
+
+  it('should add the environment ID, permission scope, and service ID to the request body', (done) => {
+    BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      'abc',
+      '123',
+      undefined,
+      undefined,
+      'cool-svc'
+    );
+
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc',
+      }),
+      status: 200,
+    });
+
+    // Wait for the token request to kick off.
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        const requestData = tokenRequest.data();
+
+        expect(requestData).toEqual({
+          environment_id: 'abc',
+          permission_scope: '123',
+          svc_id: 'cool-svc',
+        });
+
+        done();
+      }
+    });
+  });
+
+  it('should add the environment ID and service ID to the request body', (done) => {
+    BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      'abc',
+      undefined,
+      undefined,
+      undefined,
+      'cool-svc'
+    );
+
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc',
+      }),
+      status: 200,
+    });
+
+    // Wait for the token request to kick off.
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        const requestData = tokenRequest.data();
+
+        expect(requestData).toEqual({
+          environment_id: 'abc',
+          svc_id: 'cool-svc',
+        });
+
+        done();
+      }
+    });
+  });
+
+  it('should add the legal entity ID and service ID to the request body', (done) => {
+    BBCsrfXhr.request(
+      'https://example.com/token',
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      'leid',
+      undefined,
+      'cool-svc'
+    );
+
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc',
+      }),
+      status: 200,
+    });
+
+    // Wait for the token request to kick off.
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        const requestData = tokenRequest.data();
+
+        expect(requestData).toEqual({
+          legal_entity_id: 'leid',
+          svc_id: 'cool-svc',
+        });
+
+        done();
+      }
+    });
+  });
+
+  it('should ignore service ID if environment ID and legal entity ID are not provided', (done) => {
+    BBCsrfXhr.request('https://example.com/token');
+
+    const csrfRequest = jasmine.Ajax.requests.mostRecent();
+
+    csrfRequest.respondWith({
+      responseText: JSON.stringify({
+        csrf_token: 'abc',
+      }),
+      status: 200,
+    });
+
+    // Wait for the token request to kick off.
+    const intervalId = setInterval(() => {
+      const tokenRequest = jasmine.Ajax.requests.mostRecent();
+
+      if (tokenRequest.url === 'https://example.com/token') {
+        clearInterval(intervalId);
+
+        const requestData = tokenRequest.data();
+
+        expect(requestData).toEqual({});
 
         done();
       }

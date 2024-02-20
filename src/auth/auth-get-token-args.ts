@@ -8,4 +8,6 @@ export interface BBAuthGetTokenArgs {
   forceNewToken?: boolean;
 
   disableRedirect?: boolean;
+
+  svcId?: string;
 }
