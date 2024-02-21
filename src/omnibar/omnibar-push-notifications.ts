@@ -74,6 +74,9 @@ const notificationSvcIds: Record<
   highered: {
     requiresNotif: false,
   },
+  1bbfun: {
+    requiresNotif: false,
+  },
 };
 
 async function initToastContainer(
