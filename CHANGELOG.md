@@ -1,3 +1,7 @@
+# 2.77.0 (2024-02-22)
+
+- Added `1bbfun` to the list of valid service IDs for notifications. [#257](https://github.com/blackbaud/auth-client/pull/257)
+
 # 2.76.0 (2024-02-15)
 
 - Add svc_id to request token [#255](https://github.com/blackbaud/auth-client/pull/255)
