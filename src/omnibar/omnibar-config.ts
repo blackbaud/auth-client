@@ -60,4 +60,6 @@ export interface BBOmnibarConfig {
   getRouteDetails?: (args: { href: string; pathname: string }) => {
     category?: string;
   };
+
+  nonce?: string;
 }

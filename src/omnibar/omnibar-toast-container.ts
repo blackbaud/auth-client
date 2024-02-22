@@ -46,11 +46,10 @@ function handleGetToken(
   );
 }
 
-function getContainerEl(): HTMLDivElement {
+function getContainerEl(nonce?: string): HTMLDivElement {
   /* istanbul ignore else */
   if (!iframeEl) {
-    styleEl = BBAuthDomUtility.addCss(
-      `
+    const css = `
 .${CLS_TOAST_CONTAINER} {
   border: none;
   display: none;
@@ -69,8 +68,9 @@ function getContainerEl(): HTMLDivElement {
 .${CLS_TOAST_CONTAINER_EMPTY} {
   visibility: hidden;
 }
-`
-    );
+`;
+
+    styleEl = BBAuthDomUtility.addCss(css, nonce);
 
     iframeEl = document.createElement('iframe');
     iframeEl.src = BBOmnibarToastContainer.CONTAINER_URL;
@@ -180,7 +180,7 @@ export class BBOmnibarToastContainer {
     if (!initPromise) {
       initPromise = new Promise((resolve) => {
         initResolve = resolve;
-        getContainerEl();
+        getContainerEl(args.nonce);
       });
     }
 

@@ -169,7 +169,7 @@ function addStyleEl(): void {
     }
   }
 
-  styleEl = BBAuthDomUtility.addCss(`
+  const css = `
 body {
   margin-top: ${OMNIBAR_HEIGHT}px;
 }
@@ -250,7 +250,9 @@ body {
 .${CLS_ENVIRONMENT_VISIBLE} .sky-omnibar-environment {
   height: ${ENVIRONMENT_HEIGHT}px;
 }
-`);
+`;
+
+  styleEl = BBAuthDomUtility.addCss(css, omnibarConfig.nonce);
 
   updateSize();
 }

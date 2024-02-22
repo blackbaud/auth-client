@@ -23,8 +23,8 @@ function showPicker(
   let styleEl: HTMLStyleElement;
   let iframeEl: HTMLIFrameElement;
 
-  function addStyleEl() {
-    styleEl = BBAuthDomUtility.addCss(`
+  function addStyleEl(nonce?: string) {
+    const css = `
 .sky-omnibar-welcome-iframe {
   background-color: #fff;
   border: none;
@@ -35,7 +35,9 @@ function showPicker(
   width: 100%;
   z-index: 10000;
 }
-`);
+`;
+
+    styleEl = BBAuthDomUtility.addCss(css, nonce);
   }
 
   function addIframeEl() {
@@ -132,7 +134,7 @@ function showPicker(
     }
   }
 
-  addStyleEl();
+  addStyleEl(args.nonce);
   addIframeEl();
 
   window.addEventListener('message', messageHandler);

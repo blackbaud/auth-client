@@ -34,6 +34,8 @@ import { BBOmnibarToastContainer } from './omnibar-toast-container';
 
 import { BBOmnibarVertical } from './omnibar-vertical';
 
+import { getNonceStyleCount } from './testing/omnibar-test-utility';
+
 describe('Omnibar', () => {
   const BASE_URL = 'about:blank';
 
@@ -179,6 +181,18 @@ describe('Omnibar', () => {
 
     expect(iframeEl.src).toBe(BASE_URL + '?hostid=omnibar');
     expect(iframeEl.title).toBe('Navigation');
+  });
+
+  it('should add the specified nonce to dynamic styles', () => {
+    const nonce = '0mn1bar';
+
+    expect(getNonceStyleCount(nonce)).toBe(0);
+
+    loadOmnibar({
+      nonce,
+    });
+
+    expect(getNonceStyleCount(nonce)).toBe(1);
   });
 
   it('should load omnibar with query parameters correctly', () => {
@@ -1496,11 +1510,12 @@ describe('Omnibar', () => {
     async function validateVerticalNavExists(svcId?: string): Promise<void> {
       loadSpy.calls.reset();
 
-      const config = {
+      const config: BBOmnibarConfig = {
         svcId,
         theme: {
           name: 'modern',
         },
+        nonce: 'nonce-omnibar-vertical',
       };
 
       const loadPromise = loadOmnibar(config);

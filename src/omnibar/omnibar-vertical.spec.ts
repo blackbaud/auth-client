@@ -13,6 +13,7 @@ import { BBOmnibarConfig } from './omnibar-config';
 import { BBOmnibarResizeArgs } from './omnibar-resize-args';
 
 import { BBOmnibarVertical } from './omnibar-vertical';
+import { getNonceStyleCount } from './testing/omnibar-test-utility';
 
 describe('Omnibar vertical', () => {
   type MediaQueryChangeListener = (ev: MediaQueryListEvent) => void;
@@ -140,6 +141,18 @@ describe('Omnibar vertical', () => {
 
     expect(iframeEl.src).toBe(BASE_URL);
     expect(iframeEl.title).toBe('Vertical Navigation');
+  });
+
+  it('should add the specified nonce to dynamic styles', async () => {
+    const nonce = '0mn1bar-V3rt1ca1';
+
+    expect(getNonceStyleCount(nonce)).toBe(0);
+
+    await loadOmnibarVertical({
+      nonce,
+    });
+
+    expect(getNonceStyleCount(nonce)).toBe(1);
   });
 
   it('should only display the wrapper element until the vertical omnibar is ready for display', async () => {

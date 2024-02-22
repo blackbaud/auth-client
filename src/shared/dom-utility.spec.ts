@@ -37,6 +37,16 @@ describe('DOM utility', () => {
     expect(styleEl.textContent).toBe(testCss);
   });
 
+  it('should add a nonce to CSS elements if specified', () => {
+    const testCss = '.test-class { color: green }';
+
+    const styleEl = BBAuthDomUtility.addCss(testCss, 'abc');
+
+    testStyleEls.push(styleEl);
+
+    expect(styleEl.nonce).toBe('abc');
+  });
+
   it('should allow elements to be added to the top of the body', () => {
     const el = document.createElement('div');
 

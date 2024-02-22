@@ -91,8 +91,8 @@ function addIframeEl(afterEl: HTMLElement): void {
   document.body.classList.add(CLS_BODY);
 }
 
-function addStyleEl(): void {
-  styleEl = BBAuthDomUtility.addCss(`
+function addStyleEl(nonce?: string): void {
+  const css = `
 .${CLS_IFRAME_WRAPPER} {
   position: fixed;
   top: 50px;
@@ -140,7 +140,9 @@ function addStyleEl(): void {
     display: none;
   }
 }
-`);
+`;
+
+  styleEl = BBAuthDomUtility.addCss(css, nonce);
 }
 
 function windowMediaQueryChange(): void {
@@ -283,7 +285,7 @@ export class BBOmnibarVertical {
     return new Promise<void>(async (resolve) => {
       promiseResolve = resolve;
 
-      addStyleEl();
+      addStyleEl(config.nonce);
 
       try {
         currentSettings = await BBUserSettings.getSettings();

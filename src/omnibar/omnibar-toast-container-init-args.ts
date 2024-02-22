@@ -20,4 +20,6 @@ export interface BBOmnibarToastContainerInitArgs {
   svcId: string;
 
   url: string;
+
+  nonce?: string;
 }

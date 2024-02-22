@@ -5,6 +5,8 @@ import { BBAuth } from '../auth';
 import { BBOmnibarToastContainer } from './omnibar-toast-container';
 
 import { BBAuthInterop } from '../shared/interop';
+import { BBOmnibarToastContainerInitArgs } from './omnibar-toast-container-init-args';
+import { getNonceStyleCount } from './testing/omnibar-test-utility';
 
 //#endregion
 
@@ -40,8 +42,11 @@ describe('Omnibar toast container', () => {
     );
   }
 
-  function loadToastContainer(): Promise<void> {
+  function loadToastContainer(
+    config?: Partial<BBOmnibarToastContainerInitArgs>
+  ): Promise<void> {
     const initPromise = BBOmnibarToastContainer.init({
+      ...(config ?? {}),
       envId: 'abc',
       leId: '123',
       navigateCallback: navigateCallbackSpy,
@@ -168,6 +173,22 @@ describe('Omnibar toast container', () => {
     expect(iframeEl.src).toBe(CONTAINER_URL);
     expect(getComputedStyle(iframeEl).visibility).toBe('hidden');
     expect(iframeEl.title).toBe('Toast container');
+  });
+
+  it('should add the specified nonce to dynamic styles', () => {
+    const nonce = '0mn1bar-T0ast-C0nta1n3r';
+
+    expect(getNonceStyleCount(nonce)).toBe(0);
+
+    loadToastContainer({
+      nonce,
+    });
+
+    fireMessageEvent({
+      messageType: 'toast-ready',
+    });
+
+    expect(getNonceStyleCount(nonce)).toBe(1);
   });
 
   it('should not create another toast container IFRAME if it has already been created', async () => {
