@@ -38,7 +38,7 @@ export class BBOmnibarUserActivityPrompt {
 
   public static show(args: BBOmnibarUserActivityPromptShowArgs) {
     function addStyleEl() {
-      styleEl = BBAuthDomUtility.addCss(`
+      const css = `
   .sky-omnibar-inactivity-iframe {
     background-color: transparent;
     border: none;
@@ -54,7 +54,9 @@ export class BBOmnibarUserActivityPrompt {
   .sky-omnibar-inactivity-iframe-ready {
     visibility: visible;
   }
-  `);
+  `;
+
+      styleEl = BBAuthDomUtility.addCss(css, args.nonce);
     }
 
     function addIframeEl() {

@@ -3,6 +3,7 @@
 import { BBAuthInterop } from '../shared/interop';
 
 import { BBOmnibarUserActivityPrompt } from './omnibar-user-activity-prompt';
+import { getNonceStyleCount } from './testing/omnibar-test-utility';
 
 //#endregion
 
@@ -74,6 +75,19 @@ describe('User activity prompt', () => {
     expect(iframeStyle.visibility).toBe('hidden');
     expect(iframeStyle.width).toBe(document.documentElement.clientWidth + 'px');
     expect(iframeStyle.zIndex).toBe('100000');
+  });
+
+  it('should add the specified nonce to dynamic styles', () => {
+    const nonce = '0mn1bar-Us3r-1nact1v1ty';
+
+    expect(getNonceStyleCount(nonce)).toBe(0);
+
+    BBOmnibarUserActivityPrompt.show({
+      sessionRenewCallback: () => undefined,
+      nonce,
+    });
+
+    expect(getNonceStyleCount(nonce)).toBe(1);
   });
 
   it('should post the host-ready message and show the IFRAME when the inactivity prompt IFRAME is ready', () => {

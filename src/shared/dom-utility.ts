@@ -1,6 +1,10 @@
 export class BBAuthDomUtility {
-  public static addCss(css: string): HTMLStyleElement {
+  public static addCss(css: string, nonce?: string): HTMLStyleElement {
     const styleEl = document.createElement('style');
+
+    if (nonce) {
+      styleEl.nonce = nonce;
+    }
 
     styleEl.appendChild(document.createTextNode(css));
 
