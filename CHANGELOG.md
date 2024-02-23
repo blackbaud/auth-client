@@ -1,3 +1,7 @@
+# 2.78.0 (2024-02-23)
+
+- Add `nonce` option to omnibar for dynamic styles. [#258](https://github.com/blackbaud/auth-client/pull/258)
+
 # 2.77.0 (2024-02-22)
 
 - Added `1bbfun` to the list of valid service IDs for notifications. [#257](https://github.com/blackbaud/auth-client/pull/257)
